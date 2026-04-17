@@ -69,18 +69,6 @@ public class AeroNeoForgeClientEvents {
         }
 
         @SubscribeEvent
-        public static void registerBlockLayersEvent(final ForgeVeilRegisterBlockLayersEvent event) {
-            event.registerBlockLayer(AeroRenderTypes.levitite());
-            event.registerBlockLayer(AeroRenderTypes.levititeGhosts());
-        }
-
-        @SubscribeEvent
-        public static void registerFixedBuffersEvent(final ForgeVeilRegisterFixedBuffersEvent event) {
-            event.register(RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES, AeroRenderTypes.levitite());
-            event.register(RenderLevelStageEvent.Stage.AFTER_WEATHER, AeroRenderTypes.levititeGhosts());
-        }
-
-        @SubscribeEvent
         public static void registerRegisterStageEvent(final RenderLevelStageEvent.RegisterStageEvent event) {
             event.register(Aeronautics.path("levitite"), AeroRenderTypes.levitite());
             event.register(Aeronautics.path("levitite_ghosts"), AeroRenderTypes.levititeGhosts());
