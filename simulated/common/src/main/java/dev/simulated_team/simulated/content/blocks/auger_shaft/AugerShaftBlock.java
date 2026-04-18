@@ -51,6 +51,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -264,7 +265,7 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
 
         @Override
         public String getSerializedName() {
-            return this.toString().toLowerCase();
+            return this.toString().toLowerCase(Locale.ROOT);
         }
     }
 

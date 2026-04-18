@@ -158,7 +158,7 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
 
         @Override
         public String getSerializedName() {
-            return this.toString().toLowerCase();
+            return this.toString().toLowerCase(Locale.ROOT);
         }
     }
 }

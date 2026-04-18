@@ -34,6 +34,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
+
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
 public class AltitudeSensorBlock extends FaceAttachedHorizontalDirectionalBlock implements IBE<AltitudeSensorBlockEntity>, IWrenchable, CommonRedstoneBlock {
@@ -177,7 +179,7 @@ public class AltitudeSensorBlock extends FaceAttachedHorizontalDirectionalBlock 
 
         @Override
         public @NotNull String getSerializedName() {
-            return this.toString().toLowerCase();
+            return this.toString().toLowerCase(Locale.ROOT);
         }
     }
 
