@@ -1,0 +1,86 @@
+{
+  "item.aeronautics.aviators_goggles.tooltip": {
+    "behaviour1": "Кинетические компоненты показывают дополнительное воздействие напряжения или несущую способность. Стрессометры отображают статистику подключенной к ним кинетической сети. Некоторые другие блоки отображают информацию, такую ​​как содержимое предмета и жидкости.",
+    "condition1": "При рассмотрении блоков",
+    "summary": "Дополняет ваш HUD различной информацией о компонентах мест."
+  },
+
+  "jukebox_song.aeronautics.cloud_skipper": "Старлотта - Облачный Шкипер",
+
+  "aeronautics": {
+    "simulated_section.aeronautics": "Aeronautics",
+
+    "unit": {
+      "kpg": "%s kpg",
+      "mpg": "%s Mpg",
+      "gpg": "%s Gpg",
+      "pn": "%s pN",
+      "kpn": "%s kpN",
+      "mpn": "%s MpN",
+      "gpn": "%s GpN",
+      "meter_cubed": "%s m³",
+      "meters_per_second": "%s m/s"
+    },
+    "tooltip": {
+      "capacity_used": "Использованное кинетическое напряжение:"
+    },
+    "scroll_option": {
+      "hot_air_amount": "Максимальная производительность по подаче горячего воздуха",
+      "thrust_direction": "Направление тяги"
+    },
+    "generic": {
+      "pull_when_clockwise": "Втягивание воздуха происходит при вращении по часовой стрелке.",
+      "push_when_clockwise": "Нагнетайте воздух, вращая по часовой стрелке.",
+      "hot_air": "Hot Air"
+    },
+    "display_source": {
+      "propeller": {
+        "data": "Данные о винте",
+        "thrust": "Толкать",
+        "airflow": "Расход воздуха"
+      },
+      "lifting_gas": {
+        "data": "Данные по подъему газа",
+        "volume": "Объем",
+        "total_lift": "Полный подъем"
+      }
+    },
+    "propeller": {
+      "thrust": "Толкать: %s",
+      "airflow": "Расход воздуха: %s",
+      "can_lift": "Может поднимать: %s",
+      "sails": "Паруса"
+    },
+    "potato_cannon": {
+      "ammo": "Боеприпасы: %s x%s",
+      "attack_damage": "Урон от атаки: %s",
+      "knockback": "Отбрасывание: %s",
+      "reload_ticks": "Перезагрузить тики: %s"
+    },
+    "boiler": {
+      "via_one_vent": "через 1 вентиляционное отверстие",
+      "via_vents": "через %1$s вентиляционные отверстия"
+    },
+    "lifting_gas": {
+      "default": "Газ",
+      "steam": "Пар",
+
+      "gas_output": "%s вывод: %s",
+      "balloon": "Воздушный шар: ",
+      "fill": "Наполнять... %s",
+      "total_lift": "Общий лифт: %s",
+      "balloon_volume": "Объем баллона: % от",
+      "no_suitable_balloon": "Подходящего воздушного шара не найдено."
+    }
+  },
+
+  "block": {
+    "aeronautics": {
+      "smart_propeller.tooltip": {
+        "summary": "Создает тягу при вращении. Наклоняет винт вдоль одной оси, стремясь направить его вверх.",
+        "condition1": "При нажатии правой кнопки мыши с помощью гаечного ключа",
+        "behaviour1": "Изменяет направление вращения винта, создающего тягу."
+      }
+    }
+  }
+}
