@@ -6,7 +6,6 @@ import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.block.WrenchableDirectionalBlock;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.BlockSubLevelAssemblyListener;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.data.SimLang;
@@ -36,7 +35,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SpringBlock extends WrenchableDirectionalBlock implements IBE<SpringBlockEntity>, BlockSubLevelAssemblyListener, IWrenchable {
-    public static final EnumProperty<Size> SIZE = EnumProperty.create("size", Size .class);
+    public static final EnumProperty<Size> SIZE = EnumProperty.create("size", Size.class);
 
     public SpringBlock(final Properties properties) {
         super(properties);
@@ -166,17 +165,19 @@ public class SpringBlock extends WrenchableDirectionalBlock implements IBE<Sprin
         MEDIUM("medium"),
         LARGE("large");
 
-        private final static Size[] VALUES = values();
+        private static final Size[] VALUES = values();
         private final String name;
 
         Size(final String name) {
             this.name = name;
         }
 
+        @Override
         public String toString() {
             return this.name;
         }
 
+        @Override
         public String getSerializedName() {
             return this.name;
         }
