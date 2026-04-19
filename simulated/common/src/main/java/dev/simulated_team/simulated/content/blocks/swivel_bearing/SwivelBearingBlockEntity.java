@@ -15,7 +15,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintConfiguration;
@@ -23,10 +22,12 @@ import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintHandle;
 import dev.ryanhcode.sable.api.schematic.SubLevelSchematicSerializationContext;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.config.server.physics.SimPhysics;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.SwivelBearingPlateBlock;
@@ -34,6 +35,7 @@ import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.Swi
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import dev.simulated_team.simulated.index.SimBlocks;
+import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimAssemblyHelper;
 import dev.simulated_team.simulated.util.SimLevelUtil;
@@ -52,8 +54,10 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -393,11 +397,12 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
     }
 
     public void assemble() {
-        final BlockPos toAssemble = this.getBlockPos().relative(this.getBlockState().getValue(SwivelBearingBlock.FACING));
+        final BlockPos pos = this.getBlockPos();
+        final BlockPos toAssemble = pos.relative(this.getBlockState().getValue(SwivelBearingBlock.FACING));
         final SimAssemblyHelper.AssemblyResult result;
 
         try {
-            result = SimAssemblyHelper.assembleFromSingleBlock(this.getLevel(), this.getBlockPos(), toAssemble, false, false);
+            result = SimAssemblyHelper.assembleFromSingleBlock(this.level, pos, toAssemble, false, false);
             this.lastException = null;
         } catch (final AssemblyException e) {
             this.lastException = e;
@@ -407,26 +412,67 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
         this.sendData();
 
+        final ServerSubLevel assembledSubLevel;
+        final BlockPos assembleOffset;
+        final BlockState link = SimBlocks.SWIVEL_BEARING_LINK_BLOCK.getDefaultState()
+                .setValue(SwivelBearingPlateBlock.FACING, this.getBlockState().getValue(SwivelBearingBlock.FACING));
+
         if (result != null) {
-            this.getLevel().setBlockAndUpdate(this.getBlockPos(), this.getBlockState().setValue(SwivelBearingBlock.ASSEMBLED, true));
+            assembledSubLevel = (ServerSubLevel) result.subLevel();
+            assembleOffset = result.offset();
+        } else {
+            final ServerSubLevelContainer container = (ServerSubLevelContainer) SubLevelContainer.getContainer(this.level);
 
-            final SubLevel assembledSubLevel = result.subLevel();
-            final BlockPos assembleOffset = result.offset();
+            final Pose3d pose = new Pose3d();
+            pose.position().set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
-            this.attachConstraints(assembledSubLevel, this.getConstraintPos(toAssemble, assembleOffset));
-            this.setSubLevelID(assembledSubLevel.getUniqueId());
+            assembledSubLevel = (ServerSubLevel) container.allocateNewSubLevel(pose);
+            final LevelPlot plot = assembledSubLevel.getPlot();
 
-            final BlockPos plotPos = this.getBlockPos().offset(assembleOffset);
-            this.getLevel().setBlockAndUpdate(plotPos, SimBlocks.SWIVEL_BEARING_LINK_BLOCK.getDefaultState().setValue(SwivelBearingPlateBlock.FACING, this.getBlockState().getValue(SwivelBearingBlock.FACING)));
-            final BlockEntity be = this.getLevel().getBlockEntity(plotPos);
+            final ChunkPos center = plot.getCenterChunk();
+            plot.newEmptyChunk(center);
+            plot.getEmbeddedLevelAccessor().setBlock(BlockPos.ZERO, link, 3);
 
-            if (be instanceof final SwivelBearingPlateBlockEntity plateBE) {
-                plateBE.setParent(this);
-                this.setPlatePos(plotPos);
+            final BlockPos plotAnchor = plot.getCenterBlock();
+            final Vector3dc centerOfMass = assembledSubLevel.getMassTracker().getCenterOfMass();
+            Vector3d subLevelCenter = JOMLConversion.atLowerCornerOf(pos);
+
+            if (centerOfMass != null) {
+                subLevelCenter.add(centerOfMass.x() - plotAnchor.getX(), centerOfMass.y() - plotAnchor.getY(), centerOfMass.z() - plotAnchor.getZ());
+            } else {
+                assembledSubLevel.logicalPose().rotationPoint()
+                        .set(plotAnchor.getX() + 0.5, plotAnchor.getY() + 0.5, plotAnchor.getZ() + 0.5);
             }
 
-            SimAdvancements.YOU_SPIN_ME_RIGHT_ROUND.awardToNearby(this.getBlockPos(), this.getLevel());
+            assembledSubLevel.logicalPose().position().set(subLevelCenter.x, subLevelCenter.y, subLevelCenter.z);
+            assembleOffset = plotAnchor.subtract(pos);
+
+            final SubLevelPhysicsSystem physicsSystem = container.physicsSystem();
+            final PhysicsPipeline pipeline = physicsSystem.getPipeline();
+
+            pipeline.teleport(assembledSubLevel, assembledSubLevel.logicalPose().position(), assembledSubLevel.logicalPose().orientation());
+            assembledSubLevel.updateLastPose();
+
+            this.level.playSound(null, pos, SimSoundEvents.SIMULATED_CONTRAPTION_MOVES.event(), SoundSource.BLOCKS, 1.0f, 1.0f);
         }
+
+        this.getLevel().setBlockAndUpdate(pos, this.getBlockState().setValue(SwivelBearingBlock.ASSEMBLED, true));
+
+        this.attachConstraints(assembledSubLevel, this.getConstraintPos(toAssemble, assembleOffset));
+        this.setSubLevelID(assembledSubLevel.getUniqueId());
+
+        final BlockPos plotPos = pos.offset(assembleOffset);
+        if (result != null) {
+            this.getLevel().setBlockAndUpdate(plotPos, link);
+        }
+        final BlockEntity be = this.getLevel().getBlockEntity(plotPos);
+
+        if (be instanceof final SwivelBearingPlateBlockEntity plateBE) {
+            plateBE.setParent(this);
+            this.setPlatePos(plotPos);
+        }
+
+        SimAdvancements.YOU_SPIN_ME_RIGHT_ROUND.awardToNearby(pos, this.getLevel());
     }
 
     public void disassemble() {
@@ -741,7 +787,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
     /**
      * TODO: separate icon for the locked settings
-      */
+     */
     public enum LockingSetting implements INamedIconOptions {
         LOCKED_ALWAYS(AllIcons.I_CONFIG_LOCKED, "swivel_default_always_locked"),
         LOCKED_DEFAULT(AllIcons.I_CONFIG_LOCKED, "swivel_default_locked"),
