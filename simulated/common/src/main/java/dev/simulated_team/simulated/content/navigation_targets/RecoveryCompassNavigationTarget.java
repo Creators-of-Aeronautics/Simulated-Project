@@ -47,4 +47,13 @@ public class RecoveryCompassNavigationTarget implements NavigationTarget {
 				.set(SimDataComponents.COMPASS_PLACER_UUID, player.getUUID().toString())
 				.build());
 	}
+
+	@Override
+	public java.util.Map<String, Object> getPeripheralMetadata(final NavTableBlockEntity be, final ItemStack self) {
+		final String placer = self.getComponents().get(SimDataComponents.COMPASS_PLACER_UUID);
+		if (placer == null) {
+			return java.util.Map.of();
+		}
+		return java.util.Map.of("placer", placer);
+	}
 }

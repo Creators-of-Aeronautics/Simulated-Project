@@ -10,6 +10,7 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 
 import java.util.List;
+import java.util.Map;
 
 public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
 
@@ -35,6 +36,15 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
         }
         final ResourceLocation key = SimRegistries.NAVIGATION_TARGET.getKey(nti);
         return key != null ? key.toString() : null;
+    }
+
+    @LuaFunction
+    public Map<String, Object> getTargetMetadata() {
+        final NavigationTarget nti = this.blockEntity.getNavTableItem();
+        if (nti == null) {
+            return Map.of();
+        }
+        return nti.getPeripheralMetadata(this.blockEntity, this.blockEntity.getHeldItem());
     }
 
     @LuaFunction
