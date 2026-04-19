@@ -88,8 +88,6 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
 
         this.sailPositions = new ArrayList<>();
         this.thrustDirection = new Vector3d();
-
-        this.behavior.setThrustDirection(this.thrustDirection);
     }
 
     private static double getConfigAirflowMult() {
@@ -397,6 +395,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     public void contraptionInitialize() {
         final Direction direction = this.getBlockState().getValue(PropellerBearingBlock.FACING);
         this.thrustDirection.set(direction.getStepX(), direction.getStepY(), direction.getStepZ());
+        this.behavior.setThrustDirection(this.thrustDirection);
         this.findSails();
     }
 

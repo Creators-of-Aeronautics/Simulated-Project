@@ -43,14 +43,20 @@ public class AeroSoundDistUtil {
         final ClientLevel level = minecraft.level;
         final SoundManager soundManager = minecraft.getSoundManager();
 
-        if (level != null) {
-            if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND)) {
-                soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND);
-            }
+        if (level == null) {
+            return;
+        }
 
-            if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND)) {
-                soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND);
-            }
+        if (minecraft.isPaused()) {
+            return;
+        }
+
+        if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND)) {
+            soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND);
+        }
+
+        if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND)) {
+            soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND);
         }
     }
 
