@@ -53,7 +53,7 @@ public class ClientBalloonEffectRenderer {
         }
 
         final BalloonMap ballonMap = BalloonMap.MAP.get(level);
-        if (ballonMap.isEmpty()) {
+        if (ballonMap == null || ballonMap.isEmpty()) {
             freeFbo();
             return;
         }

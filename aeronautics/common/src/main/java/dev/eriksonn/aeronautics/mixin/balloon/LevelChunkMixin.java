@@ -35,7 +35,10 @@ public class LevelChunkMixin {
         final BlockState oldState = original.call(instance, pX, pY, pZ, newState);
 
         if (this.level.isClientSide() && oldState != newState) {
-            BalloonMap.MAP.get(this.level).updateNearbyBalloons(this.simulated$blockSet, oldState, newState);
+            final BalloonMap balloonMap = BalloonMap.MAP.get(this.level);
+            if (balloonMap != null) {
+                balloonMap.updateNearbyBalloons(this.simulated$blockSet, oldState, newState);
+            }
         }
 
         return oldState;

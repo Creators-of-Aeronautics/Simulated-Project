@@ -30,12 +30,13 @@ public class SimAssemblyHelperMixin {
                                                 final CallbackInfo ci,
                                                 @Local final SubLevelAssemblyHelper.AssemblyTransform transform) {
         final BalloonMap balloonMap = BalloonMap.MAP.get(level);
-
-        for (final Balloon balloon : balloonMap.getBalloons()) {
-            final BlockPos controllerPos = balloon.getControllerPos();
-            if (toDisassemble.getPlot().contains(controllerPos.getX(), controllerPos.getZ())) {
-                balloon.setAssembling(transform);
-                return;
+        if (balloonMap != null) {
+            for (final Balloon balloon : balloonMap.getBalloons()) {
+                final BlockPos controllerPos = balloon.getControllerPos();
+                if (toDisassemble.getPlot().contains(controllerPos.getX(), controllerPos.getZ())) {
+                    balloon.setAssembling(transform);
+                    return;
+                }
             }
         }
     }

@@ -36,7 +36,10 @@ public class BalloonMap {
     }
 
     public static void tick(final Level level) {
-        MAP.get(level).tick();
+        final BalloonMap balloonMap = MAP.get(level);
+        if (balloonMap != null) {
+            balloonMap.tick();
+        }
     }
 
     public static void physicsTick(final ServerLevel level, final double timeStep) {
@@ -234,18 +237,20 @@ public class BalloonMap {
                 final LevelPlot plot = subLevel.getPlot();
 
                 final BalloonMap map = BalloonMap.MAP.get(this.level);
-                final Iterator<Balloon> iter = map.getBalloons().iterator();
+                if (map != null) {
+                    final Iterator<Balloon> iter = map.getBalloons().iterator();
 
-                while (iter.hasNext()) {
-                    final Balloon balloon = iter.next();
+                    while (iter.hasNext()) {
+                        final Balloon balloon = iter.next();
 
-                    if (balloon.isAssembling())
-                        continue;
+                        if (balloon.isAssembling())
+                            continue;
 
-                    final BlockPos controllerPos = balloon.getControllerPos();
-                    if (plot.contains(controllerPos.getX(), controllerPos.getZ())) {
-                        balloon.onRemoved();
-                        iter.remove();
+                        final BlockPos controllerPos = balloon.getControllerPos();
+                        if (plot.contains(controllerPos.getX(), controllerPos.getZ())) {
+                            balloon.onRemoved();
+                            iter.remove();
+                        }
                     }
                 }
             }

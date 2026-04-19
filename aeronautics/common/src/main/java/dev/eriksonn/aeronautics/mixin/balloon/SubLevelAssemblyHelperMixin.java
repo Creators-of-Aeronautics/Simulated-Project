@@ -28,11 +28,12 @@ public class SubLevelAssemblyHelperMixin {
     @Inject(method = "needsBitSet", at = @At("HEAD"), cancellable = true)
     private static void aeronautics$needsBitSet(final ServerLevel level, final BoundingBox3ic bounds, final List<Entity> entities, final CallbackInfoReturnable<Boolean> cir) {
         final BalloonMap balloonMap = BalloonMap.MAP.get(level);
-
-        for (final Balloon balloon : balloonMap.getBalloons()) {
-            if (balloon.getBounds().intersects(bounds)) {
-                cir.setReturnValue(true);
-                return;
+        if (balloonMap != null) {
+            for (final Balloon balloon : balloonMap.getBalloons()) {
+                if (balloon.getBounds().intersects(bounds)) {
+                    cir.setReturnValue(true);
+                    return;
+                }
             }
         }
     }
@@ -45,28 +46,29 @@ public class SubLevelAssemblyHelperMixin {
                                              final CallbackInfo ci,
                                              @Local final BoundedBitVolume3i volume) {
         final BalloonMap balloonMap = BalloonMap.MAP.get(level);
-
-        for (final Balloon balloon : balloonMap.getBalloons()) {
-            if (!balloon.getBounds().intersects(bounds)) {
-                continue;
-            }
-
-            boolean shouldMoveBalloon = false;
-
-            for (final Direction direction : SimDirectionUtil.VALUES) {
-                final BlockPos relativePos = balloon.getControllerPos().relative(direction);
-
-                if (volume.getOccupied(relativePos.getX(), relativePos.getY(), relativePos.getZ())) {
-                    shouldMoveBalloon = true;
-                    break;
+        if (balloonMap != null) {
+            for (final Balloon balloon : balloonMap.getBalloons()) {
+                if (!balloon.getBounds().intersects(bounds)) {
+                    continue;
                 }
-            }
 
-            if (!shouldMoveBalloon) {
-                continue;
-            }
+                boolean shouldMoveBalloon = false;
 
-            balloon.setAssembling(transform);
+                for (final Direction direction : SimDirectionUtil.VALUES) {
+                    final BlockPos relativePos = balloon.getControllerPos().relative(direction);
+
+                    if (volume.getOccupied(relativePos.getX(), relativePos.getY(), relativePos.getZ())) {
+                        shouldMoveBalloon = true;
+                        break;
+                    }
+                }
+
+                if (!shouldMoveBalloon) {
+                    continue;
+                }
+
+                balloon.setAssembling(transform);
+            }
         }
     }
 

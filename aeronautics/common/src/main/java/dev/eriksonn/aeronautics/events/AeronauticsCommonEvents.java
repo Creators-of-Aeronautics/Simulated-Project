@@ -27,7 +27,10 @@ public class AeronauticsCommonEvents {
      * Called whenever a block is modified in the given level
      */
     public static void onBlockModifiedEvent(final LevelAccessor level, final BlockPos blockPos, final BlockState oldState, final BlockState newState) {
-        BalloonMap.MAP.get(level).updateNearbyBalloons(blockPos, oldState, newState);
+        final BalloonMap balloonMap = BalloonMap.MAP.get(level);
+        if (balloonMap != null) {
+            balloonMap.updateNearbyBalloons(blockPos, oldState, newState);
+        }
     }
 
     /**

@@ -30,7 +30,9 @@ public class BalloonLevelSavedData extends SavedData {
             final DataResult<Pair<List<SavedBalloon>, Tag>> result = CODEC.decode(NbtOps.INSTANCE, tag.getList(ID, Tag.TAG_COMPOUND));
 
             final BalloonMap map = BalloonMap.MAP.get(level);
-            result.ifSuccess(x -> map.getUnloadedBalloons().addAll(x.getFirst()));
+            if (map != null) {
+                result.ifSuccess(x -> map.getUnloadedBalloons().addAll(x.getFirst()));
+            }
         }
         return sd;
     }
@@ -47,14 +49,16 @@ public class BalloonLevelSavedData extends SavedData {
     @Override
     public @NotNull CompoundTag save(final CompoundTag tag, final HolderLookup.@NotNull Provider provider) {
         final BalloonMap map = BalloonMap.MAP.get(this.level);
-        final ObjectArrayList<SavedBalloon> list = new ObjectArrayList<>(map.getUnloadedBalloons());
+        if (map != null) {
+            final ObjectArrayList<SavedBalloon> list = new ObjectArrayList<>(map.getUnloadedBalloons());
 
-        for (final Balloon balloon : map.getBalloons()) {
-            list.add(BalloonMap.saveBalloon((ServerBalloon) balloon));
+            for (final Balloon balloon : map.getBalloons()) {
+                list.add(BalloonMap.saveBalloon((ServerBalloon) balloon));
+            }
+
+            final DataResult<Tag> result = CODEC.encodeStart(NbtOps.INSTANCE, list);
+            result.ifSuccess(data -> tag.put(ID, data));
         }
-
-        final DataResult<Tag> result = CODEC.encodeStart(NbtOps.INSTANCE, list);
-        result.ifSuccess(data -> tag.put(ID, data));
 
         return tag;
     }

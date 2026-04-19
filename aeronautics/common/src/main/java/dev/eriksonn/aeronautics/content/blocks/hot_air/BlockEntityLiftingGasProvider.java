@@ -101,12 +101,18 @@ public interface BlockEntityLiftingGasProvider {
         final BlockPos castPos = this.getCastPosition();
 
         if (castPos != null) {
-            final Balloon existingBalloon = BalloonMap.MAP.get(this.getLevel()).getBalloon(castPos);
+            final Level level = this.getLevel();
+            if (level != null) {
+                final BalloonMap balloonMap = BalloonMap.MAP.get(level);
+                if (balloonMap != null) {
+                    final Balloon existingBalloon = balloonMap.getBalloon(castPos);
 
-            if (existingBalloon != null) {
-                // Yip yip!
-                existingBalloon.addHeater(this);
-                this.setBalloon(existingBalloon);
+                    if (existingBalloon != null) {
+                        // Yip yip!
+                        existingBalloon.addHeater(this);
+                        this.setBalloon(existingBalloon);
+                    }
+                }
             }
         }
     }
@@ -171,7 +177,10 @@ public interface BlockEntityLiftingGasProvider {
                 final Level level = this.getLevel();
                 assert level != null;
 
-                BalloonMap.MAP.get(level).unloadBalloon(serverBalloon);
+                final BalloonMap balloonMap = BalloonMap.MAP.get(level);
+                if (balloonMap != null) {
+                    balloonMap.unloadBalloon(serverBalloon);
+                }
             }
 
             this.setBalloon(null);
