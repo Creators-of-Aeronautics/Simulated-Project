@@ -80,6 +80,7 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
     private double XAngle;
 
     private final Vector3d angularVelocityBody = new Vector3d();
+    private final Vector3d gravityBody = new Vector3d();
 
     public GimbalSensorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
@@ -131,6 +132,10 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
         if (subLevel instanceof final ServerSubLevel serverSubLevel) {
             RigidBodyHandle.of(serverSubLevel).getAngularVelocity(this.angularVelocityBody);
             serverSubLevel.logicalPose().orientation().transformInverse(this.angularVelocityBody);
+
+            final Vector3dc worldPos = Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.atCenterOf(this.getBlockPos()));
+            this.gravityBody.set(DimensionPhysicsData.getGravity(this.getLevel(), worldPos));
+            serverSubLevel.logicalPose().orientation().transformInverse(this.gravityBody);
         }
     }
 
@@ -310,6 +315,10 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
 
     public Vector3dc getAngularVelocityBody() {
         return this.angularVelocityBody;
+    }
+
+    public Vector3dc getGravityBody() {
+        return this.gravityBody;
     }
 
     @Override

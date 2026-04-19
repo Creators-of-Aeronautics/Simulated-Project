@@ -38,4 +38,10 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
         final Vector3dc w = this.blockEntity.getAngularVelocityBody();
         return List.of(w.x(), w.y(), w.z());
     }
+
+    @LuaFunction
+    public List<Double> getGravity() {
+        final Vector3dc g = this.blockEntity.getGravityBody();
+        return List.of(g.x(), g.y(), g.z());
+    }
 }
