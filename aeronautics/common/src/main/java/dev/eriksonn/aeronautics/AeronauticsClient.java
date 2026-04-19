@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics;
 
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.effect.ClientBalloonEffectRenderer;
+import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.swivel_bearing.SwivelBearingParticleHandler;
 import dev.eriksonn.aeronautics.content.ponder.AeroPonderPlugin;
 import dev.eriksonn.aeronautics.index.AeroClickInteractions;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
@@ -19,6 +20,7 @@ public class AeronauticsClient {
         AeroPartialModels.init();
         AeroSituationalMusic.init();
         AeroClickInteractions.init();
+        SwivelBearingParticleHandler.init();
 
         registerEvents();
     }

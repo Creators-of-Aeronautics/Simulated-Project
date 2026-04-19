@@ -1,7 +1,10 @@
 package dev.simulated_team.simulated.content.blocks.swivel_bearing;
 
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.IDisplayAssemblyExceptions;
+import com.simibubi.create.content.equipment.armor.DivingBootsItem;
+import com.simibubi.create.content.kinetics.fan.AirCurrent;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
@@ -20,13 +23,22 @@ import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintConfiguration;
 import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintHandle;
+
+import dev.ryanhcode.sable.api.block.BlockSubLevelLiftProvider;
+import dev.ryanhcode.sable.api.physics.force.ForceGroups;
+import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
+import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.schematic.SubLevelSchematicSerializationContext;
+import dev.ryanhcode.sable.api.sublevel.KinematicContraption;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.ryanhcode.sable.companion.math.Pose3d;
+import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import dev.ryanhcode.sable.sublevel.plot.ServerLevelPlot;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.config.server.physics.SimPhysics;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.SwivelBearingPlateBlock;
@@ -54,6 +66,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -63,6 +76,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,6 +92,13 @@ import static net.minecraft.ChatFormatting.GOLD;
 
 public class SwivelBearingBlockEntity extends KineticBlockEntity implements ExtraKinetics, IDisplayAssemblyExceptions, BlockEntitySubLevelActor {
     private static final MutableComponent SCROLL_OPTION_TITLE = Component.translatable(Simulated.MOD_ID + ".scroll_option.swivel_default_locked");
+
+    /**
+     * Optional client-side particle spawner for rotor airflow.
+     * Set by aeronautics module to use custom PropellerAirParticle.
+     */
+    @Nullable
+    public static java.util.function.Consumer<SwivelBearingBlockEntity> rotorParticleSpawner = null;
 
     @NotNull
     private final SwivelBearingCogwheelBlockEntity cogwheel;
@@ -122,6 +143,18 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
      * The locked default scroll option
      */
     private ScrollOptionBehaviour<LockingSetting> lockedDefaultOption;
+    /**
+     * Rotor radius in blocks (computed server-side, synced to client for particles)
+     */
+    private float rotorRadius = 0;
+    /**
+     * Net thrust vector (world space, impulse/tick). Synced to client for particle direction.
+     */
+    private final org.joml.Vector3f thrustVector = new org.joml.Vector3f();
+    /**
+     * Cached airflow speed in m/tick (= airflow_m_per_s / 20). Updated in physicsTick or computeThrustFromCogwheel.
+     */
+    private float cachedAirflowTickSpeed = 0;
 
     public SwivelBearingBlockEntity(final BlockEntityType<?> typeIn, final BlockPos pos, final BlockState state) {
         super(typeIn, pos, state);
@@ -159,6 +192,10 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         if (level.isClientSide) {
             if (this.isTooFast()) {
                 this.playGrindingEffect();
+            }
+
+            if (this.isAssembled() && this.cogwheel.getSpeed() != 0) {
+                this.spawnRotorParticles();
             }
 
             return;
@@ -252,6 +289,14 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         this.assembleNextTick = false;
+
+        if (this.isAssembled() && this.getContainingSubLevel() == null) {
+            this.computeThrustFromCogwheel();
+        }
+
+        if (this.isAssembled() && this.cachedAirflowTickSpeed > 0.001f && this.thrustVector.lengthSquared() > 0.0001f) {
+            this.pushEntities();
+        }
     }
 
     private void playGrindingEffect() {
@@ -270,6 +315,292 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             this.level.addParticle(ParticleTypes.CRIT, particlePos.x, particlePos.y, particlePos.z, 0.0f, 0.0f, 0.0f);
         }
+    }
+
+    private void spawnRotorParticles() {
+        if (rotorParticleSpawner != null) {
+            rotorParticleSpawner.accept(this);
+        }
+    }
+
+    private static final double PUSH_FRICTION_SCALE = 0.2;
+    private static final double PUSH_LIFETIME = 20.0;
+    private static final double MAX_PUSH_ACCEL = 5.0;
+
+    /**
+     * Computes thrust from cogwheel RPM when the bearing is NOT inside a SubLevel.
+     * Mirrors the logic in sable$physicsTick but uses Create kinetic speed instead of physics angular velocity.
+     */
+    private void computeThrustFromCogwheel() {
+        if (this.subLevelID == null) return;
+        final SubLevel attached = this.getAttachedSubLevel();
+        if (!(attached instanceof final ServerSubLevel rotorSubLevel)) return;
+
+        final float rpm = this.limitCogSpeed(this.cogwheel.getSpeed());
+        if (Math.abs(rpm) < 0.01f) {
+            if (this.thrustVector.lengthSquared() > 0) {
+                this.thrustVector.set(0, 0, 0);
+                this.cachedAirflowTickSpeed = 0;
+                this.sendData();
+            }
+            return;
+        }
+
+        final double angularSpeed = Math.abs(rpm) * Math.PI / 600.0;
+        if (angularSpeed < 0.01) return;
+
+        final Direction facing = this.getBlockState().getValue(SwivelBearingBlock.FACING);
+        final Vector3d worldAxis = new Vector3d(facing.getStepX(), facing.getStepY(), facing.getStepZ());
+
+        final ServerLevelPlot rotorPlot = rotorSubLevel.getPlot();
+        final Pose3d rotorPose = rotorSubLevel.logicalPose();
+        final Vector3dc rotorCenter = rotorPose.position();
+        if (!Double.isFinite(rotorCenter.x())) return;
+
+        final SubLevelPhysicsSystem physicsSystem =
+                ((ServerSubLevelContainer) SubLevelContainer.getContainer(this.level)).physicsSystem();
+        final Pose3d localPose = new Pose3d();
+
+        final Vector3d sailNormal = new Vector3d();
+        final Vector3d sailPos = new Vector3d();
+        final Vector3d offset = new Vector3d();
+
+        int totalSails = 0;
+        double maxRadiusSq = 0;
+        for (final KinematicContraption kc : rotorPlot.getContraptions()) {
+            final var sails = kc.sable$liftProviders();
+            if (sails.isEmpty()) continue;
+            kc.sable$getLocalPose(localPose, physicsSystem.getPartialPhysicsTick());
+            for (final var entry : sails.values()) {
+                totalSails++;
+                sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+                localPose.transformPosition(sailPos);
+                rotorPose.transformPosition(sailPos);
+                sailPos.sub(rotorCenter, offset);
+                maxRadiusSq = Math.max(maxRadiusSq, offset.lengthSquared());
+            }
+        }
+        for (final var entry : rotorPlot.getLiftProviders()) {
+            totalSails++;
+            sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+            rotorPose.transformPosition(sailPos);
+            sailPos.sub(rotorCenter, offset);
+            maxRadiusSq = Math.max(maxRadiusSq, offset.lengthSquared());
+        }
+        if (totalSails < 1) return;
+
+        final float newRadius = (float) Math.sqrt(maxRadiusSq);
+        if (Math.abs(newRadius - this.rotorRadius) > 0.1f) {
+            this.rotorRadius = newRadius;
+        }
+
+        final double timeStep = 1.0 / 20.0;
+        final Vector3d bearingWorldPos = JOMLConversion.atCenterOf(this.getBlockPos());
+        final double airPressure = DimensionPhysicsData.getAirPressure(this.level, bearingWorldPos);
+        final double airflow = Math.sqrt(totalSails) * angularSpeed
+                * SimConfigService.INSTANCE.server().physics.swivelBearingAirflowMult.get();
+        this.cachedAirflowTickSpeed = (float) (airflow / 20.0);
+        final double totalImpulse = Math.pow(totalSails, 1.5) * angularSpeed
+                * SimConfigService.INSTANCE.server().physics.swivelBearingRotorThrust.get()
+                * airPressure * timeStep;
+        if (totalImpulse < 1e-10) return;
+
+        final Vector3d rotorAngVel = new Vector3d(worldAxis).mul(angularSpeed * Math.signum(rpm));
+        final Vector3d tangentialVel = new Vector3d();
+        final Vector3d netForce = new Vector3d();
+        double totalV = 0;
+
+        for (final KinematicContraption kc : rotorPlot.getContraptions()) {
+            final var sails = kc.sable$liftProviders();
+            if (sails.isEmpty()) continue;
+            kc.sable$getLocalPose(localPose, physicsSystem.getPartialPhysicsTick());
+            for (final var entry : sails.values()) {
+                sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+                localPose.transformPosition(sailPos);
+                rotorPose.transformPosition(sailPos);
+                sailPos.sub(rotorCenter, offset);
+                rotorAngVel.cross(offset, tangentialVel);
+                totalV += tangentialVel.length();
+            }
+        }
+        for (final var entry : rotorPlot.getLiftProviders()) {
+            sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+            rotorPose.transformPosition(sailPos);
+            sailPos.sub(rotorCenter, offset);
+            rotorAngVel.cross(offset, tangentialVel);
+            totalV += tangentialVel.length();
+        }
+        if (totalV < 0.01) return;
+
+        final double symmetricMult = SimConfigService.INSTANCE.server().physics.swivelBearingSymmetricMult.get();
+        final Vector3d sailForce = new Vector3d();
+
+        for (final KinematicContraption kc : rotorPlot.getContraptions()) {
+            final var sails = kc.sable$liftProviders();
+            if (sails.isEmpty()) continue;
+            kc.sable$getLocalPose(localPose, physicsSystem.getPartialPhysicsTick());
+            for (final var entry : sails.values()) {
+                sailNormal.set(entry.dir().x(), entry.dir().y(), entry.dir().z());
+                sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+                localPose.transformNormal(sailNormal);
+                localPose.transformPosition(sailPos);
+                rotorPose.transformNormal(sailNormal);
+                rotorPose.transformPosition(sailPos);
+                sailPos.sub(rotorCenter, offset);
+                rotorAngVel.cross(offset, tangentialVel);
+                final double vSail = tangentialVel.length();
+                if (vSail < 0.01) continue;
+
+                final double cosA = sailNormal.dot(worldAxis);
+                if (entry.state().getBlock() instanceof BlockSubLevelLiftProvider prov
+                        && prov.sable$getLiftScalar() <= 0) {
+                    final double absCosA = Math.abs(cosA);
+                    final double sinA = Math.sqrt(Math.max(0, 1.0 - absCosA * absCosA));
+                    final double effectivePitch = sinA * absCosA * symmetricMult;
+                    if (effectivePitch < 1e-6) continue;
+                    final double normalDotFlow = sailNormal.dot(tangentialVel);
+                    final double sign = -Math.signum(normalDotFlow);
+                    if (sign == 0) continue;
+                    sailForce.set(worldAxis).mul(sign * totalImpulse * (vSail / totalV) * effectivePitch);
+                } else {
+                    final double effectivePitch = Math.abs(cosA);
+                    if (effectivePitch < 1e-6) continue;
+                    sailForce.set(sailNormal).negate().mul(totalImpulse * (vSail / totalV) * effectivePitch);
+                }
+                if (Double.isFinite(sailForce.lengthSquared())) netForce.add(sailForce);
+            }
+        }
+        for (final var entry : rotorPlot.getLiftProviders()) {
+            sailNormal.set(entry.dir().x(), entry.dir().y(), entry.dir().z());
+            sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+            rotorPose.transformNormal(sailNormal);
+            rotorPose.transformPosition(sailPos);
+            sailPos.sub(rotorCenter, offset);
+            rotorAngVel.cross(offset, tangentialVel);
+            final double vSail = tangentialVel.length();
+            if (vSail < 0.01) continue;
+
+            final double cosA = sailNormal.dot(worldAxis);
+            if (entry.state().getBlock() instanceof BlockSubLevelLiftProvider prov
+                    && prov.sable$getLiftScalar() <= 0) {
+                final double absCosA = Math.abs(cosA);
+                final double sinA = Math.sqrt(Math.max(0, 1.0 - absCosA * absCosA));
+                final double effectivePitch = sinA * absCosA * symmetricMult;
+                if (effectivePitch < 1e-6) continue;
+                final double normalDotFlow = sailNormal.dot(tangentialVel);
+                final double sign = -Math.signum(normalDotFlow);
+                if (sign == 0) continue;
+                sailForce.set(worldAxis).mul(sign * totalImpulse * (vSail / totalV) * effectivePitch);
+            } else {
+                final double effectivePitch = Math.abs(cosA);
+                if (effectivePitch < 1e-6) continue;
+                sailForce.set(sailNormal).negate().mul(totalImpulse * (vSail / totalV) * effectivePitch);
+            }
+            if (Double.isFinite(sailForce.lengthSquared())) netForce.add(sailForce);
+        }
+
+        final org.joml.Vector3f newThrust = new org.joml.Vector3f((float) netForce.x, (float) netForce.y, (float) netForce.z);
+        if (newThrust.distanceSquared(this.thrustVector) > 0.01f) {
+            this.thrustVector.set(newThrust);
+            this.sendData();
+        }
+    }
+
+    /**
+     * Pushes nearby entities using rotor wind, similar to PropellerActorBehaviour.pushEntities().
+     * Uses the cached thrustVector and rotorRadius.
+     */
+    private void pushEntities() {
+        final float thrustMag = this.thrustVector.length();
+        if (thrustMag < 0.01f || this.rotorRadius < 0.5f) return;
+
+        final Vector3d windDir = new Vector3d(-this.thrustVector.x / thrustMag, -this.thrustVector.y / thrustMag, -this.thrustVector.z / thrustMag);
+
+        final double airflowTickSpeed = this.cachedAirflowTickSpeed;
+        if (Math.abs(airflowTickSpeed) < 0.001) return;
+
+        final double range = Math.log(Math.abs(airflowTickSpeed) * PUSH_FRICTION_SCALE * PUSH_LIFETIME + 1) / PUSH_FRICTION_SCALE;
+
+        final Direction facing = this.getFacing();
+        final Vector3d center = JOMLConversion.atCenterOf(this.getBlockPos());
+        center.add(facing.getStepX(), facing.getStepY(), facing.getStepZ());
+
+        final SubLevel subLevel = Sable.HELPER.getContaining(this);
+        final Vector3d transformedWindDir = new Vector3d(windDir);
+        if (subLevel != null) {
+            subLevel.logicalPose().transformPosition(center);
+        }
+
+        final double r = this.rotorRadius + 1.0;
+        final double d0 = Math.min(0, range);
+        final double d1 = Math.max(0, range);
+        final AABB aabb = new AABB(
+                center.x - r, center.y - r, center.z - r,
+                center.x + r, center.y + r, center.z + r
+        ).expandTowards(transformedWindDir.x * d1, transformedWindDir.y * d1, transformedWindDir.z * d1)
+         .expandTowards(transformedWindDir.x * d0, transformedWindDir.y * d0, transformedWindDir.z * d0);
+
+        final double airPressure = DimensionPhysicsData.getAirPressure(this.level, center);
+
+        for (final Entity entity : this.level.getEntities((Entity) null, aabb)) {
+            if (entity instanceof AbstractContraptionEntity
+                    || AirCurrent.isPlayerCreativeFlying(entity)
+                    || DivingBootsItem.isWornBy(entity)) {
+                continue;
+            }
+
+            final Vec3 ec = entity.getBoundingBox().getCenter();
+            final Vector3d toEntity = new Vector3d(ec.x - center.x, ec.y - center.y, ec.z - center.z);
+
+            final double axialDist = transformedWindDir.dot(toEntity);
+            final Vector3d radialVec = new Vector3d(toEntity).fma(-axialDist, transformedWindDir);
+            final double radialDistSq = radialVec.lengthSquared();
+
+            if (axialDist <= 0 || radialDistSq > r * r) continue;
+
+            final double distScale = axialDist * PUSH_FRICTION_SCALE;
+            final double forceScale = Math.exp(-distScale);
+            if (forceScale < 0.01) continue;
+
+            final float modifier = entity.isShiftKeyDown() ? 0.125f : 1;
+            final double acceleration = PUSH_FRICTION_SCALE * PUSH_LIFETIME * 0.55
+                    * airflowTickSpeed * modifier * forceScale * Math.min(airPressure, 1);
+
+            final Vec3 prevMotion = entity.getDeltaMovement();
+            entity.setDeltaMovement(prevMotion.add(
+                    Math.min(Math.max(transformedWindDir.x * acceleration - prevMotion.x, -MAX_PUSH_ACCEL), MAX_PUSH_ACCEL) * (1 / 8.0),
+                    Math.min(Math.max(transformedWindDir.y * acceleration - prevMotion.y, -MAX_PUSH_ACCEL), MAX_PUSH_ACCEL) * (1 / 8.0),
+                    Math.min(Math.max(transformedWindDir.z * acceleration - prevMotion.z, -MAX_PUSH_ACCEL), MAX_PUSH_ACCEL) * (1 / 8.0)));
+            entity.fallDistance = 0;
+        }
+    }
+
+    /**
+     * @return the facing direction of this bearing
+     */
+    public Direction getFacing() {
+        return this.getBlockState().getValue(SwivelBearingBlock.FACING);
+    }
+
+    /**
+     * @return the cogwheel speed (RPM)
+     */
+    public float getCogwheelSpeed() {
+        return this.cogwheel.getSpeed();
+    }
+
+    /**
+     * @return the rotor radius in blocks (synced from server)
+     */
+    public float getRotorRadius() {
+        return this.rotorRadius;
+    }
+
+    /**
+     * @return the net thrust vector (world space, impulse/tick, synced from server)
+     */
+    public org.joml.Vector3fc getThrustVector() {
+        return this.thrustVector;
     }
 
     @Override
@@ -390,6 +721,197 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
         this.handle.setMotor(RotaryConstraintHandle.DEFAULT_AXIS, goal, kP, kD, false, 0.0);
         this.handle.setContactsEnabled(false);
+    }
+
+    @Override
+    public void sable$physicsTick(final ServerSubLevel subLevel, final RigidBodyHandle handle, final double timeStep) {
+        if (!this.isAssembled() || this.subLevelID == null) return;
+
+        final SubLevel attached = this.getAttachedSubLevel();
+        if (!(attached instanceof final ServerSubLevel rotorSubLevel)) return;
+
+        final RigidBodyHandle rotorHandle = RigidBodyHandle.of(rotorSubLevel);
+        if (rotorHandle == null) return;
+
+        final Direction facing = this.getBlockState().getValue(SwivelBearingBlock.FACING);
+        final Pose3d vehiclePose = subLevel.logicalPose();
+        final Vector3d worldAxis = new Vector3d(facing.getStepX(), facing.getStepY(), facing.getStepZ());
+        vehiclePose.transformNormal(worldAxis);
+        if (!Double.isFinite(worldAxis.lengthSquared())) return;
+
+        final Vector3d rotorAngVel = rotorHandle.getAngularVelocity(new Vector3d());
+        if (!Double.isFinite(rotorAngVel.lengthSquared())) return;
+        final double angularSpeed = Math.abs(rotorAngVel.dot(worldAxis));
+        if (angularSpeed < 0.01) return;
+
+        final ServerLevelPlot rotorPlot = rotorSubLevel.getPlot();
+
+        final Vector3d bearingWorldPos = JOMLConversion.atCenterOf(this.getBlockPos());
+        vehiclePose.transformPosition(bearingWorldPos);
+        if (!Double.isFinite(bearingWorldPos.lengthSquared())) return;
+
+        final Pose3d rotorPose = rotorSubLevel.logicalPose();
+        final Vector3dc rotorCenter = rotorPose.position();
+        if (!Double.isFinite(rotorCenter.x()) || !Double.isFinite(rotorCenter.y())
+                || !Double.isFinite(rotorCenter.z())) return;
+        final SubLevelPhysicsSystem physicsSystem =
+                ((ServerSubLevelContainer) SubLevelContainer.getContainer(this.level)).physicsSystem();
+        final Pose3d localPose = new Pose3d();
+
+        final Vector3d sailNormal = new Vector3d();
+        final Vector3d sailPos = new Vector3d();
+        final Vector3d offset = new Vector3d();
+        final Vector3d tangentialVel = new Vector3d();
+
+        int totalSails = 0;
+        double totalV = 0;
+        double maxRadiusSq = 0;
+        for (final KinematicContraption kc : rotorPlot.getContraptions()) {
+            final var sails = kc.sable$liftProviders();
+            if (sails.isEmpty()) continue;
+            kc.sable$getLocalPose(localPose, physicsSystem.getPartialPhysicsTick());
+            for (final var entry : sails.values()) {
+                totalSails++;
+                sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+                localPose.transformPosition(sailPos);
+                rotorPose.transformPosition(sailPos);
+                sailPos.sub(rotorCenter, offset);
+                maxRadiusSq = Math.max(maxRadiusSq, offset.lengthSquared());
+                rotorAngVel.cross(offset, tangentialVel);
+                totalV += tangentialVel.length();
+            }
+        }
+        for (final var entry : rotorPlot.getLiftProviders()) {
+            totalSails++;
+            sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+            rotorPose.transformPosition(sailPos);
+            sailPos.sub(rotorCenter, offset);
+            maxRadiusSq = Math.max(maxRadiusSq, offset.lengthSquared());
+            rotorAngVel.cross(offset, tangentialVel);
+            totalV += tangentialVel.length();
+        }
+        if (totalSails < 1 || totalV < 0.01) return;
+
+        final float newRadius = (float) Math.sqrt(maxRadiusSq);
+        if (Math.abs(newRadius - this.rotorRadius) > 0.1f) {
+            this.rotorRadius = newRadius;
+            this.sendData();
+        }
+
+        final double airPressure = DimensionPhysicsData.getAirPressure(this.level, bearingWorldPos);
+        final double airflow = Math.sqrt(totalSails) * angularSpeed
+                * SimConfigService.INSTANCE.server().physics.swivelBearingAirflowMult.get();
+        this.cachedAirflowTickSpeed = (float) (airflow / 20.0);
+        double airflowScaling = 1.0;
+        if (airflow > 0.001) {
+            final double vehicleSpeedAlongAxis = Math.abs(handle.getLinearVelocity(new Vector3d()).dot(worldAxis));
+            airflowScaling = Math.max(0.0, Math.min(1.0, 1.0 - vehicleSpeedAlongAxis / airflow));
+        }
+        final double totalImpulse = Math.pow(totalSails, 1.5) * angularSpeed
+                * SimConfigService.INSTANCE.server().physics.swivelBearingRotorThrust.get()
+                * airPressure * airflowScaling * timeStep;
+        if (totalImpulse < 1e-10) return;
+
+        // Lift sails:      force = -normal * mag, effectivePitch = |cos(α)|
+        //                  Direction depends only on sail facing, not rotation direction.
+        // Symmetric sails: force along worldAxis, effectivePitch = sin(α)·cos(α)·mult
+        //                  Direction depends on angle of attack (normal vs tangentialVel).
+        //                  Changing tilt from +45° to -45° reverses the force.
+        final Vector3d sailForce = new Vector3d();
+        final Vector3d vehicleLocalPos = new Vector3d();
+        final Vector3d netForce = new Vector3d();
+        final QueuedForceGroup forceGroup = subLevel.getOrCreateQueuedForceGroup(ForceGroups.PROPULSION.get());
+        final double symmetricMult = SimConfigService.INSTANCE.server().physics.swivelBearingSymmetricMult.get();
+
+        for (final KinematicContraption kc : rotorPlot.getContraptions()) {
+            final var sails = kc.sable$liftProviders();
+            if (sails.isEmpty()) continue;
+            kc.sable$getLocalPose(localPose, physicsSystem.getPartialPhysicsTick());
+            for (final var entry : sails.values()) {
+                sailNormal.set(entry.dir().x(), entry.dir().y(), entry.dir().z());
+                sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+                localPose.transformNormal(sailNormal);
+                localPose.transformPosition(sailPos);
+                rotorPose.transformNormal(sailNormal);
+                rotorPose.transformPosition(sailPos);
+
+                sailPos.sub(rotorCenter, offset);
+                rotorAngVel.cross(offset, tangentialVel);
+                final double vSail = tangentialVel.length();
+                if (vSail < 0.01) continue;
+
+                final double cosA = sailNormal.dot(worldAxis);
+                final double mag;
+                if (entry.state().getBlock() instanceof BlockSubLevelLiftProvider prov
+                        && prov.sable$getLiftScalar() <= 0) {
+                    // Symmetric sail: effectivePitch = sin(α)·|cos(α)|·mult
+                    // Force along worldAxis, sign from angle of attack (normal · tangentialVel)
+                    final double absCosA = Math.abs(cosA);
+                    final double sinA = Math.sqrt(Math.max(0, 1.0 - absCosA * absCosA));
+                    final double effectivePitch = sinA * absCosA * symmetricMult;
+                    if (effectivePitch < 1e-6) continue;
+                    final double normalDotFlow = sailNormal.dot(tangentialVel);
+                    final double sign = -Math.signum(normalDotFlow);
+                    if (sign == 0) continue;
+                    mag = totalImpulse * (vSail / totalV) * effectivePitch;
+                    sailForce.set(worldAxis).mul(sign * mag);
+                } else {
+                    // Lift sail: effectivePitch = |cos(α)|, force = -normal * mag
+                    final double effectivePitch = Math.abs(cosA);
+                    if (effectivePitch < 1e-6) continue;
+                    mag = totalImpulse * (vSail / totalV) * effectivePitch;
+                    sailForce.set(sailNormal).negate().mul(mag);
+                }
+                if (!Double.isFinite(sailForce.lengthSquared())) continue;
+
+                vehiclePose.transformPositionInverse(sailPos, vehicleLocalPos);
+                forceGroup.applyAndRecordPointForce(vehicleLocalPos, sailForce);
+                netForce.add(sailForce);
+            }
+        }
+
+        for (final var entry : rotorPlot.getLiftProviders()) {
+            sailNormal.set(entry.dir().x(), entry.dir().y(), entry.dir().z());
+            sailPos.set(entry.pos().getX() + 0.5, entry.pos().getY() + 0.5, entry.pos().getZ() + 0.5);
+            rotorPose.transformNormal(sailNormal);
+            rotorPose.transformPosition(sailPos);
+
+            sailPos.sub(rotorCenter, offset);
+            rotorAngVel.cross(offset, tangentialVel);
+            final double vSail = tangentialVel.length();
+            if (vSail < 0.01) continue;
+
+            final double cosA = sailNormal.dot(worldAxis);
+            final double mag;
+            if (entry.state().getBlock() instanceof BlockSubLevelLiftProvider prov
+                    && prov.sable$getLiftScalar() <= 0) {
+                final double absCosA = Math.abs(cosA);
+                final double sinA = Math.sqrt(Math.max(0, 1.0 - absCosA * absCosA));
+                final double effectivePitch = sinA * absCosA * symmetricMult;
+                if (effectivePitch < 1e-6) continue;
+                final double normalDotFlow = sailNormal.dot(tangentialVel);
+                final double sign = -Math.signum(normalDotFlow);
+                if (sign == 0) continue;
+                mag = totalImpulse * (vSail / totalV) * effectivePitch;
+                sailForce.set(worldAxis).mul(sign * mag);
+            } else {
+                final double effectivePitch = Math.abs(cosA);
+                if (effectivePitch < 1e-6) continue;
+                mag = totalImpulse * (vSail / totalV) * effectivePitch;
+                sailForce.set(sailNormal).negate().mul(mag);
+            }
+            if (!Double.isFinite(sailForce.lengthSquared())) continue;
+
+            vehiclePose.transformPositionInverse(sailPos, vehicleLocalPos);
+            forceGroup.applyAndRecordPointForce(vehicleLocalPos, sailForce);
+            netForce.add(sailForce);
+        }
+
+        final org.joml.Vector3f newThrust = new org.joml.Vector3f((float) netForce.x, (float) netForce.y, (float) netForce.z);
+        if (newThrust.distanceSquared(this.thrustVector) > 0.01f) {
+            this.thrustVector.set(newThrust);
+            this.sendData();
+        }
     }
 
     public void assemble() {
@@ -561,6 +1083,15 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         if (this.sequencedAngleLimit >= 0)
             compound.putDouble("SequencedAngleLimit", this.sequencedAngleLimit);
 
+        if (this.rotorRadius > 0)
+            compound.putFloat("RotorRadius", this.rotorRadius);
+
+        if (this.thrustVector.lengthSquared() > 0) {
+            compound.putFloat("ThrustX", this.thrustVector.x);
+            compound.putFloat("ThrustY", this.thrustVector.y);
+            compound.putFloat("ThrustZ", this.thrustVector.z);
+        }
+
         AssemblyException.write(compound, registries, this.lastException);
     }
 
@@ -593,6 +1124,12 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDouble("SequencedAngleLimit") : -1;
+        this.rotorRadius = compound.getFloat("RotorRadius");
+        this.thrustVector.set(
+                compound.getFloat("ThrustX"),
+                compound.getFloat("ThrustY"),
+                compound.getFloat("ThrustZ")
+        );
         this.lastException = AssemblyException.read(compound, registries);
     }
 
