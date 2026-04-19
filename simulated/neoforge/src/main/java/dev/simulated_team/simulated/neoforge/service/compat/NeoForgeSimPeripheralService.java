@@ -1,7 +1,11 @@
 package dev.simulated_team.simulated.neoforge.service.compat;
 
+import dan200.computercraft.api.network.wired.WiredElementCapability;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.PeripheralCapability;
+import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElement;
+import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlock;
+import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,6 +34,12 @@ public class NeoForgeSimPeripheralService implements SimPeripheralService {
 				peripheral.peripheralFunction().apply(be)
 			);
 		}
+
+		event.registerBlockEntity(WiredElementCapability.get(), SimBlockEntityTypes.DOCKING_CONNECTOR.get(), (e, d) -> {
+			if (e.getBlockState().getValue(DockingConnectorBlock.FACING) == d)
+				return null;
+			return (DockingConnectorWiredElement) e.ccWiredElement;
+		});
 	}
 
 	private record Peripheral<T extends BlockEntity>(Supplier<BlockEntityType<T>> typeSupplier, Function<T, IPeripheral> peripheralFunction) {
