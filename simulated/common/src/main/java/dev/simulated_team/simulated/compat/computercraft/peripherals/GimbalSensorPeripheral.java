@@ -44,4 +44,16 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
         final Vector3dc g = this.blockEntity.getGravityBody();
         return List.of(g.x(), g.y(), g.z());
     }
+
+    // Body-frame linear acceleration (m/s^2). Gravity is not included: this is
+    // the "true" acceleration of the ship, i.e. d/dt of linear velocity, what a
+    // real accelerometer would output after subtracting the gravity vector.
+    // Derived by finite-difference at 20 Hz; expect measurement noise on hard
+    // maneuvers. Returns {0, 0, 0} on the first tick and whenever the block is
+    // not attached to a ship.
+    @LuaFunction
+    public List<Double> getLinearAcceleration() {
+        final Vector3dc a = this.blockEntity.getLinearAccelerationBody();
+        return List.of(a.x(), a.y(), a.z());
+    }
 }

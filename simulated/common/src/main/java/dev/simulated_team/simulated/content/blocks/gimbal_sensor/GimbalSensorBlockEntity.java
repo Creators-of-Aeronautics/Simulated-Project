@@ -81,6 +81,9 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
 
     private final Vector3d angularVelocityBody = new Vector3d();
     private final Vector3d gravityBody = new Vector3d();
+    private final Vector3d linearAccelerationBody = new Vector3d();
+    private final Vector3d lastLinearVelocity = new Vector3d();
+    private boolean hasLastLinearVelocity = false;
 
     public GimbalSensorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
@@ -130,12 +133,27 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
         this.setPower(-this.XAngle, Direction.NORTH);
 
         if (subLevel instanceof final ServerSubLevel serverSubLevel) {
-            RigidBodyHandle.of(serverSubLevel).getAngularVelocity(this.angularVelocityBody);
+            final RigidBodyHandle body = RigidBodyHandle.of(serverSubLevel);
+
+            body.getAngularVelocity(this.angularVelocityBody);
             serverSubLevel.logicalPose().orientation().transformInverse(this.angularVelocityBody);
 
             final Vector3dc worldPos = Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.atCenterOf(this.getBlockPos()));
             this.gravityBody.set(DimensionPhysicsData.getGravity(this.getLevel(), worldPos));
             serverSubLevel.logicalPose().orientation().transformInverse(this.gravityBody);
+
+            final Vector3d currentLinearVelocity = body.getLinearVelocity(new Vector3d());
+            if (this.hasLastLinearVelocity) {
+                currentLinearVelocity.sub(this.lastLinearVelocity, this.linearAccelerationBody).mul(20.0);
+                serverSubLevel.logicalPose().orientation().transformInverse(this.linearAccelerationBody);
+            } else {
+                this.linearAccelerationBody.zero();
+                this.hasLastLinearVelocity = true;
+            }
+            this.lastLinearVelocity.set(currentLinearVelocity);
+        } else {
+            this.hasLastLinearVelocity = false;
+            this.linearAccelerationBody.zero();
         }
     }
 
@@ -319,6 +337,10 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
 
     public Vector3dc getGravityBody() {
         return this.gravityBody;
+    }
+
+    public Vector3dc getLinearAccelerationBody() {
+        return this.linearAccelerationBody;
     }
 
     @Override
