@@ -1,0 +1,86 @@
+{
+  "item.aeronautics.aviators_goggles.tooltip": {
+    "behaviour1": "_动能组件_会显示额外的_应力影响_或_容量_。_应力表_显示其_所连接的动能网络_的统计数据。其他一些方块会显示诸如物品和流体含量之类的信息。",
+    "condition1": "当看向方块时",
+    "summary": "用关于放置组件的_各类信息_增强您的HUD。"
+  },
+
+  "jukebox_song.aeronautics.cloud_skipper": "Starlotte - Cloud Skipper",
+
+  "aeronautics": {
+    "simulated_section.aeronautics": "航空学",
+
+    "unit": {
+      "kpg": "%s kpg",
+      "mpg": "%s Mpg",
+      "gpg": "%s Gpg",
+      "pn": "%s pN",
+      "kpn": "%s kpN",
+      "mpn": "%s MpN",
+      "gpn": "%s GpN",
+      "meter_cubed": "%s m³",
+      "meters_per_second": "%s m/s"
+    },
+    "tooltip": {
+      "capacity_used": "使用的应力容量："
+    },
+    "scroll_option": {
+      "hot_air_amount": "最大热空气输出",
+      "thrust_direction": "推力方向"
+    },
+    "generic": {
+      "pull_when_clockwise": "顺时针旋转时吸入空气",
+      "push_when_clockwise": "顺时针旋转时推出空气",
+      "hot_air": "热空气"
+    },
+    "display_source": {
+      "propeller": {
+        "data": "螺旋桨数据",
+        "thrust": "推力",
+        "airflow": "空气流量"
+      },
+      "lifting_gas": {
+        "data": "升力气体数据",
+        "volume": "体积",
+        "total_lift": "总升力"
+      }
+    },
+    "propeller": {
+      "thrust": "推力：%s",
+      "airflow": "空气流量：%s",
+      "can_lift": "可提升：%s",
+      "sails": "叶片"
+    },
+    "potato_cannon": {
+      "ammo": "弹药：%s x%s",
+      "attack_damage": "攻击伤害：%s",
+      "knockback": "击退：%s",
+      "reload_ticks": "重装时间（游戏刻）：%s"
+    },
+    "boiler": {
+      "via_one_vent": "通过 1 个通风口",
+      "via_vents": "通过 %1$s 个通风口"
+    },
+    "lifting_gas": {
+      "default": "气体",
+      "steam": "蒸汽",
+
+      "gas_output": "%s 输出：%s",
+      "balloon": "气球：",
+      "fill": "正在填充... %s",
+      "total_lift": "总升力：%s",
+      "balloon_volume": "气球体积：%s",
+      "no_suitable_balloon": "未找到合适的气球"
+    }
+  },
+
+  "block": {
+    "aeronautics": {
+      "smart_propeller.tooltip": {
+        "summary": "旋转时_产生推力_。沿一个轴_倾斜螺旋桨_以_尝试朝上_。",
+        "condition1": "用扳手右键点击时",
+        "behaviour1": "_反转_螺旋桨提供推力的方向。"
+      }
+    }
+  }
+}

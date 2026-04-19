@@ -19,7 +19,7 @@
   "item.offroad.small_tire": "Small Tire",
   "item.offroad.small_tire.tooltip.behaviour1": "_Places_ the tire on the mount.",
   "item.offroad.small_tire.tooltip.condition1": "When R-Clicked on Wheel Mount",
-  "item.offroad.small_tire.tooltip.summary": "A _small-terrain wheel._",
+  "item.offroad.small_tire.tooltip.summary": "A small _all-terrain wheel._",
   "item.offroad.tire": "Tire",
   "item.offroad.tire.placement_error": "Must be placed on the front of a Wheel Mount!",
   "item.offroad.tire.tooltip.behaviour1": "_Places_ the tire on the mount.",

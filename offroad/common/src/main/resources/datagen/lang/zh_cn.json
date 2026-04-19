@@ -1,0 +1,55 @@
+{
+  "item.offroad.tire.placement_error": "必须放置在轮毂支架的前方！",
+
+  "block.offroad.wheel_mount.tooltip": {
+    "summary": "安装_轮状_物品以实现地面行驶。",
+    "condition1": "当从顶部供能时",
+    "behaviour1": "_制动_附着的车轮，_增加摩擦力_。",
+    "condition2": "当从侧面供能时",
+    "behaviour2": "_转向_车轮朝向_信号来源的方向_。"
+  },
+
+  "item.offroad.small_tire.tooltip": {
+    "summary": "一个小型_全地形轮胎_。",
+    "condition1": "当右键点击轮毂支架时",
+    "behaviour1": "将轮胎_安装_到支架上。"
+  },
+
+  "item.offroad.tire.tooltip": {
+    "summary": "一个标准的_全地形轮胎_。",
+    "condition1": "当右键点击轮毂支架时",
+    "behaviour1": "将轮胎_安装_到支架上。"
+  },
+
+  "item.offroad.large_tire.tooltip": {
+    "summary": "一个大型的_全地形轮胎_。",
+    "condition1": "当右键点击轮毂支架时",
+    "behaviour1": "将轮胎_安装_到支架上。"
+  },
+
+  "item.offroad.monstrous_tire.tooltip": {
+    "summary": "一个体型巨大的_全地形轮胎_。",
+    "condition1": "当右键点击轮毂支架时",
+    "behaviour1": "将轮胎_安装_到支架上。"
+  },
+
+  "offroad": {
+    "simulated_section.offroad": "越野",
+    "tooltip.borehead_bearing_stress": "岩石切削轮",
+
+    "scroll_option": {
+      "suspension_strength": "悬挂强度",
+      "suspension_strength_label": "强度"
+    },
+
+    "exceptions": {
+      "borehead_bearing": {
+        "insuffecient_rockcutting_wheels": "附加结构中不包含任何_岩石切削轮_：\n至少需要_一个_。",
+        "insuffecient_inventory_blocks": "附加结构中不包含任何_容器_方块。",
+
+        "too_many_items": "此装置无法挖掘。",
+        "too_many_items_description": "没有_足够_的_储存空间_来收集更多方块。_移除_多余的物品以继续挖掘。"
+      }
+    }
+  }
+}

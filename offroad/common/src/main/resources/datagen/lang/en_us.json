@@ -10,7 +10,7 @@
   },
 
   "item.offroad.small_tire.tooltip": {
-    "summary": "A _small-terrain wheel._",
+    "summary": "A small _all-terrain wheel._",
     "condition1": "When R-Clicked on Wheel Mount",
     "behaviour1": "_Places_ the tire on the mount."
   },
