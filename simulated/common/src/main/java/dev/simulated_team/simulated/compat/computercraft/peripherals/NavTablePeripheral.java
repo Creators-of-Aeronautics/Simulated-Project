@@ -57,6 +57,21 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
         return Math.toRadians(this.blockEntity.getRelativeAngle());
     }
 
+    // Forward-error bearing: 0 = target straight ahead of the block's arrow,
+    // +90 = target to the right, -90 = to the left, ±180 = behind. The block's
+    // arrow points along local +Z, which the raw relativeAngle (atan2(z, x))
+    // encodes as 90°; this method subtracts that offset and wraps to ±180.
+    @LuaFunction
+    public double getBearing() {
+        final double raw = this.blockEntity.getRelativeAngle() - 90.0;
+        return ((raw % 360.0) + 540.0) % 360.0 - 180.0;
+    }
+
+    @LuaFunction
+    public double getBearingRad() {
+        return Math.toRadians(this.getBearing());
+    }
+
     @LuaFunction
     public double getDistanceToTarget() {
         return this.blockEntity.distanceToTarget();
