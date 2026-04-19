@@ -1,0 +1,55 @@
+{
+  "item.offroad.tire.placement_error": "Необходимо разместить на передней части крепления для колеса!",
+
+  "block.offroad.wheel_mount.tooltip": {
+    "summary": "Устанавливает элементы, похожие на колеса, для обеспечения возможности передвижения по земле.",
+    "condition1": "При питании сверху",
+    "behaviour1": "_Тормоза_ воздействуют на прикрепленное колесо, _увеличивая трение_.",
+    "condition2": "При питании сбоку",
+    "behaviour2": "Поворачивает руль в сторону, откуда поступает сигнал."
+  },
+
+  "item.offroad.small_tire.tooltip": {
+    "summary": "Небольшое внедорожное колесо.",
+    "condition1": "При нажатии правой кнопкой мыши на крепление руля",
+    "behaviour1": "_Устанавливает_ шину на крепление."
+  },
+
+  "item.offroad.tire.tooltip": {
+    "summary": "Стандартное колесо для бездорожья.",
+    "condition1": "При нажатии правой кнопкой мыши на крепление руля",
+    "behaviour1": "_Устанавливает_ шину на крепление."
+  },
+
+  "item.offroad.large_tire.tooltip": {
+    "summary": "Большое _колесо для бездорожья._",
+    "condition1": "При нажатии ПКМ на крепление руля",
+    "behaviour1": "_Устанавливает_ шину на крепление."
+  },
+
+  "item.offroad.monstrous_tire.tooltip": {
+    "summary": "Огромное вездеходное колесо.",
+    "condition1": "При нажатии ПКМ на крепление руля",
+    "behaviour1": "_Устанавливает_ шину на крепление."
+  },
+
+  "offroad": {
+    "simulated_section.offroad": "Offroad",
+    "tooltip.borehead_bearing_stress" : "Колеса для резки горных пород",
+
+    "scroll_option": {
+      "suspension_strength": "Прочность подвески",
+      "suspension_strength_label": "Сила"
+    },
+
+    "exceptions": {
+      "borehead_bearing" : {
+        "insuffecient_rockcutting_wheels": "Attached structure does not include any _Rock Cutting_ _Wheels_:\nA minimum of _one_ is required.",
+        "insuffecient_inventory_blocks":"Прикрепленная структура не содержит никаких блоков _инвентаря_.",
+
+        "too_many_items" : "Это приспособление не способно проводить раскопки.",
+        "too_many_items_description" : "There is _insufficient_ _storage_ to gather more blocks. _Remove_ excess items in order to continue excavating."
+      }
+    }
+  }
+}
