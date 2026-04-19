@@ -163,6 +163,12 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         return this.range.getValue() + 1;
     }
 
+    public void setRange(final int blocks) {
+        final int max = SimConfigService.INSTANCE.server().blocks.opticalSensorRange.get();
+        // getLaserRange = scroll.getValue() + 1, so translate the caller's "block reach" back to scroll units.
+        this.range.setValue(Math.clamp(blocks - 1, 1, max));
+    }
+
     public float getRayDistance() {
        return this.rayDistance;
     }
