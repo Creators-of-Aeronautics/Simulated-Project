@@ -26,6 +26,11 @@ public class TorsionSpringPeripheral extends SimPeripheral<TorsionSpringBlockEnt
     }
 
     @LuaFunction
+    public double getAngleRad() {
+        return Math.toRadians(this.blockEntity.getAngle());
+    }
+
+    @LuaFunction
     public int getLimit() {
         return this.blockEntity.angleInput.getValue();
     }

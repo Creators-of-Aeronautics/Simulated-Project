@@ -18,4 +18,9 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
     public Float getRelativeAngle() {
         return this.blockEntity.getRelativeAngle();
     }
+
+    @LuaFunction
+    public double getRelativeAngleRad() {
+        return Math.toRadians(this.blockEntity.getRelativeAngle());
+    }
 }

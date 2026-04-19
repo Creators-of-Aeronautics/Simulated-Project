@@ -18,4 +18,9 @@ public class SwivelBearingPeripheral extends SimPeripheral<SwivelBearingBlockEnt
     public double getTargetAngle() {
         return this.blockEntity.getTargetAngleDegrees();
     }
+
+    @LuaFunction
+    public double getTargetAngleRad() {
+        return Math.toRadians(this.blockEntity.getTargetAngleDegrees());
+    }
 }
