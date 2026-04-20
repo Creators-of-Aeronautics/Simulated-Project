@@ -20,14 +20,12 @@ public class LinkedTypewriterPeripheral extends SimPeripheral<LinkedTypewriterBl
     @Override
     public void attach(IComputerAccess computer) {
         super.attach(computer);
-        System.out.println("Attaching linked typewriter block entity");
         this.blockEntity.computerHandler.attach(computer);
     }
 
     @Override
     public void detach(IComputerAccess computer) {
         super.detach(computer);
-        System.out.println("Detaching linked typewriter block entity");
         this.blockEntity.computerHandler.detach(computer);
     }
 
