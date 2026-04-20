@@ -1,0 +1,86 @@
+{
+  "item.aeronautics.aviators_goggles.tooltip": {
+    "behaviour1": "_Kinetik bileşenler_ eklenen _Stres Etkisini_ veya _Kapasiteyi_ gösterir. _Stresölçerler_ bağlı oldukları _kinetik ağın_ istatistiklerini gösterir. Diğer bazı bloklar eşya ve sıvı içeriği gibi bilgileri ortaya çıkarır.",
+    "condition1": "Bloklara bakıldığında",
+    "summary": "HUD ekranınızı yerleştirilen bileşenler hakkında _çeşitli bilgilerle_ zenginleştirir."
+  },
+
+  "jukebox_song.aeronautics.cloud_skipper": "Starlotte - Cloud Skipper",
+
+  "aeronautics": {
+    "simulated_section.aeronautics": "Aeronautics",
+
+    "unit": {
+      "kpg": "%s kpg",
+      "mpg": "%s Mpg",
+      "gpg": "%s Gpg",
+      "pn": "%s pN",
+      "kpn": "%s kpN",
+      "mpn": "%s MpN",
+      "gpn": "%s GpN",
+      "meter_cubed": "%s m³",
+      "meters_per_second": "%s m/s"
+    },
+    "tooltip": {
+      "capacity_used": "Kullanılan Kinetik Stres:"
+    },
+    "scroll_option": {
+      "hot_air_amount": "Maksimum Sıcak Hava Çıkışı",
+      "thrust_direction": "İtiş Yönü"
+    },
+    "generic": {
+      "pull_when_clockwise": "Saat yönünde hava çek",
+      "push_when_clockwise": "Saat yönünde hava it",
+      "hot_air": "Sıcak Hava"
+    },
+    "display_source": {
+      "propeller": {
+        "data": "Pervane Verisi",
+        "thrust": "İtiş Gücü",
+        "airflow": "Hava Akışı"
+      },
+      "lifting_gas": {
+        "data": "Kaldırma Gazı Verisi",
+        "volume": "Hacim",
+        "total_lift": "Toplam Kaldırma"
+      }
+    },
+    "propeller": {
+      "thrust": "İtiş Gücü: %s",
+      "airflow": "Hava Akışı: %s",
+      "can_lift": "Kaldırabileceği: %s",
+      "sails": "Yelkenler"
+    },
+    "potato_cannon": {
+      "ammo": "Mühimmat: %s x%s",
+      "attack_damage": "Saldırı hasarı: %s",
+      "knockback": "Geri itme: %s",
+      "reload_ticks": "Yenileme süresi (tick): %s"
+    },
+    "boiler": {
+      "via_one_vent": "1 havalandırma yoluyla",
+      "via_vents": "%1$s havalandırma yoluyla"
+    },
+    "lifting_gas": {
+      "default": "Gaz",
+      "steam": "Buhar",
+
+      "gas_output": "%s çıkışı: %s",
+      "balloon": "Balon: ",
+      "fill": "Dolduruluyor... %s",
+      "total_lift": "Toplam kaldırma: %s",
+      "balloon_volume": "Balon hacmi: %s",
+      "no_suitable_balloon": "Uygun balon bulunamadı"
+    }
+  },
+
+  "block": {
+    "aeronautics": {
+      "smart_propeller.tooltip": {
+        "summary": "Döndürüldüğünde _itiş gücü üretir_. _Yukarı bakmaya çalışmak_ için pervaneyi bir eksen boyunca _eğer_.",
+        "condition1": "İngiliz Anahtarı ile Sağ Tıklandığında",
+        "behaviour1": "Pervanenin itiş sağladığı yönü _tersine çevirir_."
+      }
+    }
+  }
+}
