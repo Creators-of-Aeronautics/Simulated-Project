@@ -1,0 +1,380 @@
+{
+  "itemGroup.simulated.group": "Create Simulated",
+
+  "simulated": {
+    "simulated_section.simulated": "Simulated",
+
+    "prevent_disassembly": "Ana Fizik Birleştiricisi (Physics Assembler) dışındaki işlemlerden sökülme engellendi",
+
+    "generic": {
+      "pull_when_clockwise": "Saat yönünde hava çek",
+      "push_when_clockwise": "Saat yönünde hava it",
+      "swivel_default_always_locked": "Her Zaman Kilitli",
+      "swivel_default_always_unlocked": "Her Zaman Kilitsiz",
+      "swivel_default_unlocked": "Güç Verildi -> Kilitle",
+      "swivel_default_locked": "Güç Kesildi -> Kilitle"
+    },
+
+    "key": {
+      "alt": "Alt"
+    },
+
+    "scroll_option": {
+      "swivel_default_locked": "Redstone Kilitleme Davranışı"
+    },
+
+    "linked_typewriter": {
+      "title": "Bağlı Daktilo",
+      "start_controlling": "Bağlı Daktilo kontrol ediliyor",
+      "stop_controlling": "Bağlı Daktilo kontrolü bırakıldı",
+      "bind_mode": "Bağlama modu aktif",
+      "press_keybind": "Bu Kumandanın frekanslarını Bağlı Daktiloya atamak için herhangi bir tuşa basın",
+      "key_bound": "Frekans %1$s tuşuna atandı",
+      "bound": "Frekans atandı",
+      "controller_bound": "Kumanda frekansları atandı",
+      "confirm_delete_all": "Bu işlem tüm mevcut tuş atamalarını silecek. Onaylamak için tekrar tıklayın.",
+      "bind_screen_title": "Tuş Atamalarını Düzenle",
+      "bind_screen_description": "Girdi şuna atandı:",
+      "bind_screen_prompt": "Bir tuşa basın...",
+      "bind_item": "Bu frekansı ilgili tuşa atamak için herhangi bir tuşa basın",
+      "bind_success": "Frekans %s tuşuna atandı",
+      "delete.key": "Silme işlemini onayla?",
+      "bind_new_key": "Yeni tuş ata",
+      "linked_controller_copy": "Bağlı Kumanda tuşları eklendi",
+      "key_count": "%1$s yapılandırılmış tuş"
+    },
+
+    "contraption_diagram": {
+      "total_mass": "Toplam kütle: ",
+      "mass": "%s kpg",
+      "cannot_use": "Bu diyagramın incelenebilmesi için bir Simüle Edilmiş Düzenek (Simulated Contraption) üzerinde olması gerekir...",
+      "toggle_paper": "Diyagramı Yapılandır",
+      "shown": "Gösteriliyor",
+      "hidden": "Gizli",
+      "center_of_mass": "Kütle Merkezi: ",
+      "merged": "Birleştirilmiş",
+      "unmerged": "Ayrı",
+      "merge_forces": "Kuvvet Okları: ",
+
+      "force_arrow": "%2$s üzerinden %1$s kuvveti",
+      "merged_force_arrow": "%1$s adet %2$s kuvveti toplamı %3$s",
+      "merging_numeral": "%s",
+      "force_arrow_magnitude": "%s pN"
+    },
+
+    "analog_transmission": {
+      "too_fast": "Çok Hızlı",
+      "too_fast_error": "Bu _Analog Şanzıman_ (Analog Transmission) _maksimum dönüş hızını_ aşmaya çalışıyor gibi görünüyor. Yavaşlatmak için _Redstone Sinyalini_ azaltın veya kesin."
+    },
+
+    "swivel_bearing": {
+      "too_fast": "Çok Hızlı",
+      "too_fast_error": "Bu _Döner Rulman_ (Swivel Bearing) _çok hızlı_ dönüyor gibi görünüyor."
+    },
+
+    "auger_shaft": {
+      "information": "Burgu Mili Bilgisi",
+      "item_flow": "-> Saniyede %1$s yığın taşınıyor",
+      "actor_items": "Aktörlerden gelen %1$s eşya içeriyor",
+      "update_progress": "Eşya İlerlemesi:"
+    },
+
+    "portable_engine": {
+      "tooltip_name": "Taşınabilir Motor",
+      "superheated": "Aşırı Isınmış",
+      "superheated_time": "Aşırı Isınmış (%s)",
+      "infinite": "Sonsuz",
+      "time": "Yanma süresi: %s",
+      "fuel": "Yakıt: %s",
+      "none": "Yok",
+      "byproduct": "Yan ürün: %s"
+    },
+
+    "velocity_sensor": {
+      "description": "Maksimum Hız",
+      "selection": {
+        "away": "Uzağa",
+        "towards": "Yakına"
+      }
+    },
+
+    "optical_sensor.max_length": "Maksimum Algılama Mesafesi",
+    "laser_pointer.max_length": "Maksimum Yansıtma Mesafesi",
+    "torsion_spring.angle_limit": "Maksimum Açı",
+    "nameplate": {
+      "edit": "İsmi Düzenle",
+      "target.unwaxed": "İsim levhası cilalanmamış"
+    },
+
+    "gui": {
+      "assembly.exception": {
+        "couldNotAlign": "Simüle Edilmiş Düzenek sökmek için hizalanamadı!",
+        "outOfWorld": "Dünyanın dışındayken sökme işlemi yapılamaz!",
+        "tooFarFromGround": "Sökmek için zeminden çok uzak!",
+        "tooFast": "Sökmek için çok hızlı hareket ediyor!"
+      },
+
+      "hold_tip": {
+        "hold_to_assemble": "Birleştirmek için basılı tutup sürükleyin",
+        "hold_to_disassemble": "Sökmek için basılı tutup sürükleyin",
+        "hold_to_adjust": "Ayarlamak için basılı tutup sürükleyin",
+        "hold_to_rotate": "Döndürmek için basılı tutup sürükleyin"
+      },
+
+      "altitude_sensor.title": "Sinyal Aralığını Yapılandır",
+
+      "modulating_linked_receiver": {
+        "title": "Modülatörlü Bağlı Alıcı",
+        "minimum_range": "Minimum Menzil",
+        "maximum_range": "Maksimum Menzil",
+        "min": "Min",
+        "max": "Max"
+      },
+
+      "threshold_switch.rope_winch_length": "%1$s Blok"
+    },
+
+    "zipline": {
+      "too_far": "Halat çok uzak!",
+      "too_steep": "Halat çok dik!"
+    },
+
+    "extra_kinetics": {
+      "default": "Ekstra Kinetikler",
+      "information": "Şunun için bilgi:",
+      "extra_cogwheel": "Dönüş Dişlisi",
+      "torsion_output": "Çıkış Mili"
+    },
+
+    "plunger_launcher": {
+      "clear_plungers": "Fırlatılan vantuzlar temizlendi!"
+    },
+
+    "spring": {
+      "out_of_range": "Menzil dışında!",
+      "same_block": "Aynı blok konumu!",
+      "block_exists": "Burada bir blok var!",
+      "not_enough_support": "Bu yüzey yeterli desteğe sahip değil!",
+      "connection_terminated": "Seçim iptal edildi",
+      "new_length": "Uzunluk %sm olarak ayarlandı",
+      "min_length": "Minimum uzunluk (%sm)",
+      "max_length": "Maksimum uzunluk (%sm)",
+      "too_compressed": "Çok sıkışmış!",
+      "too_stretched": "Çok gerilmiş!"
+    },
+
+    "altitude_sensor": {
+      "height": "Yükseklik: %s",
+      "air_pressure": "Hava Basıncı: %s"
+    },
+
+    "gimbal_sensor": {
+      "x_angle": "X Açısı: %s",
+      "z_angle": "Z Açısı: %s"
+    },
+
+    "merging_glue": {
+      "out_of_range": "Menzil dışında!",
+      "same_block": "Aynı blok konumu!",
+      "block_exists": "Burada bir blok var!",
+      "invalid_directions": "Geçersiz yönler!",
+      "only_between_sub_levels": "Sadece Simüle Edilmiş Düzenekler arasına yapıştırılabilir!",
+      "same_sub_level": "Aynı Simüle Edilmiş Düzenek üzerine yapıştırılamaz!",
+      "not_enough_support": "Bu yüzey yeterli desteğe sahip değil!",
+      "connection_terminated": "Seçim iptal edildi"
+    },
+
+    "unit": {
+      "mass": "%s kpg",
+      "restitution": "%%%s",
+      "friction": "%s μ",
+      "floating": "%s kpg",
+
+      "length_blocks": "Blok"
+    },
+
+    "tooltip": {
+      "dynamic_stress_impact": "Dinamik",
+
+      "properties": "Özellikler:",
+      "mass": {
+        "none": "Ağırlıksız",
+        "super_light": "Süper Hafif",
+        "light": "Hafif",
+        "heavy": "Ağır",
+        "super_heavy": "Süper Ağır",
+        "absurdly_heavy": "Saçma Derecede Ağır"
+      },
+      "friction": {
+        "slippery": "Kaygan",
+        "sticky": "Yapışkan"
+      },
+      "bouncy": "Zıplayan",
+      "fragile": "Kırılgan",
+      "airtight": "Hava Sızdırmaz",
+      "floating": "Yüzen",
+
+      "new_ponder": "(Yeni!)"
+    },
+
+    "display_source": {
+      "optical_sensor": {
+        "data": "Optik Sensör Verisi",
+        "detected_block": "Algılanan Blok",
+        "block_distance": "Blok Mesafesi"
+      },
+
+      "laser_sensor": {
+        "data": "Lazer Sensör Verisi",
+        "laser_distance": "Lazer Mesafesi"
+      },
+
+      "velocity_sensor": {
+        "data": "Hız Sensörü Verisi",
+        "speed": "Göreceli Hız",
+        "description": "Maksimum Hız ve Çıkış Yönü",
+        "towards": "Yakına",
+        "away": "Uzağa"
+      },
+
+      "altitude_sensor": {
+        "data": "İrtifa Sensörü Verisi",
+        "height": "Yükseklik",
+        "air_pressure": "Hava Basıncı"
+      },
+
+      "gimbal_sensor": {
+        "data": "Yalpa (Gimbal) Sensörü Verisi",
+        "x_angle": "X Açısı",
+        "z_angle": "Z Açısı"
+      },
+
+      "portable_engine": {
+        "data": "Taşınabilir Motor Verisi",
+        "current_burn": "Mevcut Yanma Süresi",
+        "total_burn": "Toplam Yanma Süresi"
+      },
+
+      "navigation_table": {
+        "data": "Navigasyon Tablosu Verisi",
+        "distance": "Hedef Mesafesi",
+        "eta_real": "Tahmini Varış Süresi"
+      },
+
+      "typewriter": {
+        "typed_text": "Yazılan Metin"
+      },
+
+      "item_throughput": "Eşya Akışı",
+      "sublevel_name": "Düzenek (Contraption) Adı"
+    }
+  },
+
+  "generator.simulated": {
+    "airship_ready": "Hava Gemisine Hazır",
+    "airship_ready.info": "Normal hava basıncı koşullarını simüle etmek için y=63 seviyesinde Dümdüz (Superflat) bir dünya.",
+    "end_sea": "End Denizi"
+  },
+
+  "block.simulated": {
+    "handle.tooltip": {
+      "summary": "Bir bloğu kolayca _tutmak_ için ona takın.",
+      "condition1": "Sağ Tık Basılı Tut",
+      "behaviour1": "Kolu _tutar_ ve kendinizi onun etrafında hareket ettirirsiniz.",
+      "condition2": "Eğilirken Sağ Tık Basılı Tut",
+      "behaviour2": "Kolu _tutar_ ve sadece kolun üzerinde olduğu _Simüle Edilmiş Düzeneği_ hareket ettirirsiniz.",
+      "condition3": "Sağ Tık Basılıyken Kaydır",
+      "behaviour3": "_Mesafeyi_ ayarlar, kolu yaklaştırır veya uzaklaştırır."
+    },
+
+    "linked_typewriter.tooltip": {
+      "summary": "_Tuşlarına_ atanan birçok _Redstone Link_ frekansı üzerinde kolay kontrol sağlar.",
+      "condition1": "Sağ Tıklandığında",
+      "behaviour1": "Bağlı Daktiloyu _açıp kapatır_. Aktifken _hareket kontrolleri_ ve _atanmış tuşlar_ daktilo tarafından devralınır.",
+      "condition2": "Eğilirken Sağ Tıklandığında",
+      "behaviour2": "Manuel _Yapılandırma Arayüzünü_ açar.",
+      "condition3": "Bağlı Kumanda ile Sağ Tık",
+      "behaviour3": "_Bağlı Kumandanın_ frekanslarını daktiloya atar.",
+      "condition4": "Redstone Link Alıcısı üzerinde Eşya ile Sağ Tık",
+      "behaviour4": "_Bağlama Modunu_ etkinleştirir, bir frekansı bir tuşa atamak için _herhangi bir tuşa_ basın. (Frekanslar Bağlı Daktilo _kırıldığında_ kaydedilir)"
+    },
+
+    "absorber.tooltip": {
+      "summary": "§c[Geçici Metin] TAMAMLANMADI. §cÇALIŞMIYOR."
+    },
+
+    "nameplate.tooltip": {
+      "summary": "_Simüle Edilmiş Düzeneğinizin_ adını _ilan edin_!",
+      "condition1": "Sağ Tıklandığında",
+      "behaviour1": "İsim Levhasında gösterilen _ismi düzenler_",
+      "condition2": "Boya ile Sağ Tıklandığında",
+      "behaviour2": "İsim Levhasındaki ismin _rengini değiştirir_",
+      "condition3": "Petek ile Sağ Tıklandığında",
+      "behaviour3": "İsim Levhasında gösterilen ismi _kilitler_",
+      "condition4": "Simüle Edilmiş Düzenek üzerinde kullanıldığında",
+      "behaviour4": "Tüm İsim Levhaları _Simüle Edilmiş Düzeneğin_ ismini _paylaşır ve ayarlar_"
+    },
+
+    "redstone_inductor": {
+      "copy": "Kopyala",
+      "invert": "Ters Çevir"
+    },
+
+    "redstone_accumulator": {
+      "input_delay": "Giriş Gecikmesi"
+    }
+  },
+
+  "item.simulated": {
+    "plunger_launcher.tooltip": {
+      "summary": "Vakumlama gücüyle _Simüle Edilmiş Düzenekleri_ hareket ettirin. Bir _Sırt Tankından_ gelen _Hava Basıncı_ ile çalıştırılabilir.",
+      "condition1": "Sağ Tıklandığında",
+      "behaviour1": "Halata bağlı bir _Vantuz_ fırlatır. Fırlatılan iki Vantuz _birbirine bağlanır_ ve _takılı blokları birbirine çeker_.",
+      "condition2": "Shift + Sağ Tıklandığında",
+      "behaviour2": "Halata bağlı tüm _Vantuzları_ çıkarır.",
+      "condition3": "Sırt Tankı takılıyken",
+      "behaviour3": "_Dayanıklılık_ harcanmaz. Bunun yerine tanktaki _Hava basıncı_ tüketilir."
+    },
+
+    "spring.tooltip": {
+      "summary": "Boing! İki bloğu bir _yay_ ile _bağlar._",
+      "condition1": "İngiliz Anahtarı ile Sağ Tık",
+      "behaviour1": "Yayın _sertliğini_ ayarlar",
+      "condition2": "Yay ile Sağ Tık",
+      "behaviour2": "Boştaki uzunluğu _artırır_",
+      "condition3": "Yay ile Shift + Sağ Tık",
+      "behaviour3": "Boştaki uzunluğu _azaltır_"
+    },
+
+    "creative_physics_staff.tooltip": {
+      "summary": "_Simüle Edilmiş Düzenekleri_ hareket ettirmek için _Yaratıcı mod_ aracı.",
+      "condition1": "Simüle Edilmiş Düzenek üzerinde Sol Tık",
+      "behaviour1": "_Hedeflenen Düzenek_ olduğu yere _kilitlenir_.",
+      "condition2": "Simüle Edilmiş Düzenek üzerinde Sağ Tık",
+      "behaviour2": "Asa ile _Hedeflenen Düzeneği_ sürüklemeyi _açar/kapatır_.",
+      "condition3": "Sürüklerken Tab tuşuna basılı tutun",
+      "behaviour3": "_Hedeflenen Düzeneği_ asa ile döndürür.",
+      "condition4": "Sürüklerken Kaydırın",
+      "behaviour4": "_Hedeflenen Düzeneği_ ne kadar _uzakta_ sürüklediğinizi ayarlar"
+    },
+
+    "contraption_diagram.tooltip": {
+      "summary": "Bir _Simüle Edilmiş Düzenek_ hakkında detaylı bilgi içeren _görsel bir diyagram_.",
+      "condition1": "Simüle Edilmiş Düzenek üzerinde Sağ Tıklandığında",
+      "behaviour1": "_Simüle Edilmiş Düzenek_ üzerindeki _kuvvetleri görselleştirir_"
+    }
+  },
+
+  "commands.simulated.lock.success": "%s alt seviye%s için kilit güncellendi",
+
+  "create": {
+    "item_attributes": {
+      "block_mass": "kütle %s kpg",
+      "block_mass.inverted": "kütle %s kpg değil",
+      "block_friction": "sürtünme %s μ",
+      "block_friction.inverted": "sürtünme %s μ değil",
+      "block_bounciness": "zıplama özelliği %s",
+      "block_bounciness.inverted": "zıplama özelliği %s değil"
+    }
+  }
+}

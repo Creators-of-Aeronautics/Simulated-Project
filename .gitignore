@@ -110,7 +110,15 @@ gradle-app.setting
 .gradletasknamecache
 
 **/build/
-
+.gradle/
+build/
+*/build/
+run/
+out/
+.idea/
+*.iml
+logs/
+.DS_Store
 # Common working directory
 run/
 runs/

@@ -1,0 +1,55 @@
+{
+  "item.offroad.tire.placement_error": "Bir Tekerlek Yuvası'nın (Wheel Mount) önüne yerleştirilmelidir!",
+
+  "block.offroad.wheel_mount.tooltip": {
+    "summary": "Zemin seyahati sağlamak için _tekerlek benzeri_ eşyaları monte eder.",
+    "condition1": "Üstten Güç Verildiğinde",
+    "behaviour1": "Takılı tekerleğe _fren yapar_, _sürtünmeyi artırır_.",
+    "condition2": "Yandan Güç Verildiğinde",
+    "behaviour2": "Tekerleği, _sinyalin geldiği yöne_ doğru _yönlendirir_."
+  },
+
+  "item.offroad.small_tire.tooltip": {
+    "summary": "Küçük bir _arazi tekerleği._",
+    "condition1": "Tekerlek Yuvasına Sağ Tıklandığında",
+    "behaviour1": "Lastiği yuvaya _yerleştirir_."
+  },
+
+  "item.offroad.tire.tooltip": {
+    "summary": "Standart bir _her araziye uygun tekerlek._",
+    "condition1": "Tekerlek Yuvasına Sağ Tıklandığında",
+    "behaviour1": "Lastiği yuvaya _yerleştirir_."
+  },
+
+  "item.offroad.large_tire.tooltip": {
+    "summary": "Büyük bir _her araziye uygun tekerlek._",
+    "condition1": "Tekerlek Yuvasına Sağ Tıklandığında",
+    "behaviour1": "Lastiği yuvaya _yerleştirir_."
+  },
+
+  "item.offroad.monstrous_tire.tooltip": {
+    "summary": "Devasa büyüklükte bir _her araziye uygun tekerlek._",
+    "condition1": "Tekerlek Yuvasına Sağ Tıklandığında",
+    "behaviour1": "Lastiği yuvaya _yerleştirir_."
+  },
+
+  "offroad": {
+    "simulated_section.offroad": "Offroad",
+    "tooltip.borehead_bearing_stress" : "Kaya Kesme Tekerlekleri",
+
+    "scroll_option": {
+      "suspension_strength": "Süspansiyon Sertliği",
+      "suspension_strength_label": "Sertlik"
+    },
+
+    "exceptions": {
+      "borehead_bearing" : {
+        "insuffecient_rockcutting_wheels": "Bağlı yapı herhangi bir _Kaya Kesme_ _Tekerleği_ içermiyor:\nEn az _bir_ adet gereklidir.",
+        "insuffecient_inventory_blocks": "Bağlı yapı herhangi bir _envanter_ bloğu içermiyor.",
+
+        "too_many_items" : "Bu düzenek (contraption) kazı yapamıyor.",
+        "too_many_items_description" : "Daha fazla blok toplamak için _yetersiz_ _depolama_ alanı var. Kazmaya devam etmek için fazla eşyaları _boşaltın_."
+      }
+    }
+  }
+}
