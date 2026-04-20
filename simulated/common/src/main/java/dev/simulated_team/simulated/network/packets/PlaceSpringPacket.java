@@ -44,7 +44,14 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
 
     public void handle(final ServerPacketContext ctx) {
         final ServerPlayer player = ctx.player();
+        double range = player.blockInteractionRange() + 4;
+        if (player.distanceToSqr(childPos.getCenter()) > range*range) {
+            return;
+        }
         final Level level = ctx.level();
+        if (!level.getBlockState(parentPos).canBeReplaced() || !level.getBlockState(childPos).canBeReplaced()) {
+            return;
+        }
 
         final BlockPos parentRelative = this.parentPos().relative(this.parentFacing);
         final BlockPos childRelative = this.childPos().relative(this.childFacing);
