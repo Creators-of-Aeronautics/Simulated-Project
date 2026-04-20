@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.index;
 
 
 import com.simibubi.create.foundation.particle.ICustomParticleData;
+import dev.simulated_team.simulated.content.particle.AugerIndicatorParticleData;
 import dev.simulated_team.simulated.content.particle.MagnetFieldParticleData;
 import dev.simulated_team.simulated.content.particle.MagnetFieldParticleData2;
 import net.minecraft.core.particles.ParticleOptions;
@@ -13,7 +14,9 @@ import java.util.function.Supplier;
 public enum SimParticleTypes {
 
     MAGNET_FIELD(MagnetFieldParticleData::new),
-    MAGNET_FIELD2(MagnetFieldParticleData2::new);
+    MAGNET_FIELD2(MagnetFieldParticleData2::new),
+    AUGER_INDICATOR(AugerIndicatorParticleData::new)
+    ;
 
 
     public final ParticleEntry<?> entry;

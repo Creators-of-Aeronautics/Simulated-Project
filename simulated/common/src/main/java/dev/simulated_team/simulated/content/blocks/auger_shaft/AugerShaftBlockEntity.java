@@ -1,11 +1,15 @@
 package dev.simulated_team.simulated.content.blocks.auger_shaft;
 
+import com.simibubi.create.content.kinetics.base.IRotate;
+import com.simibubi.create.content.kinetics.base.KineticBlock;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.content.kinetics.base.KineticEffectHandler;
 import com.simibubi.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.simibubi.create.content.redstone.displayLink.source.ItemThroughputDisplaySource;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import dev.simulated_team.simulated.content.blocks.auger_shaft.auger_groups.AugerDistributor;
+import dev.simulated_team.simulated.content.particle.AugerIndicatorParticleData;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.multiloader.inventory.ContainerSlot;
 import dev.simulated_team.simulated.multiloader.inventory.InventoryLoaderWrapper;
@@ -14,19 +18,24 @@ import dev.simulated_team.simulated.service.SimInventoryService;
 import dev.simulated_team.simulated.util.Observable;
 import dev.simulated_team.simulated.util.SimDirectionUtil;
 import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -82,6 +91,15 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
      */
     private boolean maxSpeed;
 
+    /**
+     * Set by {@link AugerShaftBlockEntity#addToGoggleTooltip(List, boolean)} for indicator particles
+     */
+    private boolean observed = false;
+    /**
+     * Ensures no particle spam
+     */
+    private int particleCooldown = 100;
+
     public AugerShaftBlockEntity(final BlockEntityType<?> type,
                                  final BlockPos pos, final BlockState state) {
         super(type, pos, state);
@@ -91,6 +109,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
         this.setLazyTickRate(20);
 
         this.updateTracker.chase(1, 0, LerpedFloat.Chaser.LINEAR);
+        this.effects = new AugerKineticEffectHandler(this);
     }
 
     @Override
@@ -108,6 +127,15 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
         this.handleUpdateTracking();
 
         this.accelerator.clearCache();
+
+        if (this.level.isClientSide) {
+            this.particleCooldown--;
+            if (this.observed && this.particleCooldown < 0) {
+                this.particleCooldown = 100;
+                this.effects.spawnRotationIndicators();
+            }
+            this.observed = false;
+        }
     }
 
     private void handleUpdateTracking() {
@@ -320,6 +348,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
                     .forGoggles(tooltip);
         }
 
+        this.observed = true;
         return true;
     }
 
@@ -355,5 +384,53 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
     public void clearContent() {
         this.inventory.clearContent();
         this.actorInventory.clearContent();
+    }
+
+    public class AugerKineticEffectHandler extends KineticEffectHandler {
+        public AugerKineticEffectHandler(final KineticBlockEntity kte) {
+            super(kte);
+        }
+
+        public void spawnRotationIndicators() {
+            final AugerShaftBlockEntity auger = AugerShaftBlockEntity.this;
+            final float speed = auger.getSpeed();
+            if (speed == 0)
+                return;
+
+            final BlockState state = auger.getBlockState();
+            final Block block = state.getBlock();
+            if (!(block instanceof final KineticBlock kb))
+                return;
+
+            final float radius1 = kb.getParticleInitialRadius();
+            final float radius2 = kb.getParticleTargetRadius();
+
+            final Direction direction = auger.flowDirection;
+
+            final BlockPos pos = auger.getBlockPos();
+            final Level level = auger.getLevel();
+            if (direction == null || auger.speed == 0)
+                return;
+            if (level == null)
+                return;
+
+            final Vec3 vec = VecHelper.getCenterOf(pos);
+            final IRotate.SpeedLevel speedLevel = IRotate.SpeedLevel.of(speed);
+            final int color = speedLevel.getColor();
+            int particleSpeed = speedLevel.getParticleSpeed();
+            particleSpeed *= (int) Math.signum(speed);
+
+            for (int i = 0; i < 3; i++) {
+                final AugerIndicatorParticleData particleData =
+                        new AugerIndicatorParticleData(color, particleSpeed, radius1, radius2, i / 3f, 10, direction);
+                if (level instanceof final ServerLevel serverLevel) {
+                    serverLevel.sendParticles(particleData, vec.x, vec.y, vec.z, 20, 0, 0, 0, 1);
+                } else {
+                    for (int j = 0; j < 20; j++) {
+                        level.addParticle(particleData, vec.x, vec.y, vec.z, 0, 0, 0);
+                    }
+                }
+            }
+        }
     }
 }
