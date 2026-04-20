@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated.compat.computercraft.peripherals;
 
 import dan200.computercraft.api.lua.LuaFunction;
+import dan200.computercraft.api.peripheral.IComputerAccess;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterBlockEntity;
 
 import java.util.List;
@@ -14,6 +15,20 @@ public class LinkedTypewriterPeripheral extends SimPeripheral<LinkedTypewriterBl
     @Override
     public String getType() {
         return "linked_typewriter";
+    }
+
+    @Override
+    public void attach(IComputerAccess computer) {
+        super.attach(computer);
+        System.out.println("Attaching linked typewriter block entity");
+        this.blockEntity.computerHandler.attach(computer);
+    }
+
+    @Override
+    public void detach(IComputerAccess computer) {
+        super.detach(computer);
+        System.out.println("Detaching linked typewriter block entity");
+        this.blockEntity.computerHandler.detach(computer);
     }
 
     @LuaFunction
