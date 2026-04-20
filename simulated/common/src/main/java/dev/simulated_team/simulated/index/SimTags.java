@@ -91,6 +91,8 @@ public class SimTags {
             prov.tag(ROTATE_WITH_NAV_ARROW)
                     .add(COMPASS, RECOVERY_COMPASS)
                     .addOptional(ResourceLocation.fromNamespaceAndPath("naturescompass", "naturescompass"));
+            prov.tag(ROTATE_WITH_NAV_ARROW)
+                    .addOptional(ResourceLocation.fromNamespaceAndPath("explorerscompass", "explorerscompass"));
             prov.tag(DESTROYS_ROPE)
                     .add(SHEARS)
                     .add(AllItems.WRENCH.asItem());

@@ -49,6 +49,7 @@ dependencies {
     runtimeOnly("cc.tweaked:cc-tweaked-$minecraft_version-forge:$computercraft_tweaked_version")
 
     implementation("maven.modrinth:natures-compass:$minecraft_version-$natures_compass_version-neoforge")
+    implementation("maven.modrinth:explorers-compass:$minecraft_version-$explorers_compass_version-neoforge")
     compileOnly("maven.modrinth:iris:$iris_version")
     compileOnly("maven.modrinth:sodium:$rootProject.sodium_version")
 }
