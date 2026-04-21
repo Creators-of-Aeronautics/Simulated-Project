@@ -29,8 +29,7 @@ public class KineticBlockEntityMixin {
                             tooltip.add(Component.empty());
                         }
 
-                        SimLang.translate("extra_kinetics.information").text(": ").style(ChatFormatting.WHITE)
-                                .add(SimLang.builder().add(ekb.getKey()).style(ChatFormatting.AQUA))
+                        SimLang.translate("extra_kinetics.information", SimLang.builder().add(ekb.getKey()).style(ChatFormatting.AQUA)).style(ChatFormatting.WHITE)
                                 .forGoggles(tooltip);
 
                         tooltip.addAll(extraKineticsTooltips);
