@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.util;
 
+import com.simibubi.create.AllTags;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
@@ -26,6 +27,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.TorchBlock;
+import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,6 +59,8 @@ public class SimAssemblyHelper {
         final SubLevelAssemblyHelper.AssemblyTransform transform = new SubLevelAssemblyHelper.AssemblyTransform(subLevelAnchor, disassemblyGoal, rotation == Rotation.NONE ? 0 : (4 - rotation.ordinal()), rotation, (ServerLevel) level);
 
         final ObjectArrayList<BlockPos> blocks = new ObjectArrayList<>();
+        final ObjectArrayList<BlockPos> brittleBlocks = new ObjectArrayList<>();
+
         final LevelPlot plot = toDisassemble.getPlot();
         for (final PlotChunkHolder chunk : plot.getLoadedChunks()) {
             final BoundingBox3ic localChunkBounds = chunk.getBoundingBox();
@@ -71,13 +78,23 @@ public class SimAssemblyHelper {
                                 z + chunk.getPos().getMinBlockZ()
                         );
                         final BlockState state = level.getBlockState(pos);
-                        if (!state.isAir()) {
-                            blocks.add(pos);
-                        }
+                        if (state.isAir()) { continue; }
+
+                        final Block block = state.getBlock();
+
+                        // Dirty way of checking for affected blocks.
+                        if (state.is(AllTags.AllBlockTags.BRITTLE.tag) || state.is(AllTags.AllBlockTags.WRENCH_PICKUP.tag)
+                                || block instanceof DiodeBlock || block instanceof TorchBlock || block instanceof SignBlock ) { brittleBlocks.add(pos); continue; }
+
+                        // Add non-brittle block.
+                        blocks.add(pos);
                     }
                 }
             }
         }
+
+        // Add all the brittle blocks in the front so they are processed first.
+        blocks.addAll(0, brittleBlocks);
 
         disassembleAndAddCreateContraptions(level, plot.getBoundingBox(), blocks, false, null);
 
