@@ -1,0 +1,171 @@
+{
+  "itemGroup.simulated.group": "Create Simulated",
+
+  "simulated": {
+    "simulated_section.simulated": "Simulated",
+
+    "prevent_disassembly": "Разборка запрещена неосновным физическим сборщиком",
+
+    "generic": {
+      "pull_when_clockwise": "Тянет воздух при вращении по часовой",
+      "push_when_clockwise": "Толкает воздух при вращении по часовой",
+      "swivel_default_always_locked": "Всегда заблокирован",
+      "swivel_default_always_unlocked": "Всегда разблокирован",
+      "swivel_default_unlocked": "Питание → блокировка",
+      "swivel_default_locked": "Без питания → блокировка"
+    },
+
+    "key": {
+      "alt": "Alt"
+    },
+
+    "scroll_option": {
+      "swivel_default_locked": "Поведение блокировки редстоуна"
+    },
+
+    "linked_typewriter": {
+      "title": "Связанная печатная машинка",
+      "start_controlling": "Управление печатной машинкой начато",
+      "stop_controlling": "Управление печатной машинкой остановлено",
+      "bind_mode": "Режим привязки активен",
+      "press_keybind": "Нажмите любую клавишу для привязки частоты",
+      "key_bound": "Частота привязана к %1$s",
+      "bound": "Частота привязана",
+      "controller_bound": "Частоты контроллера привязаны",
+      "confirm_delete_all": "Будут удалены все привязки. Нажмите ещё раз для подтверждения",
+      "bind_screen_title": "Редактирование клавиш",
+      "bind_screen_description": "Привязано к:",
+      "bind_screen_prompt": "Нажмите клавишу...",
+      "bind_item": "Нажмите любую клавишу для привязки",
+      "bind_success": "Частота привязана к %s",
+      "delete.key": "Подтвердить удаление?",
+      "bind_new_key": "Назначить новую клавишу",
+      "linked_controller_copy": "Добавлены клавиши контроллера",
+      "key_count": "%1$s настроенных клавиш"
+    },
+
+    "contraption_diagram": {
+      "total_mass": "Общая масса: ",
+      "mass": "%s кпг",
+      "cannot_use": "Диаграмма должна быть на конструкции",
+      "toggle_paper": "Настроить диаграмму",
+      "shown": "Показано",
+      "hidden": "Скрыто",
+      "center_of_mass": "Центр массы: ",
+      "merged": "Объединено",
+      "unmerged": "Разделено",
+      "merge_forces": "Силовые стрелки: ",
+      "force_arrow": "%s сила %s",
+      "merged_force_arrow": "%s %s сил общей величины %s",
+      "merging_numeral": "%s",
+      "force_arrow_magnitude": "%s пН"
+    },
+
+    "analog_transmission": {
+      "too_fast": "Слишком быстро",
+      "too_fast_error": "Аналоговая передача превышает максимальную скорость вращения"
+    },
+
+    "swivel_bearing": {
+      "too_fast": "Слишком быстро",
+      "too_fast_error": "Поворотный подшипник вращается слишком быстро"
+    },
+
+    "auger_shaft": {
+      "information": "Информация о шнековом валу",
+      "item_flow": "-> Перемещает %1$s стаков/сек",
+      "actor_items": "Содержит %1$s предметов от акторов",
+      "update_progress": "Прогресс предметов:"
+    },
+
+    "portable_engine": {
+      "tooltip_name": "Портативный двигатель",
+      "superheated": "Перегрет",
+      "superheated_time": "Перегрет (%s)",
+      "infinite": "Бесконечно",
+      "time": "Время горения: %s",
+      "fuel": "Топливо: %s",
+      "none": "Нет",
+      "byproduct": "Побочный продукт: %s"
+    },
+
+    "velocity_sensor": {
+      "description": "Максимальная скорость",
+      "selection": {
+        "away": "От",
+        "towards": "К"
+      }
+    },
+
+    "optical_sensor.max_length": "Максимальная дальность обнаружения",
+    "laser_pointer.max_length": "Максимальная дальность луча",
+    "torsion_spring.angle_limit": "Максимальный угол",
+
+    "nameplate": {
+      "edit": "Изменить имя",
+      "target.unwaxed": "Табличка не запечатана воском"
+    },
+
+    "zipline": {
+      "too_far": "Верёвка слишком далеко!",
+      "too_steep": "Верёвка слишком крутая!"
+    },
+
+    "extra_kinetics": {
+      "default": "Дополнительная кинематика",
+      "information": "Информация для",
+      "extra_cogwheel": "Вращающаяся шестерня",
+      "torsion_output": "Выходной вал"
+    },
+
+    "spring": {
+      "out_of_range": "Вне диапазона!",
+      "same_block": "Та же позиция блока!",
+      "block_exists": "Здесь уже есть блок!",
+      "not_enough_support": "Недостаточная опора!",
+      "connection_terminated": "Выбор отменён",
+      "new_length": "Длина установлена: %sm",
+      "min_length": "Минимальная длина (%sm)",
+      "max_length": "Максимальная длина (%sm)",
+      "too_compressed": "Слишком сжато!",
+      "too_stretched": "Слишком растянуто!"
+    },
+
+    "tooltip": {
+      "properties": "Свойства:",
+      "bouncy": "Прыгучий",
+      "fragile": "Хрупкий",
+      "airtight": "Герметичный",
+      "floating": "Плавающий",
+      "new_ponder": "(Новое!)"
+    },
+
+    "unit": {
+      "mass": "%s кпг",
+      "restitution": "%s%%",
+      "friction": "%s μ",
+      "floating": "%s кпг",
+      "length_blocks": "Блоки"
+    },
+
+    "display_source": {
+      "sublevel_name": "Имя конструкции"
+    }
+  },
+
+  "generator.simulated": {
+    "airship_ready": "Готово для дирижабля",
+    "airship_ready.info": "Плоский мир на высоте y=63 для имитации нормального давления",
+    "end_sea": "Крайнее море"
+  },
+
+  "commands.simulated.lock.success": "Обновлена блокировка для %s подуровня%s",
+
+  "create": {
+    "item_attributes": {
+      "block_mass": "масса %s кпг",
+      "block_friction": "трение %s μ",
+      "block_bounciness": "прыгучесть %s"
+    }
+  }
+}
