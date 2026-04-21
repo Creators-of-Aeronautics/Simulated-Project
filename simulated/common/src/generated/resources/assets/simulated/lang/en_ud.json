@@ -282,7 +282,7 @@
   "simulated.display_source.velocity_sensor.towards": "spɹɐʍo⟘",
   "simulated.extra_kinetics.default": "sɔıʇǝuıʞ ɐɹʇxƎ",
   "simulated.extra_kinetics.extra_cogwheel": "ןǝǝɥʍboƆ uoıʇɐʇoᴚ",
-  "simulated.extra_kinetics.information": "ɹoɟ uoıʇɐɯɹoɟuI",
+  "simulated.extra_kinetics.information": "%s :ɹoɟ uoıʇɐɯɹoɟuI",
   "simulated.extra_kinetics.torsion_output": "ʇɟɐɥS ʇndʇnO",
   "simulated.generic.pull_when_clockwise": "ǝsıʍʞɔoןɔ uǝɥʍ ɹıɐ ןןnԀ",
   "simulated.generic.push_when_clockwise": "ǝsıʍʞɔoןɔ uǝɥʍ ɹıɐ ɥsnԀ",

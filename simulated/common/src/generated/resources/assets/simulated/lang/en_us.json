@@ -282,7 +282,7 @@
   "simulated.display_source.velocity_sensor.towards": "Towards",
   "simulated.extra_kinetics.default": "Extra Kinetics",
   "simulated.extra_kinetics.extra_cogwheel": "Rotation Cogwheel",
-  "simulated.extra_kinetics.information": "Information for",
+  "simulated.extra_kinetics.information": "Information for: %s",
   "simulated.extra_kinetics.torsion_output": "Output Shaft",
   "simulated.generic.pull_when_clockwise": "Pull air when clockwise",
   "simulated.generic.push_when_clockwise": "Push air when clockwise",
