@@ -99,7 +99,7 @@ public record EndSeaPhysics(ResourceLocation dimension, Optional<Integer> priori
                 if (player == null)
                     continue;
 
-                if (EntitySubLevelUtil.getTrackingSubLevel(player) == subLevel) {
+                if (Sable.HELPER.getTrackingSubLevel(player) == subLevel) {
                     SimAdvancements.CALL_OF_THE_VOID.awardTo(player);
                 }
             }

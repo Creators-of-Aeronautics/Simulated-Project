@@ -153,7 +153,7 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
             if (!player.onGround() && !player.isInWater() && !player.getAbilities().flying &&!player.onClimbable()) {
                 return;
             } else {
-                final SubLevel standingSubLevel = EntitySubLevelUtil.getTrackingSubLevel(player);
+                final SubLevel standingSubLevel = Sable.HELPER.getTrackingSubLevel(player);
                 if (standingSubLevel == subLevel) {
                     return;
                 }

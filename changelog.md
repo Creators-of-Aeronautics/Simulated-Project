@@ -1,7 +1,15 @@
- - Fix Nature's Compass compatibility issues
- - Make all dyed Envelope blocks ponderable
- - Fix issues with String locales causing crashes in some languages
- - Fix hold interactions not working when the Use key is bound to a key instead of a mouse button
- - Fix issues with labels in the value boxes for the Torsion Spring
- - Add #simulated:non_movable tag for blocks for Simulated Contraption assembly
- - Fix issues with the ponder tooltip manager causing crashes
+ - Sync approved translations from Crowdin
+ - Fix Hot Air display sources
+ - Improve Rope coupling color indicators when connecting two Rope connectors 
+ - Allow assembling a Swivel Bearing with nothing on it
+ - Make Swivel Bearing assembly more seamless
+ - Fix the Swivel Bearing cogwheel not connecting diagonally
+ - Fix issues with docking connector animation on world load
+ - Fix Create contraptions being allowed to assemble Swivel Bearings
+ - Fix the Contraption Diagram leaking resources
+ - Fix laser pointer rotation handling upon assembly/disassembly
+ - Fix crash when Nature's Compass is not installed on Java 25 servers
+ - Fix crash caused by rope state management
+ - Fix issue with Velocity Sensor CC peripheral
+ - Add `/simulated glue` command for honey glue
+ - Various other bug, crash, and networking fixes.

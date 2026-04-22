@@ -168,6 +168,15 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             return;
         }
 
+        // assemble or disassemble
+        if (this.assembleNextTick) {
+            if (!this.isAssembled()) {
+                this.assemble();
+            } else {
+                this.disassemble();
+            }
+        }
+
         final SubLevel attached = this.getAttachedSubLevel();
 
         // update our powered state and reattach constraints
@@ -201,15 +210,6 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         // check persistence to make sure we keep our sublevel after reload
         if (this.getSubLevelID() != null) {
             this.checkPersistence(this.getSubLevelID());
-        }
-
-        // assemble or disassemble
-        if (this.assembleNextTick) {
-            if (!this.isAssembled()) {
-                this.assemble();
-            } else {
-                this.disassemble();
-            }
         }
 
         // update our target angles
@@ -435,7 +435,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             final BlockPos plotAnchor = plot.getCenterBlock();
             final Vector3dc centerOfMass = assembledSubLevel.getMassTracker().getCenterOfMass();
-            Vector3d subLevelCenter = JOMLConversion.atLowerCornerOf(pos);
+            final Vector3d subLevelCenter = JOMLConversion.atLowerCornerOf(pos);
 
             if (centerOfMass != null) {
                 subLevelCenter.add(centerOfMass.x() - plotAnchor.getX(), centerOfMass.y() - plotAnchor.getY(), centerOfMass.z() - plotAnchor.getZ());
@@ -484,7 +484,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         if (this.getSubLevelID() != null) {
             final SubLevel subLevel = SubLevelContainer.getContainer(this.level).getSubLevel(this.getSubLevelID());
             if (subLevel != null) {
-                BlockPos platePos = this.getPlatePos();
+                final BlockPos platePos = this.getPlatePos();
                 if (platePos != null) {
                     this.destroyPlate();
 

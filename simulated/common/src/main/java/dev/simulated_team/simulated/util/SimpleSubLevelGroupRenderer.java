@@ -199,7 +199,7 @@ public class SimpleSubLevelGroupRenderer {
                 entityPoseStack.mulPose(TRANSFORM.set(modelView));
 
                 for (final Entity entity : entities) {
-                    if (Sable.HELPER.getContaining(entity) != entitySubLevel && EntitySubLevelUtil.getTrackingOrVehicleSubLevel(entity) != entitySubLevel) {
+                    if (Sable.HELPER.getContaining(entity) != entitySubLevel && Sable.HELPER.getTrackingOrVehicleSubLevel(entity) != entitySubLevel) {
                         continue;
                     }
 

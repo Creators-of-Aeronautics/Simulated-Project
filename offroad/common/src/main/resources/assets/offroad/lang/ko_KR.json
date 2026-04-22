@@ -1,0 +1,10 @@
+{
+  "block.offroad.borehead_bearing": "굴진 베어링",
+  "block.offroad.rockcutting_wheel": "석재절단 휠",
+  "block.offroad.wheel_mount": "현가 장치",
+  "item.offroad.large_tire": "대형 타이어",
+  "item.offroad.monstrous_tire": "초대형 타이어",
+  "item.offroad.small_tire": "소형 타이어",
+  "item.offroad.tire": "타이어",
+  "offroad.tooltip.borehead_bearing_stress": "석재절단 휠"
+}

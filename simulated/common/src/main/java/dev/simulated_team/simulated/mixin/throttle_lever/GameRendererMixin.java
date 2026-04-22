@@ -32,7 +32,7 @@ public class GameRendererMixin {
         final LocalPlayer player = this.minecraft.player;
         if (player == null) return;
 
-        final Vec3 eyePos = EntitySubLevelUtil.getEyePositionInterpolated(player, partialTicks);
+        final Vec3 eyePos = Sable.HELPER.getEyePositionInterpolated(player, partialTicks);
 
         final HitResult mcHitResult = this.minecraft.hitResult;
         double minDistance = mcHitResult != null && mcHitResult.getType() != HitResult.Type.MISS ? Sable.HELPER.distanceSquaredWithSubLevels(player.level(), eyePos, mcHitResult.getLocation()) : Double.MAX_VALUE;
