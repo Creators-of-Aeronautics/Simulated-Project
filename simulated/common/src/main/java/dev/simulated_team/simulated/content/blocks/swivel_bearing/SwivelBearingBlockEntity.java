@@ -15,6 +15,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import dev.ryanhcode.sable.Sable;
+import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintConfiguration;
@@ -449,6 +450,11 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             final SubLevelPhysicsSystem physicsSystem = container.physicsSystem();
             final PhysicsPipeline pipeline = physicsSystem.getPipeline();
+
+            final SubLevel containingSubLevel = this.getContainingSubLevel();
+            if (containingSubLevel != null) {
+                SubLevelAssemblyHelper.kickFromContainingSubLevel((ServerLevel) this.level, physicsSystem, pipeline, assembledSubLevel, containingSubLevel);
+            }
 
             pipeline.teleport(assembledSubLevel, assembledSubLevel.logicalPose().position(), assembledSubLevel.logicalPose().orientation());
             assembledSubLevel.updateLastPose();

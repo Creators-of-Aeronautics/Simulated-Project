@@ -1,15 +1,1 @@
- - Sync approved translations from Crowdin
- - Fix Hot Air display sources
- - Improve Rope coupling color indicators when connecting two Rope connectors 
- - Allow assembling a Swivel Bearing with nothing on it
- - Make Swivel Bearing assembly more seamless
- - Fix the Swivel Bearing cogwheel not connecting diagonally
- - Fix issues with docking connector animation on world load
- - Fix Create contraptions being allowed to assemble Swivel Bearings
- - Fix the Contraption Diagram leaking resources
- - Fix laser pointer rotation handling upon assembly/disassembly
- - Fix crash when Nature's Compass is not installed on Java 25 servers
- - Fix crash caused by rope state management
- - Fix issue with Velocity Sensor CC peripheral
- - Add `/simulated glue` command for honey glue
- - Various other bug, crash, and networking fixes.
+ - Fix assembling Swivel Bearings by themselves deleting sub-levels
