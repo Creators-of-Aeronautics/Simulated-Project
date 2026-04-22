@@ -1,7 +1,6 @@
 package dev.ryanhcode.offroad.content.ponder;
 
 import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
-import com.simibubi.create.foundation.ponder.PonderWorldBlockEntityFix;
 import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.index.OffroadPonderScenes;
 import net.createmod.ponder.api.level.PonderLevel;
@@ -36,7 +35,7 @@ public class OffroadPonderPlugin extends CreatePonderPlugin {
 
     @Override
     public void onPonderLevelRestore(final PonderLevel ponderLevel) {
-        PonderWorldBlockEntityFix.fixControllerBlockEntities(ponderLevel);
+
     }
 
     @Override
