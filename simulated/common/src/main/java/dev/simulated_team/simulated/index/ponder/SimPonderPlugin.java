@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.index.ponder;
 
 import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
-import com.simibubi.create.foundation.ponder.PonderWorldBlockEntityFix;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimPonderScenes;
 import dev.simulated_team.simulated.index.SimPonderTags;
@@ -44,7 +43,7 @@ public class SimPonderPlugin extends CreatePonderPlugin {
 
     @Override
     public void onPonderLevelRestore(final PonderLevel ponderLevel) {
-        PonderWorldBlockEntityFix.fixControllerBlockEntities(ponderLevel);
+
     }
 
     @Override
