@@ -120,6 +120,7 @@ public class RopeItem extends Item {
 
         if (ropeHolderA.createRope(ropeHolderB)) {
             level.playSound(null, posA, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5F, 1F);
+            level.playSound(null, posB, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5F, 1F);
             return true;
         }
         return false;
