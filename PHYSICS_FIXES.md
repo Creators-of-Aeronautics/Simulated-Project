@@ -59,6 +59,28 @@ Applied two fixes in `SpringBlockEntity.java`:
 
 ---
 
+### 3. Swivel bearing copying duplicates sublevel references
+
+**Problem:**  
+When copying swivel bearing with Ctrl+MMB (pick block with NBT), the sublevel UUID and plate position were copied to the new block. This caused one sublevel to be linked to multiple swivel bearings, pulling it to multiple points simultaneously or even to itself, resulting in infinite forces and teleportation (issue #525).
+
+**Solution:**  
+Modified NBT read logic in `SwivelBearingBlockEntity.java` (lines 640-643, 650-657):
+- When copying without schematic context (normal Ctrl+MMB copy), clear sublevel UUID and plate position
+- When placing from schematic, preserve and transform references correctly
+
+```java
+} else if (schematicContext == null) {
+    // When copying block with Ctrl+MMB (no schematic context),
+    // clear sublevel reference to prevent duplicate sublevel links
+    subLevelID = null;
+}
+```
+
+**File:** `simulated/common/src/main/java/dev/simulated_team/simulated/content/blocks/swivel_bearing/SwivelBearingBlockEntity.java`
+
+---
+
 ## Technical Details
 
 ### Magnets
@@ -72,6 +94,11 @@ Applied two fixes in `SpringBlockEntity.java`:
 - Damping increased from -4.5 to -6.5 for better stabilization
 - Maintains physical correctness for normal configurations
 
+### Swivel Bearing
+- Copying with Ctrl+MMB now creates independent bearing without sublevel reference
+- Schematic placement still works correctly with proper UUID remapping
+- Prevents duplicate sublevel links that cause spatial anomalies
+
 ## Testing
 
 Recommended tests:
@@ -79,3 +106,5 @@ Recommended tests:
 2. Magnets on different constructions (should work normally - attract/repel)
 3. Springs with different thickness between physical blocks (should not create infinite impulse)
 4. Normal spring configurations (should work as before)
+5. Copy assembled swivel bearing with Ctrl+MMB (should not duplicate sublevel reference)
+6. Place swivel bearing schematic (should work correctly with remapped UUIDs)

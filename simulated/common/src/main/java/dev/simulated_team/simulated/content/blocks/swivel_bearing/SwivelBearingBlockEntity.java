@@ -637,13 +637,26 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             if (mapping != null) {
                 subLevelID = mapping.newUUID();
+            } else if (schematicContext == null) {
+                // When copying block with Ctrl+MMB (no schematic context),
+                // clear sublevel reference to prevent duplicate sublevel links
+                subLevelID = null;
             }
 
             this.setSubLevelID(subLevelID);
         }
 
         if (compound.contains("SwivelPlate")) {
-            final BlockPos blockPos = NbtUtils.readBlockPos(compound, "SwivelPlate").orElseThrow();
+            BlockPos blockPos = NbtUtils.readBlockPos(compound, "SwivelPlate").orElseThrow();
+
+            // When copying block with Ctrl+MMB (no schematic context),
+            // clear plate position to prevent duplicate sublevel links
+            if (schematicContext == null) {
+                blockPos = null;
+            } else if (mapping != null) {
+                blockPos = mapping.transform().apply(blockPos);
+            }
+
             this.setPlatePos(blockPos);
         }
 
