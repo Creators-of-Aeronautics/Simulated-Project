@@ -201,7 +201,8 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         //#region damping
         final Vector3d relativeVelo = velo1.sub(velo2);
         final Vector3d dampingPointForce = new Vector3d(relativeVelo);
-        dampingPointForce.mul(-4.5);
+        // Increased damping to prevent oscillations with mismatched spring sizes
+        dampingPointForce.mul(-6.5);
         //#endregion
 
         // math shenanigans means that a desiredLength value of 1.25 would lead to an actual length of 2 blocks
@@ -238,6 +239,12 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         final Vector3d alignmentForce = desireA.sub(positionA.x, positionA.y, positionA.z);
 
         final Vector3d hookesPointForce = alignmentForce.mul(145.0);
+
+        // Clamp force to prevent infinite impulse with mismatched spring sizes
+        final double maxForce = 1000.0 * sizeScale;
+        if (hookesPointForce.lengthSquared() > maxForce * maxForce) {
+            hookesPointForce.normalize().mul(maxForce);
+        }
         //#endregion
 
         //#region angular damping along spring axes (to stop spinning !)

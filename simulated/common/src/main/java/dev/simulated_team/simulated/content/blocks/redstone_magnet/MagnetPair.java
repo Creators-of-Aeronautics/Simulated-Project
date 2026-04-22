@@ -113,6 +113,9 @@ public class MagnetPair<T extends BlockEntity & SimMagnet> {
             return;
         }
 
+        // Check if magnets are on the same rigid body
+        final boolean sameSublevel = (subLevel1 != null && subLevel1 == subLevel2);
+
         if (subLevel1 != null) {
             this.orientation1.set(subLevel1.logicalPose().orientation());
         } else {
@@ -186,7 +189,10 @@ public class MagnetPair<T extends BlockEntity & SimMagnet> {
                 this.orientation1.transformInverse(this.totalTorque1);
 
                 final QueuedForceGroup forceTotal1 = subLevel1.getOrCreateQueuedForceGroup(ForceGroups.MAGNETIC_FORCE.get());
-                forceTotal1.applyAndRecordPointForce(JOMLConversion.toJOML(magnet1.getMagnetPosition()), this.totalForce1.mul(timeStep));
+                // For magnets on same sublevel, only apply torque (internal forces cancel out)
+                if (!sameSublevel) {
+                    forceTotal1.applyAndRecordPointForce(JOMLConversion.toJOML(magnet1.getMagnetPosition()), this.totalForce1.mul(timeStep));
+                }
                 forceTotal1.getForceTotal().applyLinearAndAngularImpulse(new Vector3d(), this.totalTorque1.mul(timeStep));
             }
 
@@ -195,7 +201,10 @@ public class MagnetPair<T extends BlockEntity & SimMagnet> {
                 this.orientation2.transformInverse(this.totalTorque2);
 
                 final QueuedForceGroup forceTotal2 = subLevel2.getOrCreateQueuedForceGroup(ForceGroups.MAGNETIC_FORCE.get());
-                forceTotal2.applyAndRecordPointForce(JOMLConversion.toJOML(magnet2.getMagnetPosition()), this.totalForce2.mul(timeStep));
+                // For magnets on same sublevel, only apply torque (internal forces cancel out)
+                if (!sameSublevel) {
+                    forceTotal2.applyAndRecordPointForce(JOMLConversion.toJOML(magnet2.getMagnetPosition()), this.totalForce2.mul(timeStep));
+                }
                 forceTotal2.getForceTotal().applyLinearAndAngularImpulse(new Vector3d(), this.totalTorque2.mul(timeStep));
             }
         }
