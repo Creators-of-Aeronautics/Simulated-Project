@@ -1,5 +1,5 @@
 {
-	"parent": "block",
+	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
 		"0": "simulated:block/rope_winch/winch",
