@@ -13,10 +13,6 @@ public class VanillaSubLevelRenderDispatcherMixin {
 
     @WrapOperation(method = "renderSectionLayer", at = @At(value = "INVOKE", target = "Ldev/ryanhcode/sable/sublevel/render/dispatcher/VanillaSubLevelRenderDispatcher;setupDynamicEffects(Lnet/minecraft/client/renderer/ShaderInstance;ZZ)V", ordinal = 0))
     private void simulated$overrideNormalLighting(final ShaderInstance shader, final boolean onSubLevel, final boolean upload, final Operation<Void> original) {
-        if (SimpleSubLevelGroupRenderer.RENDERING_SIMPLE) {
-            original.call(shader, false, upload);
-            return;
-        }
         original.call(shader, onSubLevel, upload);
     }
 

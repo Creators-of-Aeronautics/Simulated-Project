@@ -43,7 +43,6 @@ public class SimpleSubLevelGroupRenderer {
     private static final Matrix4f TRANSFORM = new Matrix4f();
     private static final Matrix4f BACKUP_PROJECTION = new Matrix4f();
     private static final CameraMatrices BACKUP_CAMERA_MATRICES = new CameraMatrices();
-    public static boolean RENDERING_SIMPLE = false;
 
     /**
      * @return the chain of sub-levels that should render with a given sub-level into a diagram
@@ -123,7 +122,6 @@ public class SimpleSubLevelGroupRenderer {
             Lighting.setupNetherLevel();
             ((LightTextureExtension) lightTexture).simulated$makeDiagramLightTexture(0.65f);
 
-            SimpleSubLevelGroupRenderer.RENDERING_SIMPLE = true;
             for (final RenderType layer : RenderType.chunkBufferLayers()) {
                 layer.setupRenderState();
                 final ShaderInstance shader = RenderSystem.getShader();
@@ -149,7 +147,6 @@ public class SimpleSubLevelGroupRenderer {
                 layer.clearRenderState();
             }
             ((LightTextureExtension) lightTexture).simulated$makeDiagramLightTexture(1.0f);
-            SimpleSubLevelGroupRenderer.RENDERING_SIMPLE = false;
 
             final VisualizationManager visualizationManager = VisualizationManager.get(level);
 
