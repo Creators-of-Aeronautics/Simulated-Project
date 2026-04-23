@@ -323,7 +323,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
 
     @Override
     public boolean addToGoggleTooltip(final List<Component> tooltip, final boolean isPlayerSneaking) {
-        var added = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        boolean added = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         if (this.getSpeed() > 0) {
             final float perTickSpeed = this.getItemSpeed();
@@ -331,6 +331,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
             SimLang.translate("auger_shaft.item_flow", Math.floor(perSecondSpeed * 100) / 100)
                     .style(ChatFormatting.YELLOW)
                     .forGoggles(tooltip);
+            added = true;
         }
 
         final int actorItems = this.actorInventory.storedItemCount;
@@ -338,6 +339,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
             SimLang.translate("auger_shaft.actor_items", actorItems)
                     .style(ChatFormatting.GRAY)
                     .forGoggles(tooltip);
+            added = true;
         }
 
         final int count = this.inventory.slot.getStack().getCount();
@@ -346,6 +348,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
                             .getString(), count)
                     .style(ChatFormatting.GREEN)
                     .forGoggles(tooltip);
+            added = true;
         }
 
         this.observed = true;
