@@ -44,11 +44,15 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     private String typedEntry = "";
 
     public boolean powered;
-    public final AttachedComputerHandler computerHandler = new AttachedComputerHandler();
+    public final AttachedComputerHandler computerHandler;
 
     public LinkedTypewriterBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
         this.entryMap = new LinkedTypewriterEntries();
+        if (SimPlatformService.INSTANCE.isLoaded("computercraft"))
+            computerHandler = new AttachedComputerHandler();
+        else
+            computerHandler = null;
     }
 
     @Override
