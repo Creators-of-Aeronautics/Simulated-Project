@@ -14,12 +14,10 @@ import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
 import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElement;
-import dev.simulated_team.simulated.compat.computercraft.wired.IDockingConnectorWiredElement;
 import dev.simulated_team.simulated.content.blocks.redstone_magnet.*;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.service.SimConfigService;
-import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.util.SimMathUtils;
 import dev.simulated_team.simulated.util.SimMovementContext;
 import net.createmod.catnip.animation.LerpedFloat;
@@ -64,7 +62,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     protected double closestPairDistance = 0;
     private MagnetBehaviour magnetBehaviour;
     private FixedConstraintHandle constraintHandle;
-    public final IDockingConnectorWiredElement ccWiredElement;
+    public final DockingConnectorWiredElement ccWiredElement;
 
     private ConstraintSmoother constraintSmoother = null;
 
@@ -72,7 +70,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         super(type, pos, state);
         this.inventory = new DockingConnectorInventory(this);
         this.tank = new DockingConnectorTank(this);
-        this.ccWiredElement = SimPlatformService.INSTANCE.isLoaded("computercraft") ? new DockingConnectorWiredElement(this) : IDockingConnectorWiredElement.noop();
+        this.ccWiredElement = DockingConnectorWiredElement.create(this);
     }
 
     @Nullable
@@ -97,8 +95,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         final DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
 
         if (otherConnector != null && this.constraintHandle == null && otherConnector.constraintHandle == null) {
-            ccWiredElement.connect(otherConnector.ccWiredElement);
-
             final MagnetMap<DockingConnectorBlockEntity> controller = DockingConnectorBlockEntity.MAGNET_CONTROLLER;
             if (controller.getPair(this.level, this.getBlockPos(), this.otherConnectorPosition) == null) {
                 controller.tryAddPair(this.level, this.getBlockPos(), this.otherConnectorPosition, DockingConnectorPair::new);
@@ -378,6 +374,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
                 this.state = DockingConnectorState.LOCKED;
                 this.inventory.connect(this.otherConnectorPosition, otherConnector.inventory);
                 this.tank.connect(this.otherConnectorPosition, otherConnector.tank);
+                this.ccWiredElement.connect(otherConnector.ccWiredElement);
 
                 this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
                 if (this.constraintSmoother != null) {
@@ -385,8 +382,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
                     this.constraintSmoother.step(container, this, 1);
                 }
                 this.constraintSmoother = null;
-
-                ccWiredElement.connect(otherConnector.ccWiredElement);
             }
         }
 
@@ -401,7 +396,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public void unDock() {
         DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
         if (otherConnector != null) {
-            ccWiredElement.disconnect(otherConnector.ccWiredElement);
+            this.ccWiredElement.disconnect(otherConnector.ccWiredElement);
         }
 
         this.closestPairDistance = Double.MAX_VALUE;
@@ -493,7 +488,9 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public void remove() {
         super.remove();
         this.removeConstraint();
-        if (level == null || !level.isClientSide) ccWiredElement.remove();
+        if (this.level == null || !this.level.isClientSide) {
+            this.ccWiredElement.remove();
+        }
     }
 
     @Override

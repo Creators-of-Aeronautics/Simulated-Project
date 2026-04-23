@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.neoforge.service.compat;
 import dan200.computercraft.api.network.wired.WiredElementCapability;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.PeripheralCapability;
-import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElement;
+import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElementImpl;
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlock;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
@@ -38,7 +38,7 @@ public class NeoForgeSimPeripheralService implements SimPeripheralService {
 		event.registerBlockEntity(WiredElementCapability.get(), SimBlockEntityTypes.DOCKING_CONNECTOR.get(), (e, d) -> {
 			if (e.getBlockState().getValue(DockingConnectorBlock.FACING) == d)
 				return null;
-			return (DockingConnectorWiredElement) e.ccWiredElement;
+			return (DockingConnectorWiredElementImpl) e.ccWiredElement;
 		});
 	}
 
