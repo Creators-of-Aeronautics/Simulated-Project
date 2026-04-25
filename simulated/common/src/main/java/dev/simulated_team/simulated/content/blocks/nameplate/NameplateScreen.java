@@ -75,15 +75,17 @@ public class NameplateScreen extends Screen {
    @Override
    public boolean keyPressed(final int pKeyCode, final int pScanCode, final int pModifiers) {
       if (pKeyCode != 264 && pKeyCode != 257 && pKeyCode != 335) {
-         return this.nameField.keyPressed(pKeyCode) || super.keyPressed(pKeyCode, pScanCode, pModifiers);
+         return this.nameField.keyPressed(pKeyCode, pScanCode, pModifiers) || super.keyPressed(pKeyCode, pScanCode, pModifiers);
       }
       return false;
    }
 
    @Override
    public boolean charTyped(final char pCodePoint, final int pModifiers) {
-      this.nameField.charTyped(pCodePoint);
-      return true;
+       if (!this.nameField.charTyped(pCodePoint)) {
+           return super.charTyped(pCodePoint, pModifiers);
+       }
+       return true;
    }
 
    @Override
