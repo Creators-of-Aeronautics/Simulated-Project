@@ -40,6 +40,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimAssemblyHelper;
 import dev.simulated_team.simulated.util.SimLevelUtil;
+import dev.simulated_team.simulated.util.SimMathUtils;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraBlockPos;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraKinetics;
 import net.createmod.catnip.lang.FontHelper;
@@ -496,7 +497,14 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
                     // if destroying the plate removed the sub-level, skip disassembling
                     if (!subLevel.isRemoved()) {
-                        SimAssemblyHelper.disassembleSubLevel(this.level, subLevel, platePos, this.getBlockPos(), Rotation.NONE, true);
+                        // Calculate the rotation angle from the sublevel's current orientation
+                        // This ensures blocks are placed in the correct rotated position
+                        final double closestYRotation = SimMathUtils.getClosestYaw(subLevel.logicalPose().orientation());
+                        final double ninety = Math.PI / 2.0;
+                        final int turns = -(Mth.floor(closestYRotation / ninety + 0.5));
+                        final Rotation rotation = SimAssemblyHelper.rotationFrom90DegRots(turns);
+
+                        SimAssemblyHelper.disassembleSubLevel(this.level, subLevel, platePos, this.getBlockPos(), rotation, true);
                     } else {
                         this.level.playSound(null, platePos, SimSoundEvents.SIMULATED_CONTRAPTION_STOPS.event(), SoundSource.BLOCKS, 1.0f, 1.0f);
                     }
