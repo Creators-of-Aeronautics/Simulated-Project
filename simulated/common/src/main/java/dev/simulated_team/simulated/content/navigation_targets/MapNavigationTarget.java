@@ -49,12 +49,14 @@ public class MapNavigationTarget implements NavigationTarget {
 			final MapItemSavedData mapData = level.getMapData(mapId);
 			if (mapData != null) {
 				final Collection<MapBanner> banners = mapData.getBanners();
-				for (final MapBanner banner : banners) {
-					final Vec3 bannerPos = banner.pos().getCenter();
-					final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
-					if(dist < closestDist) {
-						closestPos = bannerPos;
-						closestDist = dist;
+				if (banners != null) {
+					for (final MapBanner banner : banners) {
+						final Vec3 bannerPos = banner.pos().getCenter();
+						final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
+						if(dist < closestDist) {
+							closestPos = bannerPos;
+							closestDist = dist;
+						}
 					}
 				}
 			}

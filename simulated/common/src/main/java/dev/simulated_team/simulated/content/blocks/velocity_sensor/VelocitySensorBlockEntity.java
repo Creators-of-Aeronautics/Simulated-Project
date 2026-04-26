@@ -159,7 +159,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
         super.read(tag, registries, clientPacket);
 
         this.adjustedVelocity = tag.getFloat("AdjustedVelocity");
-        this.signedRedstoneStrength = Mth.clamp(-15, 15, tag.getInt("SignedRedstoneStrength"));
+        this.signedRedstoneStrength = Mth.clamp(tag.getInt("SignedRedstoneStrength"), -15, 15);
     }
 
     public Vector3dc getCurrentNormal() {
@@ -173,7 +173,9 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
     @Override
     public boolean addToGoggleTooltip(final List<Component> tooltip, final boolean isPlayerSneaking) {
         if (this.subLevelReference.get() != null) {
-            SimLang.number(Math.abs(this.getAdjustedVelocity()))
+            final float velocity = this.getAdjustedVelocity();
+            final float displayVelocity = this.maxSpeed.isTowards() ? velocity : -velocity;
+            SimLang.number(displayVelocity)
                     .text(" m/s").forGoggles(tooltip);
         }
 

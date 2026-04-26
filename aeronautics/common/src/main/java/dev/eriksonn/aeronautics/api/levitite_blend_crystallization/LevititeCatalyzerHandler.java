@@ -45,11 +45,15 @@ public class LevititeCatalyzerHandler implements InteractCallback {
             final LocalPlayer player = (LocalPlayer) SimDistUtil.getClientPlayer();
             final Level level = player.level();
 
-            //Gather catalyzer
-            final InteractionHand hand = InteractionHand.MAIN_HAND;
-            final ItemStack catalyzer = player.getItemInHand(hand);
-            if (!isCatalyzer(catalyzer))
-                return Result.empty();
+            // Check both hands for catalyzer
+            InteractionHand hand = InteractionHand.MAIN_HAND;
+            ItemStack catalyzer = player.getItemInHand(hand);
+            if (!isCatalyzer(catalyzer)) {
+                hand = InteractionHand.OFF_HAND;
+                catalyzer = player.getItemInHand(hand);
+                if (!isCatalyzer(catalyzer))
+                    return Result.empty();
+            }
 
             final ClipContext context = gatherContext(player);
             final BlockHitResult ray = level.clip(context);
