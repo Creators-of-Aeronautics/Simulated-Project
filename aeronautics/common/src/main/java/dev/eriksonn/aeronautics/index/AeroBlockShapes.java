@@ -50,13 +50,13 @@ public class AeroBlockShapes {
 					.build(),
 
 			MOUNTED_POTATO_CANNON = shape(0, 0, 0, 16, 8, 16)
-					.add(2, 8, 1, 14, 12, 15)
+					.add(1, 8, 1, 15, 12, 15)
 					.add(4, 12, 4, 12, 28, 12)
 					.erase(5, 18, 5, 11, 28, 11)
 					.build(),
 
 			MOUNTED_POTATO_CANNON_BLOCKED = shape(0, 0, 0, 16, 8, 16)
-					.add(2, 8, 1, 14, 12, 15)
+					.add(1, 8, 1, 15, 12, 15)
 					.build();
 
 
