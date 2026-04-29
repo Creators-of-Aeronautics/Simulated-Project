@@ -141,7 +141,7 @@
 
     "extra_kinetics": {
       "default": "Extra Kinetics",
-      "information": "Information for",
+      "information": "Information for: %s",
       "extra_cogwheel": "Rotation Cogwheel",
       "torsion_output": "Output Shaft"
     },
