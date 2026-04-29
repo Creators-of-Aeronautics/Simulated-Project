@@ -347,6 +347,18 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         if (strand != null) {
             final RopeAttachment target = strand.getAttachment(RopeAttachmentPoint.END);
             if (target != null) {
+                if (player != null) {
+                    double range = player.blockInteractionRange() + 4;
+                    boolean isInRange = false;
+                    for (Vector3d pos : strand.getPoints()) {
+                        if (player.distanceToSqr(pos.x, pos.y, pos.z) < range * range) {
+                            isInRange = true;
+                            break;
+                        }
+                    }
+                    if (!isInRange)
+                        return;
+                }
                 final BlockPos targetBlockPos = target.blockAttachment();
 
                 if (level.getBlockEntity(targetBlockPos) instanceof final SmartBlockEntity be) {

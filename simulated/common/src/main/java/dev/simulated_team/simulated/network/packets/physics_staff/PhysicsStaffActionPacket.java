@@ -3,6 +3,7 @@ package dev.simulated_team.simulated.network.packets.physics_staff;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffAction;
+import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffItem;
 import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffServerHandler;
 import dev.simulated_team.simulated.util.SimCodecUtil;
 import foundry.veil.api.network.handler.PacketContext;
@@ -49,7 +50,9 @@ public class PhysicsStaffActionPacket implements CustomPacketPayload {
 
     public void handle(final PacketContext context) {
         final ServerLevel level = (ServerLevel) context.level();
-
+        if (this.action != PhysicsStaffAction.STOP_DRAG && !PhysicsStaffItem.isHolding(context.player())) {
+            return;
+        }
         if (this.action == PhysicsStaffAction.LOCK) {
             PhysicsStaffServerHandler.get(level).toggleLock(this.subLevel);
         }
