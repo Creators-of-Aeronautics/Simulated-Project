@@ -13,7 +13,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringB
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import dev.simulated_team.simulated.content.blocks.lasers.LaserBehaviour;
@@ -27,6 +26,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeItem;
@@ -44,7 +44,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.awt.*;
@@ -300,7 +299,12 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         @Override
         public ValueSettingsBoard createBoard(final Player player, final BlockHitResult hitResult) {
             return new ValueSettingsBoard(this.label, this.max, 15, ImmutableList.of(Component.translatable("simulated.unit.length_blocks")),
-                    new ValueSettingsFormatter(ValueSettings::format));
+                    new ValueSettingsFormatter(this::formatSettings));
+        }
+
+        public MutableComponent formatSettings(final ValueSettings settings) {
+            final int value = Math.max(1, settings.value());
+            return Component.literal(String.valueOf(value));
         }
     }
 }
