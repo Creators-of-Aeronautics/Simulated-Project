@@ -74,7 +74,7 @@ public class SimNeoForgeClientEvents {
 		SimulatedCommonClientEvents.appendTooltip(event.getItemStack(), event.getFlags(), event.getEntity(), event.getToolTip());
 	}
 
-	@EventBusSubscriber(modid = Simulated.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+	@EventBusSubscriber(modid = Simulated.MOD_ID, value = Dist.CLIENT)
 	public static class ModBusEvents {
 
 		@SubscribeEvent
