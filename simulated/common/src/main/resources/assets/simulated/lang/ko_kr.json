@@ -59,7 +59,7 @@
   "advancement.simulated.what_goes_down.desc": "띠용! 용수철을 얻으세요",
   "advancement.simulated.you_spin_me_right_round": "빙빙 돌아가는 회전목마처럼",
   "advancement.simulated.you_spin_me_right_round.desc": "회전 베어링을 통해서 모의 구조물을 조립하세요",
-  "block.simulated.absorber.tooltip.summary": "§c[임시용] 미완성! 작동§c하지 않습니다.",
+  "block.simulated.absorber.tooltip.summary": "§c[임시] 미완성! 작동§c하지 않습니다.",
   "block.simulated.altitude_sensor": "고도 감지기",
   "block.simulated.analog_transmission": "아날로그 전동기",
   "block.simulated.auger_cog": "오거 톱니바퀴",

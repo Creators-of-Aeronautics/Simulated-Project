@@ -1,1 +1,17 @@
-{}
+{
+  "block.offroad.borehead_bearing": "Вальниця бура",
+  "block.offroad.rockcutting_wheel": "Каменерізне колесо",
+  "block.offroad.wheel_mount.tooltip.behaviour1": "_Гальмує_ прикріплене колесо, _збільшуючи тертя_.",
+  "block.offroad.wheel_mount.tooltip.behaviour2": "_Напрямляє_ колесо в бік, _звідки йде сигнал_.",
+  "block.offroad.wheel_mount.tooltip.condition1": "Коли заживлено зверху",
+  "block.offroad.wheel_mount.tooltip.condition2": "Коли заживлено збоку",
+  "block.offroad.wheel_mount.tooltip.summary": "Кріпить _колесоподібні_ предмети для пересування по землі.",
+  "item.offroad.large_tire": "Велике колесо",
+  "item.offroad.large_tire.tooltip.summary": "Велике _всюдихідне колесо._",
+  "item.offroad.monstrous_tire": "Гігантське колесо",
+  "item.offroad.monstrous_tire.tooltip.summary": "Гігантське _всюдихідне колесо._",
+  "item.offroad.small_tire": "Мале колесо",
+  "item.offroad.small_tire.tooltip.summary": "Мале _всюдихідне колесо._",
+  "item.offroad.tire": "Колесо",
+  "item.offroad.tire.tooltip.summary": "Стандартне _всюдихідне колесо._"
+}
