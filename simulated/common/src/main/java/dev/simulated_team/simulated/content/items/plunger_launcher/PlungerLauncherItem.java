@@ -14,6 +14,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.mixin_interface.PlayerLaunchedPlungerExtension;
 import dev.simulated_team.simulated.network.packets.PlungerLauncherShootPacket;
 import dev.simulated_team.simulated.service.SimConfigService;
+import dev.simulated_team.simulated.service.SimEntityService;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -55,6 +56,10 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     @Override
     public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand interactionHand) {
         final ItemStack heldStack = player.getItemInHand(interactionHand);
+        if (SimEntityService.INSTANCE.isFake(player)) {
+            return InteractionResultHolder.fail(heldStack);
+        }
+
         if (ShootableGadgetItemMethods.shouldSwap(player, heldStack, interactionHand, s -> s.getItem() instanceof PlungerLauncherItem)) {
             return InteractionResultHolder.fail(heldStack);
         }
