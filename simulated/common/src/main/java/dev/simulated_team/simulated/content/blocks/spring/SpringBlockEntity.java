@@ -109,10 +109,10 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         newDesiredLength = Math.round(newDesiredLength / 0.25) * 0.25;
 
         final double currentLength = Sable.HELPER.distanceSquaredWithSubLevels(level, this.worldPosition.getCenter(), this.partnerPos.getCenter()) + 1;
-        if (currentLength > newDesiredLength * newDesiredLength * 4) {
+        if (delta < 0 && currentLength > newDesiredLength * newDesiredLength * 4) {
             return "too_stretched";
         }
-        if (currentLength < newDesiredLength * newDesiredLength / 4) {
+        if (delta > 0 && currentLength < newDesiredLength * newDesiredLength / 4) {
             return "too_compressed";
         }
 
