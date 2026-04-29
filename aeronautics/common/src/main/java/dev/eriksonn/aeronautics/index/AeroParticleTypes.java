@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 public enum AeroParticleTypes {
     PROPELLER_AIR_FLOW(PropellerAirParticleData::new),
     HOT_AIR_EMBER(HotAirEmberParticleData::new),
-    LEVITITE_SPARKLE(LevititeSparklePartcleData::new),
+    LEVITITE_SPARKLE(LevititeSparkleParticleData::new),
     GUST(GustParticleData::new),
     AIR_POOF(AirPoofParticleData::new);
 
