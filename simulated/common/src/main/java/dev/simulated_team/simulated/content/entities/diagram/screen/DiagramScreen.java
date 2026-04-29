@@ -581,19 +581,30 @@ public class DiagramScreen extends AbstractSimiScreen {
     @Override
     protected void renderWindow(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
         final PoseStack ps = graphics.pose();
+        int diagramX = this.width / 2 - DIAGRAM_TEXTURE.width / 2;
+        int diagramY = this.height / 2 - DIAGRAM_TEXTURE.height / 2;
 
         if (this.subLevel.isRemoved() || this.diagram.isRemoved()) {
             this.onClose();
             return;
         }
 
+        graphics.bufferSource().endBatch();
         this.note.renderWidget(graphics, mouseX, mouseY, partialTicks);
+        graphics.bufferSource().endBatch();
         this.renderContents(this.subLevel, partialTicks);
 
         // genuinely how can this be null they are assigned values in the constructor
         if (this.turnDownButton != null && this.turnUpButton != null) {
             this.turnDownButton.visible = this.turnDownButton.active = this.config.pitch() < 45.0f;
             this.turnUpButton.visible = this.turnUpButton.active = this.config.pitch() > -45.0f;
+        } else {
+            this.turnUpButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_TURN_UP, diagramX + 236, diagramY + 8, Component.empty(), () -> {
+                this.rotateDiagram(0, -1);
+            });
+            this.turnDownButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_TURN_DOWN, diagramX + 236, diagramY + 8 + 14, Component.empty(), () -> {
+                this.rotateDiagram(0, 1);
+            });
         }
 
         ps.pushPose();
@@ -604,8 +615,8 @@ public class DiagramScreen extends AbstractSimiScreen {
             widget.renderTab(graphics, mouseX, mouseY, partialTicks);
         }
 
-        final int diagramX = this.width / 2 - DIAGRAM_TEXTURE.width / 2;
-        final int diagramY = this.height / 2 - DIAGRAM_TEXTURE.height / 2;
+        diagramX = this.width / 2 - DIAGRAM_TEXTURE.width / 2;
+        diagramY = this.height / 2 - DIAGRAM_TEXTURE.height / 2;
 
         // Render config paper
         ps.pushPose();

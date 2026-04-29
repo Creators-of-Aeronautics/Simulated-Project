@@ -18,6 +18,7 @@ import dev.ryanhcode.sable.sublevel.render.SubLevelRenderData;
 import dev.ryanhcode.sable.sublevel.render.dispatcher.SubLevelRenderDispatcher;
 import dev.ryanhcode.sable.sublevel.render.dispatcher.VanillaSubLevelRenderDispatcher;
 import dev.ryanhcode.sable.sublevel.render.vanilla.VanillaSingleSubLevelRenderData;
+import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.mixin_interface.diagram.LightTextureExtension;
 import dev.simulated_team.simulated.mixin_interface.diagram.VisualManagerExtension;
 import dev.simulated_team.simulated.mixin_interface.diagram.VisualizationManagerExtension;
@@ -181,7 +182,13 @@ public class SimpleSubLevelGroupRenderer {
                     final PoseStack beMatrices = new PoseStack();
                     beMatrices.pushPose();
                     beMatrices.mulPose(transformation);
-                    beRenderer.renderBlockEntities(embeddingInfo.blockEntities(), beMatrices, partialTicks, -chunkOffset.x, -chunkOffset.y, -chunkOffset.z);
+                    try {
+                        beRenderer.renderBlockEntities(embeddingInfo.blockEntities(), beMatrices, partialTicks, -chunkOffset.x, -chunkOffset.y, -chunkOffset.z);
+                    } catch (final Exception e) {
+                        Simulated.LOGGER.warn("Skipping block-entity");
+                        bufferSource.endBatch();
+                    }
+
                     beMatrices.popPose();
 
                     dispatcher.sable$setCameraPosition(null);
@@ -189,7 +196,11 @@ public class SimpleSubLevelGroupRenderer {
             }
 
             // Render normal block-entities
-            SubLevelRenderDispatcher.get().renderBlockEntities(subLevels, beRenderer, cameraPosition.x, cameraPosition.y, cameraPosition.z, partialTicks);
+            try {
+                SubLevelRenderDispatcher.get().renderBlockEntities(subLevels, beRenderer, cameraPosition.x, cameraPosition.y, cameraPosition.z, partialTicks);
+            } catch (final Exception e) {
+                Simulated.LOGGER.warn("Skipping normal block-entity");
+            }
 
             for (final ClientSubLevel entitySubLevel : subLevels) {
                 final List<Entity> entities = level.getEntitiesOfClass(Entity.class, entitySubLevel.getPlot().getBoundingBox().toAABB().inflate(16.0));
