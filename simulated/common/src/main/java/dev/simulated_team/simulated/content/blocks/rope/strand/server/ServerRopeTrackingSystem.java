@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.content.blocks.rope.strand.server;
 
 import dev.ryanhcode.sable.api.sublevel.SubLevelTrackingPlugin;
 import dev.simulated_team.simulated.content.blocks.rope.RopeStrandHolderBehavior;
+import dev.simulated_team.simulated.network.packets.rope.ClientboundRopeDataPacket;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -75,7 +76,10 @@ public class ServerRopeTrackingSystem implements SubLevelTrackingPlugin {
                     continue;
                 }
 
-                holder.getStrandPacketSink().sendPacket(holder.makeUpdatePacket());
+                final ClientboundRopeDataPacket packet = holder.makeUpdatePacket();
+                if (packet != null) {
+                    holder.getStrandPacketSink().sendPacket(packet);
+                }
                 strand.justSynced();
             } else if (!strand.networkingStopped) {
                 strand.networkingStopped = true;
