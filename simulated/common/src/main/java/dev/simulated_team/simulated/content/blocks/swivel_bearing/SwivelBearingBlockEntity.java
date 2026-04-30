@@ -217,7 +217,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         this.lastTargetAngleDegrees = this.targetAngleDegrees;
         float angularSpeed = convertToAngular(this.limitCogSpeed(this.cogwheel.getSpeed()));
 
-        boolean shouldUpdateAngle = true;
+        boolean shouldUpdateAngle = this.isAssembled();
 
         if (this.sequencedAngleLimit >= 0) {
             angularSpeed = (float) Mth.clamp(angularSpeed, -this.sequencedAngleLimit, this.sequencedAngleLimit);
