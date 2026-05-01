@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -33,6 +32,9 @@ public abstract class LevelRenderMixin implements MultiMiningDestructionExtensio
 
     @Shadow
     private int ticks;
+
+    @Shadow
+    protected abstract void removeProgress(BlockDestructionProgress progress);
 
     /**
      * we need to manually handle this as our multimining progress does not have a tree set associated with it. It's just a holder for other progresses...
@@ -56,26 +58,35 @@ public abstract class LevelRenderMixin implements MultiMiningDestructionExtensio
     public void offroad$manuallyAddMultiDestructionProgress(final int id, final Map<BlockPos, MultiMiningClientHandler.ClientBlockBreakingData> clientData) {
         final BlockDestructionProgress multiMineBlockHolder = this.destroyingBlocks.computeIfAbsent(id, $ -> new MultiMiningBlockDestructionProgress(id, BlockPos.ZERO));
         if (multiMineBlockHolder instanceof final MultiMiningBlockDestructionProgress mmProgress) {
-            // update already present block breaking progresses, and add new ones
-            for (final Map.Entry<BlockPos, MultiMiningClientHandler.ClientBlockBreakingData> clientSet : clientData.entrySet()) {
-                mmProgress.otherProgresses.computeIfAbsent(clientSet.getKey(), pos -> new BlockDestructionProgress(id, clientSet.getKey()))
-                        .setProgress((byte) clientSet.getValue().destroyProgress);
-            }
 
-            // check ALL progresses and remove invalid ones
-            final Iterator<Map.Entry<BlockPos, BlockDestructionProgress>> iter = mmProgress.otherProgresses.entrySet().iterator();
-            while (iter.hasNext()) {
-                // remove invalid progresses
-                final BlockDestructionProgress blockDestructionProgress = iter.next().getValue();
-                if (blockDestructionProgress.getProgress() < 0 || blockDestructionProgress.getProgress() >= 10) {
-                    this.offroad$removeProgress(blockDestructionProgress);
-                    iter.remove();
-                    continue;
-                }
+            final Map<BlockPos, BlockDestructionProgress> heldProgresses = mmProgress.otherProgresses;
+            clientData.forEach((bPos, data) -> {
+                final float clientDataProgress = data.destroyProgress;
+                final boolean clientDataInvalid = data.invalid;
+                heldProgresses.compute(bPos, (k, heldBlockBreakingProgress) -> {
+                    //if we don't have a value, AND we're trying to add an invalid value, ignore
+                    if (heldBlockBreakingProgress == null && (clientDataProgress == -1 || clientDataInvalid)) {
+                        return null;
+                    }
 
-                this.destructionProgress.computeIfAbsent(blockDestructionProgress.getPos().asLong(), l -> Sets.newTreeSet())
-                        .add(blockDestructionProgress);
-            }
+                    //if we have a value, but we're given an invalid progression, remove this entry
+                    if (heldBlockBreakingProgress != null && (clientDataProgress == -1 || clientDataInvalid)) {
+                        this.offroad$removeProgress(heldBlockBreakingProgress);
+                        return null;
+                    }
+
+                    //we're given a valid progress, but we have no block progression. create a new one :>
+                    if (heldBlockBreakingProgress == null) {
+                        heldBlockBreakingProgress = new BlockDestructionProgress(id, bPos);
+                    }
+
+                    heldBlockBreakingProgress.setProgress((byte) clientDataProgress);
+                    this.destructionProgress.computeIfAbsent(bPos.asLong(), l -> Sets.newTreeSet())
+                            .add(heldBlockBreakingProgress);
+
+                    return heldBlockBreakingProgress;
+                });
+            });
 
             // update our timer to make sure we keep voided appropriately
             mmProgress.updateTick(this.ticks);

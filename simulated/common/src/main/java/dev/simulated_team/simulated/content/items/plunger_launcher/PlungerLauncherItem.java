@@ -14,12 +14,14 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.mixin_interface.PlayerLaunchedPlungerExtension;
 import dev.simulated_team.simulated.network.packets.PlungerLauncherShootPacket;
 import dev.simulated_team.simulated.service.SimConfigService;
+import dev.simulated_team.simulated.service.SimEntityService;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -54,6 +56,10 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     @Override
     public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand interactionHand) {
         final ItemStack heldStack = player.getItemInHand(interactionHand);
+        if (SimEntityService.INSTANCE.isFake(player)) {
+            return InteractionResultHolder.fail(heldStack);
+        }
+
         if (ShootableGadgetItemMethods.shouldSwap(player, heldStack, interactionHand, s -> s.getItem() instanceof PlungerLauncherItem)) {
             return InteractionResultHolder.fail(heldStack);
         }
@@ -96,6 +102,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
                 reloadCooldown = true;
             }
 
+            player.awardStat(Stats.ITEM_USED.get(heldStack.getItem()));
             // send shoot packet
             VeilPacketManager.player((ServerPlayer) player).sendPacket(new PlungerLauncherShootPacket(interactionHand));
             // todo: send to all tracking players for playing (to be implemented) external animation

@@ -522,7 +522,9 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     }
 
     public PropellerBearingContraptionEntity getMovedContraption() {
-        return (PropellerBearingContraptionEntity) this.movedContraption;
+        if(this.movedContraption instanceof PropellerBearingContraptionEntity propellerBearingContraptionEntity)
+            return propellerBearingContraptionEntity;
+        return null;
     }
 
     public enum ThrustDirection implements INamedIconOptions {

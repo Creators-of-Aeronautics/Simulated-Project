@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.network.packets;
 
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.merging_glue.MergingGlueBlock;
@@ -17,6 +16,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -73,6 +73,7 @@ public record PlaceMergingGluePacket(BlockPos parentPos, BlockPos childPos, Dire
             return;
         }
 
+        player.awardStat(Stats.ITEM_USED.get(glue.getItem()));
         controller.startControlling(partner);
     }
 

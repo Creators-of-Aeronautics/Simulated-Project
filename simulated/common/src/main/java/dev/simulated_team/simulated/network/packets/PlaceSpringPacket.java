@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.network.packets;
 
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.spring.SpringBlock;
@@ -17,6 +16,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -68,6 +68,7 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
         controllerSpring.setDesiredLength(distance);
         partnerSpring.setDesiredLength(distance);
 
+        player.awardStat(Stats.ITEM_USED.get(spring.getItem()));
         if (!player.hasInfiniteMaterials()) {
             spring.shrink(1);
         }

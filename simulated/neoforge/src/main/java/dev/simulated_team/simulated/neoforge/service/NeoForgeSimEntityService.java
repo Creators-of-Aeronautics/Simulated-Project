@@ -21,6 +21,11 @@ public class NeoForgeSimEntityService implements SimEntityService {
 	}
 
 	@Override
+	public boolean isFake(final Player player) {
+		return player.isFakePlayer();
+	}
+
+	@Override
 	public <T extends Entity, P> EntityBuilder<T, P> loaderEntityTransform(final EntityBuilder<T, P> builder, final SimEntityTypes.EntityLoaderData data) {
 		return builder.properties(p -> {
 			if (data.immuneToFire())

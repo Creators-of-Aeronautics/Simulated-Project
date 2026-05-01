@@ -21,7 +21,7 @@ public abstract class AbstractLaserBlockEntity extends SmartBlockEntity {
         return this.getDirection().getNormal();
     }
 
-    public abstract float getLaserRange();
+    public abstract float getRaycastLength();
 
     public abstract boolean shouldCast();
 
@@ -29,13 +29,13 @@ public abstract class AbstractLaserBlockEntity extends SmartBlockEntity {
         final Vec3i normal = this.getNormal();
 
         final Vec3 start = Vec3.atCenterOf(this.worldPosition).add(Vec3.atLowerCornerOf(normal).scale(0.5f));
-        final Vec3 end = start.add(Vec3.atLowerCornerOf(normal).scale(this.getLaserRange()));
+        final Vec3 end = start.add(Vec3.atLowerCornerOf(normal).scale(this.getRaycastLength()));
         return Couple.create(start, end);
     }
 
     @Override
     public AABB getRenderBoundingBox() {
-        final int range = (int) this.getLaserRange();
+        final int range = (int) this.getRaycastLength();
         final Vec3i normal = this.getNormal();
 
         return new AABB(this.getBlockPos()).expandTowards(Vec3.atLowerCornerOf(normal.multiply(range)));

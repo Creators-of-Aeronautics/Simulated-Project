@@ -6,6 +6,10 @@
     {
       "id": "naturescompass:naturescompass",
       "required": false
+    },
+    {
+      "id": "explorerscompass:explorerscompass",
+      "required": false
     }
   ]
 }

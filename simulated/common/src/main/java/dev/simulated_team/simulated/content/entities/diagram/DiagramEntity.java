@@ -5,12 +5,11 @@ import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.foundation.networking.ISyncPersistentData;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
-import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.api.physics.force.ForceGroup;
 import dev.ryanhcode.sable.api.physics.force.ForceGroups;
 import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
 import dev.ryanhcode.sable.api.physics.mass.MassData;
+import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
@@ -19,6 +18,7 @@ import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import dev.simulated_team.simulated.index.SimEntityTypes;
 import dev.simulated_team.simulated.index.SimItems;
+import dev.simulated_team.simulated.index.SimStats;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramDataPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramOpenPacket;
 import dev.simulated_team.simulated.util.SimColors;
@@ -427,6 +427,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             if (subLevel != null) {
                 DiagramEntity.queueDiagramDataFor(subLevel, ((ServerPlayer) player));
                 VeilPacketManager.player((ServerPlayer) player).sendPacket(new DiagramOpenPacket(this.getId(), this.config));
+                SimStats.INTERACT_WITH_CONTRAPTION_DIAGRAM.awardTo(player);
                 SimAdvancements.MEASURE_ONCE_BUILD_TWICE.awardTo(player);
             }
         }

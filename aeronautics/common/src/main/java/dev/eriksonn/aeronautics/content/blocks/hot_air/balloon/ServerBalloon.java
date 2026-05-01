@@ -9,18 +9,18 @@ import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.LiftingGasHol
 import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.LiftingGasType;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
-import dev.ryanhcode.sable.api.SubLevelHelper;
-import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.api.physics.force.ForceGroups;
 import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import dev.ryanhcode.sable.util.SableMathUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
@@ -37,15 +37,12 @@ public class ServerBalloon extends Balloon {
 
     // Physics
     private final Matrix3d outerProduct = new Matrix3d();
-    private final Matrix3d inertiaTensor = new Matrix3d();
 
-    private final Matrix3d translatedInertiaTensor = new Matrix3d();
     private final Matrix3d translatedOuterProduct = new Matrix3d();
 
     private final Vector3d averagePosition = new Vector3d();
     private final Vector3d translatedAveragePosition = new Vector3d();
 
-    private final Vector3d offset = new Vector3d();
     /**
      * The origin vector used for the average position & matrices
      */
@@ -65,35 +62,9 @@ public class ServerBalloon extends Balloon {
         this.onRebuilt();
     }
 
-    /**
-     * equivalent to identity.scale(u.dot(v))-fmaOuterProduct(u,v)
-     */
-    public static Matrix3d fmaInertiaTensor(final Vector3dc u, final Vector3dc v, final double scale, final Matrix3d target) {
-        target.m00 += (u.y() * v.y() + u.z() * v.z()) * scale;
-        target.m01 -= u.y() * v.x() * scale;
-        target.m02 -= u.z() * v.x() * scale;
-        target.m10 -= u.x() * v.y() * scale;
-        target.m11 += (u.z() * v.z() + u.x() * v.x()) * scale;
-        target.m12 -= u.z() * v.y() * scale;
-        target.m20 -= u.x() * v.z() * scale;
-        target.m21 -= u.y() * v.z() * scale;
-        target.m22 += (u.x() * v.x() + u.y() * v.y()) * scale;
-        return target;
-    }
-
-    public void translateMatrices(final ServerSubLevel serverSubLevel) {
-        final Vector3dc centerOfMass = serverSubLevel.getMassTracker().getCenterOfMass();
-        this.offset.set(centerOfMass).sub(this.physicsOrigin);
-
+    public void translateMatrices() {
         this.translatedOuterProduct.set(this.outerProduct);
-        SableMathUtils.fmaOuterProduct(this.offset, this.averagePosition, -this.getCapacity(), this.translatedOuterProduct);
-        SableMathUtils.fmaOuterProduct(this.averagePosition, this.offset, -this.getCapacity(), this.translatedOuterProduct);
-        SableMathUtils.fmaOuterProduct(this.offset, this.offset, this.getCapacity(), this.translatedOuterProduct);
-
-        this.translatedInertiaTensor.set(this.inertiaTensor);
-        fmaInertiaTensor(this.offset, this.averagePosition, -this.getCapacity(), this.translatedInertiaTensor);
-        fmaInertiaTensor(this.averagePosition, this.offset, -this.getCapacity(), this.translatedInertiaTensor);
-        fmaInertiaTensor(this.offset, this.offset, this.getCapacity(), this.translatedInertiaTensor);
+        SableMathUtils.fmaOuterProduct(this.averagePosition, this.averagePosition, -this.getCapacity(), this.translatedOuterProduct);
     }
 
     protected void checkHeaters() {
@@ -118,7 +89,12 @@ public class ServerBalloon extends Balloon {
             });
         }
     }
-
+    static final Vector3d force = new Vector3d();
+    static final Vector3d torque = new Vector3d();
+    static final Vector3d localAveragePosition = new Vector3d();
+    static final Vector3d worldCenter = new Vector3d();
+    static final Vector3d gradient = new Vector3d();
+    static final Vector3d gravity = new Vector3d();
     public void applyForces(final double timeStep) {
         final int capacity = this.getCapacity();
         if (capacity <= 0) return;
@@ -129,7 +105,7 @@ public class ServerBalloon extends Balloon {
             return;
         }
 
-        this.translateMatrices(subLevel);
+        this.translateMatrices();
 
         final Level level = subLevel.getLevel();
         final Pose3d pose = subLevel.logicalPose();
@@ -139,36 +115,31 @@ public class ServerBalloon extends Balloon {
 
         // calculate and impart appropriate forces onto associated sub-level
 
-        final Vector3d localAveragePosition = new Vector3d(this.translatedAveragePosition).sub(pose.rotationPoint());
-        final Vector3d worldCenter = new Vector3d(localAveragePosition);
+        localAveragePosition.set(this.translatedAveragePosition).sub(pose.rotationPoint());
+        worldCenter.set(localAveragePosition);
         pose.orientation().transform(worldCenter).add(pose.position());
 
-        final Vector3d gravity = pose.orientation().transformInverse(new Vector3d(DimensionPhysicsData.getGravity(level, worldCenter)));
+        DimensionPhysicsData.getGravity(level, worldCenter,gravity);
+        pose.orientation().transformInverse(gravity);
         final double pressure = DimensionPhysicsData.getAirPressure(level, worldCenter);
+        if(pressure < 1E-5 || gravity.lengthSquared() == 0)
+            return;
 
-        final double diff = 1;
-        final Vector3d gradient = new Vector3d();
+        //get gradient in local space
+        final double diff = 0.1;
+
         final double pressureX = DimensionPhysicsData.getAirPressure(level, gradient.set(diff, 0, 0).add(worldCenter)) - pressure;
         final double pressureY = DimensionPhysicsData.getAirPressure(level, gradient.set(0, diff, 0).add(worldCenter)) - pressure;
         final double pressureZ = DimensionPhysicsData.getAirPressure(level, gradient.set(0, 0, diff).add(worldCenter)) - pressure;
         gradient.set(pressureX, pressureY, pressureZ).div(diff);
         pose.orientation().transformInverse(gradient);
 
-        final Vector3d baseForcePerBlock = new Vector3d(gravity).mul(-this.totalLift / capacity);
-        final Vector3d baseTorquePerBlock = new Vector3d();
-
-        final Vector3d force = new Vector3d();
-        final Vector3d torque = new Vector3d();
-        final Vector3d temp = new Vector3d();
-
-        final Vector3d centerForce = new Vector3d();
-        this.translatedOuterProduct.transform(gradient);
-        baseTorquePerBlock.cross(localAveragePosition, centerForce).add(baseForcePerBlock);
-        baseTorquePerBlock.cross(gradient, force).fma(capacity * pressure, centerForce);
-
-        localAveragePosition.cross(force, torque);
-        torque.add(gradient.cross(centerForce, temp));
-        torque.fma(pressure, this.translatedInertiaTensor.transform(baseTorquePerBlock, temp));
+        //compute force and torque
+        force.set(gravity).mul(-this.totalLift);
+        torque.set(localAveragePosition).mul(pressure);
+        torque.fma(1.0/capacity,this.translatedOuterProduct.transform(gradient));
+        torque.cross(force);
+        force.mul(pressure);
 
         // torque and force are both in momentum units, let's get them into acceleration
         force.mul(timeStep);
@@ -178,18 +149,14 @@ public class ServerBalloon extends Balloon {
         forceGroup.getForceTotal().applyLinearAndAngularImpulse(force, torque);
 
         if (subLevel.isTrackingIndividualQueuedForces()) {
-            forceGroup.recordPointForce(new Vector3d(this.translatedAveragePosition), force);
+            forceGroup.recordPointForce(new Vector3d(this.translatedAveragePosition).fma(1/(pressure*capacity),gradient), new Vector3d(force));
         }
     }
-
+    static final Vector3d POSITION_TEMP = new Vector3d();
     @Override
     protected void onRebuilt() {
         this.outerProduct.zero();
-        this.inertiaTensor.zero();
         this.averagePosition.zero();
-
-        final Vector3d p = new Vector3d();
-        final Matrix3d m = new Matrix3d();
 
         for (final List<BalloonLayerData> layers : this.graph.getAllLayers()) {
             for (final BalloonLayerData layer : layers) {
@@ -198,8 +165,8 @@ public class ServerBalloon extends Balloon {
                 while (iter.hasNext()) {
                     final BlockPos pos = iter.next();
 
-                    p.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).sub(this.physicsOrigin);
-                    this.averagePosition.add(p);
+                    POSITION_TEMP.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).sub(this.physicsOrigin);
+                    this.averagePosition.add(POSITION_TEMP);
                 }
             }
         }
@@ -216,17 +183,8 @@ public class ServerBalloon extends Balloon {
                     final int y = pos.getY();
                     final int z = pos.getZ();
 
-                    p.set(x + 0.5, y + 0.5, z + 0.5).sub(this.physicsOrigin);
-                    this.outerProduct.add(m.set(
-                            p.x * p.x, p.x * p.y, p.x * p.z,
-                            p.y * p.x, p.y * p.y, p.y * p.z,
-                            p.z * p.x, p.z * p.y, p.z * p.z
-                    ));
-                    this.inertiaTensor.add(m.set(
-                            p.y * p.y + p.z * p.z, -p.x * p.y, -p.x * p.z,
-                            -p.y * p.x, p.z * p.z + p.x * p.x, -p.y * p.z,
-                            -p.z * p.x, -p.z * p.y, p.x * p.x + p.y * p.y
-                    ));
+                    POSITION_TEMP.set(x + 0.5, y + 0.5, z + 0.5).sub(this.physicsOrigin);
+                    SableMathUtils.fmaOuterProduct(POSITION_TEMP,POSITION_TEMP,1,this.outerProduct);
                 }
             }
         }
@@ -236,79 +194,46 @@ public class ServerBalloon extends Balloon {
 
     @Override
     protected void onHotAirAdded(final BlockPos pos) {
-        final Matrix3d m = new Matrix3d();
-        final Vector3d p = new Vector3d();
 
-        p.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
+        POSITION_TEMP.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
                 .sub(this.physicsOrigin);
 
         this.averagePosition.mul(this.getCapacity() - 1)
-                .add(p)
+                .add(POSITION_TEMP)
                 .div(this.getCapacity());
-
-        this.outerProduct.add(m.set(
-                p.x * p.x, p.x * p.y, p.x * p.z,
-                p.y * p.x, p.y * p.y, p.y * p.z,
-                p.z * p.x, p.z * p.y, p.z * p.z
-        ));
-        this.inertiaTensor.add(m.set(
-                p.y * p.y + p.z * p.z, -p.x * p.y, -p.x * p.z,
-                -p.y * p.x, p.z * p.z + p.x * p.x, -p.y * p.z,
-                -p.z * p.x, -p.z * p.y, p.x * p.x + p.y * p.y
-        ));
+        SableMathUtils.fmaOuterProduct(POSITION_TEMP,POSITION_TEMP,1,this.outerProduct);
     }
 
     @Override
     protected void onHotAirRemoved(final BlockPos pos) {
-        final Matrix3d m = new Matrix3d();
-        final Vector3d p = new Vector3d();
 
-        p.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
+        POSITION_TEMP.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
                 .sub(this.physicsOrigin);
 
         this.averagePosition.mul(this.getCapacity() + 1)
-                .sub(p)
+                .sub(POSITION_TEMP)
                 .div(this.getCapacity());
-
-        this.outerProduct.add(m.set(
-                p.x * p.x, p.x * p.y, p.x * p.z,
-                p.y * p.x, p.y * p.y, p.y * p.z,
-                p.z * p.x, p.z * p.y, p.z * p.z
-        ));
-        this.inertiaTensor.add(m.set(
-                p.y * p.y + p.z * p.z, -p.x * p.y, -p.x * p.z,
-                -p.y * p.x, p.z * p.z + p.x * p.x, -p.y * p.z,
-                -p.z * p.x, -p.z * p.y, p.x * p.x + p.y * p.y
-        ));
+        SableMathUtils.fmaOuterProduct(POSITION_TEMP,POSITION_TEMP,-1,this.outerProduct);
     }
 
     @Override
     protected void onHotAirRemoved(final Iterable<BlockPos> iterable) {
         super.onHotAirRemoved(iterable);
-        final Matrix3d m = new Matrix3d();
-        final Vector3d p = new Vector3d();
+
 
         for (final BlockPos blockPos : iterable) {
             final int y = blockPos.getY();
             final int x = blockPos.getX();
             final int z = blockPos.getZ();
 
-            p.set(x + 0.5, y + 0.5, z + 0.5).sub(this.physicsOrigin);
+            POSITION_TEMP.set(x + 0.5, y + 0.5, z + 0.5).sub(this.physicsOrigin);
 
             this.averagePosition.mul(this.capacity)
-                    .sub(p)
+                    .sub(POSITION_TEMP)
                     .div(this.capacity - 1);
 
-            this.outerProduct.sub(m.set(
-                    p.x * p.x, p.x * p.y, p.x * p.z,
-                    p.y * p.x, p.y * p.y, p.y * p.z,
-                    p.z * p.x, p.z * p.y, p.z * p.z
-            ));
-            this.inertiaTensor.sub(m.set(
-                    p.y * p.y + p.z * p.z, -p.x * p.y, -p.x * p.z,
-                    -p.y * p.x, p.z * p.z + p.x * p.x, -p.y * p.z,
-                    -p.z * p.x, -p.z * p.y, p.x * p.x + p.y * p.y
-            ));
+            SableMathUtils.fmaOuterProduct(POSITION_TEMP,POSITION_TEMP,-1,this.outerProduct);
+
             this.capacity--;
         }
     }
@@ -411,6 +336,34 @@ public class ServerBalloon extends Balloon {
     public boolean shouldSpawnGust(final BlockPos pos) {
         final float percentHeight = (pos.getY() + 0.5f - this.bounds.minY) / this.getHeight();
         return percentHeight > 1.0 - Math.clamp(this.totalFilledVolume / this.getCapacity(), 0, 1);
+    }
+
+    @Override
+    public void spawnGust(final Level level, final BlockPos pos, final Direction dir) {
+        int contributingGases = 0;
+        for (final LiftingGasHolder liftingGasHolder : this.getLiftingGasHolders()) {
+            if (liftingGasHolder.data().amount > 0) {
+                contributingGases++;
+            }
+        }
+
+        if (contributingGases == 0) {
+            return;
+        }
+
+        boolean canSpawnGust = true;
+        final double nudge = 1d / contributingGases;
+        for (final LiftingGasHolder liftingGasHolder : this.getLiftingGasHolders()) {
+            if (liftingGasHolder.data().amount < nudge) {
+                canSpawnGust = false;
+                liftingGasHolder.data().amount = 0;
+            } else {
+                liftingGasHolder.data().amount -= nudge;
+            }
+        }
+        if (canSpawnGust) {
+            super.spawnGust(level, pos, dir);
+        }
     }
 
     @Override

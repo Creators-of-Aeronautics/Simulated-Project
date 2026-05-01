@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -40,7 +39,6 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public class AltitudeSensorBlock extends FaceAttachedHorizontalDirectionalBlock implements IBE<AltitudeSensorBlockEntity>, IWrenchable, CommonRedstoneBlock {
     public static final EnumProperty<FaceType> DIAL = EnumProperty.create("dial", FaceType.class);
-    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
     public static final MapCodec<AltitudeSensorBlock> CODEC = simpleCodec(AltitudeSensorBlock::new);
 
     public AltitudeSensorBlock(final Properties pProperties) {
@@ -69,13 +67,12 @@ public class AltitudeSensorBlock extends FaceAttachedHorizontalDirectionalBlock 
         return this.defaultBlockState()
                 .setValue(HORIZONTAL_FACING, facing)
                 .setValue(FACE, face)
-                .setValue(DIAL, FaceType.LINEAR)
-                .setValue(POWERED, false);
+                .setValue(DIAL, FaceType.LINEAR);
     }
 
     @Override
     protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, FACE, DIAL, POWERED);
+        pBuilder.add(FACING, FACE, DIAL);
         super.createBlockStateDefinition(pBuilder);
     }
 

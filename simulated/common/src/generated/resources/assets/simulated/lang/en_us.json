@@ -636,5 +636,14 @@
   "simulated.velocity_sensor.selection.away": "Away",
   "simulated.velocity_sensor.selection.towards": "Towards",
   "simulated.zipline.too_far": "Rope is too far!",
-  "simulated.zipline.too_steep": "Rope is too steep!"
+  "simulated.zipline.too_steep": "Rope is too steep!",
+  "stat.simulated.format.meals": "%s Meals",
+  "stat.simulated.format.short_stories": "%s Short Stories",
+  "stat.simulated.interact_with_assembler": "Interactions with Assembler",
+  "stat.simulated.interact_with_contraption_diagram": "Interactions with Contraption Diagram",
+  "stat.simulated.interact_with_handle": "Interactions with Handle",
+  "stat.simulated.interact_with_steering_wheel": "Interactions with Steering Wheel",
+  "stat.simulated.portable_engines_fed": "Portable Engines Fed",
+  "stat.simulated.simulated_contraptions_named": "Simulated Contraptions Named",
+  "stat.simulated.typewriter_key_presses": "Typewriter Keystrokes"
 }

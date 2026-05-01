@@ -3,7 +3,6 @@ package dev.simulated_team.simulated.content.blocks.spring;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.force.ForceTotal;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
@@ -110,10 +109,10 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         newDesiredLength = Math.round(newDesiredLength / 0.25) * 0.25;
 
         final double currentLength = Sable.HELPER.distanceSquaredWithSubLevels(level, this.worldPosition.getCenter(), this.partnerPos.getCenter()) + 1;
-        if (currentLength > newDesiredLength * newDesiredLength * 4) {
+        if (delta < 0 && currentLength > newDesiredLength * newDesiredLength * 4) {
             return "too_stretched";
         }
-        if (currentLength < newDesiredLength * newDesiredLength / 4) {
+        if (delta > 0 && currentLength < newDesiredLength * newDesiredLength / 4) {
             return "too_compressed";
         }
 
@@ -515,7 +514,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         this.invalidateRenderBoundingBox();
     }
 
-    public SpringBlockEntity getPairedSpring() {
+    public @Nullable SpringBlockEntity getPairedSpring() {
         if (this.partnerPos == null) {
             return null;
         }

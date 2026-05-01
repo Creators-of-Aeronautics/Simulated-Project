@@ -3,9 +3,9 @@ package dev.eriksonn.aeronautics.network.packets;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.api.levitite_blend_crystallization.CrystalPropagationContext;
 import dev.eriksonn.aeronautics.api.levitite_blend_crystallization.LevititeBlendHelper;
-import dev.eriksonn.aeronautics.api.levitite_blend_crystallization.LevititeCatalyzerHandler;
 import dev.eriksonn.aeronautics.index.AeroLevititeBlendPropagationContexts;
 import dev.eriksonn.aeronautics.index.AeroTags;
+import dev.eriksonn.aeronautics.util.CatalyzerHelper;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import net.createmod.catnip.codecs.stream.CatnipStreamCodecs;
 import net.minecraft.core.BlockPos;
@@ -35,7 +35,7 @@ public record LevititeCatalystCrystallizationPacket(BlockPos pos, InteractionHan
 
 		final ItemStack item = player.getItemInHand(this.hand);
 
-		if (!LevititeCatalyzerHandler.isCatalyzer(item)) {
+		if (!CatalyzerHelper.isCatalyzer(item)) {
 			return;
 		}
 

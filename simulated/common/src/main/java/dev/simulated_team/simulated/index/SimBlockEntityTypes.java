@@ -2,7 +2,6 @@ package dev.simulated_team.simulated.index;
 
 import com.simibubi.create.content.kinetics.base.OrientedRotatingVisual;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
-import com.simibubi.create.content.kinetics.transmission.SplitShaftRenderer;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftVisual;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
@@ -112,7 +111,7 @@ public class SimBlockEntityTypes {
 
     public static final BlockEntityEntry<DockingConnectorBlockEntity> DOCKING_CONNECTOR = REGISTRATE
             .blockEntity("docking_connector", DockingConnectorBlockEntity::new)
-            .onRegister(SimInventoryService.INSTANCE.registerInventory((be, dir) -> be.inventory))
+            .onRegister(SimInventoryService.INSTANCE.registerInventory((be, dir) -> be.getInventory()))
             .onRegister(SimInventoryService.INSTANCE.registerTank((be, dir) -> be.tank))
             .validBlocks(SimBlocks.DOCKING_CONNECTOR)
             .renderer(() -> DockingConnectorRenderer::new)

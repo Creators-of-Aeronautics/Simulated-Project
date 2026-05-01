@@ -14,6 +14,8 @@ public interface SimEntityService {
 
     double getPlayerReach(Player player);
 
+    boolean isFake(Player player);
+
     /**
      * Used to allow loader specific changes to entities being registered. <p>
      * Usually used to apply the same property changes to forge and fabric, as their builders are different.

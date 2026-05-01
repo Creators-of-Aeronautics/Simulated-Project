@@ -17,6 +17,7 @@ import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorW
 import dev.simulated_team.simulated.content.blocks.redstone_magnet.*;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
+import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimMathUtils;
 import dev.simulated_team.simulated.util.SimMovementContext;
@@ -53,7 +54,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public boolean powered;
     public LerpedFloat extension = LerpedFloat.linear().chase(0, 0.1, LerpedFloat.Chaser.LINEAR);
     public LerpedFloat feet = LerpedFloat.linear().chase(0, 0.15, LerpedFloat.Chaser.LINEAR);
-    public DockingConnectorInventory inventory;
+    public DockingConnectorSoloInventory inventory;
     public DockingConnectorTank tank;
     public BlockPos otherConnectorPosition = null;
     public UUID otherConnectorSubLevelId = null;
@@ -68,7 +69,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
     public DockingConnectorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
-        this.inventory = new DockingConnectorInventory(this);
+        this.inventory = new DockingConnectorSoloInventory();
         this.tank = new DockingConnectorTank(this);
         this.ccWiredElement = DockingConnectorWiredElement.create(this);
     }
@@ -162,7 +163,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         if (previousExtended != this.isExtended())
             this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(DockingConnectorBlock.EXTENDED, this.isExtended()), 6);
         final float previousFeetValue = this.feet.getValue();
-        this.feet.updateChaseTarget(this.hasOtherConnector() || virtualLock ? 1 : 0);
+        this.feet.updateChaseTarget(this.hasOtherConnector() || this.virtualLock ? 1 : 0);
         this.feet.tickChaser();
         /*if (this.level.isClientSide() && this.isFeetExtended() && previousFeetValue != 1.0F) {
             final Direction facing = this.getBlockState().getValue(BlockStateProperties.FACING);
@@ -189,7 +190,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         }
     }
 
-    public void setVirtualLock(boolean lock) {
+    public void setVirtualLock(final boolean lock) {
         this.virtualLock = lock;
     }
 
@@ -372,7 +373,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             }
             if (isLocked) {
                 this.state = DockingConnectorState.LOCKED;
-                this.inventory.connect(this.otherConnectorPosition, otherConnector.inventory);
                 this.tank.connect(this.otherConnectorPosition, otherConnector.tank);
                 this.ccWiredElement.connect(otherConnector.ccWiredElement);
 
@@ -394,7 +394,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     }
 
     public void unDock() {
-        DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
+        final DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
         if (otherConnector != null) {
             this.ccWiredElement.disconnect(otherConnector.ccWiredElement);
         }
@@ -405,7 +405,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         this.otherConnectorPosition = null;
 
         this.state = this.isExtended() ? DockingConnectorState.EXTENDED : DockingConnectorState.UNPOWERED;
-        this.inventory.disconnect();
         this.tank.disconnect();
         this.removeConstraint();
         this.sendData();
@@ -609,6 +608,18 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
                 connector.constraintHandle = container.physicsSystem().getPipeline().addConstraint(thisSubLevel, otherSubLevel, constraint);
             }
+        }
+    }
+
+    // if any other mod caches this i am going to kill them with my mind
+    public AbstractContainer getInventory() {
+        final DockingConnectorBlockEntity other = this.getOtherConnector();
+        if (other != null) {
+            this.inventory.dock();
+            return new DockingConnectorDuoInventory(this, other);
+        } else {
+            this.inventory.unDock();
+            return this.inventory;
         }
     }
 

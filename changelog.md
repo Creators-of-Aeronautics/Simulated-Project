@@ -1,1 +1,5 @@
- - Fix assembling Swivel Bearings by themselves deleting sub-levels
+ - Fix Contraption Diagram not properly recording forces in other dimensions
+ - Fix issues with some blocks and sub-level schematics
+ - Adjust ComputerCraft peripherals and behavior for some blocks
+ - Update translations from Crowdin
+ - Fix various bugs and crashes

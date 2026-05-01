@@ -1,12 +1,10 @@
 package dev.ryanhcode.offroad.handlers.client;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.BlockDestructionProgress;
 
 import java.util.Map;
-import java.util.Set;
 
 public class MultiMiningBlockDestructionProgress extends BlockDestructionProgress {
     public final Map<BlockPos, BlockDestructionProgress> otherProgresses = new Object2ObjectOpenHashMap<>();

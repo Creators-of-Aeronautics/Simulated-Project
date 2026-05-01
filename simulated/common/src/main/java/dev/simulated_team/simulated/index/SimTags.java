@@ -29,13 +29,14 @@ public class SimTags {
     }
 
     public static class Blocks {
-        public static final TagKey<Block> NON_MOVABLE = create("non_movable");
+        public static final TagKey<Block> AIRTIGHT = create("aeronautics", "airtight");
 
         public static final TagKey<Block> SUPER_LIGHT = create("sable", "super_light");
         public static final TagKey<Block> LIGHT = create("sable", "light");
         public static final TagKey<Block> DIODE = create("sable", "diode");
 
-        public static final TagKey<Block> AIRTIGHT = create("airtight");
+        public static final TagKey<Block> NON_MOVABLE = create("non_movable");
+
         public static final TagKey<Block> NAMEPLATE_BLOCKS = create("nameplate_blocks");
         public static final TagKey<Block> SYMMETRIC_SAILS = create("symmetric_sails");
         public static final TagKey<Block> HANDLES = create("handles");

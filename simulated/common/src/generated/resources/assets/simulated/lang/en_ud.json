@@ -636,5 +636,14 @@
   "simulated.velocity_sensor.selection.away": "ʎɐʍⱯ",
   "simulated.velocity_sensor.selection.towards": "spɹɐʍo⟘",
   "simulated.zipline.too_far": "¡ɹɐɟ ooʇ sı ǝdoᴚ",
-  "simulated.zipline.too_steep": "¡dǝǝʇs ooʇ sı ǝdoᴚ"
+  "simulated.zipline.too_steep": "¡dǝǝʇs ooʇ sı ǝdoᴚ",
+  "stat.simulated.format.meals": "sןɐǝW %s",
+  "stat.simulated.format.short_stories": "sǝıɹoʇS ʇɹoɥS %s",
+  "stat.simulated.interact_with_assembler": "ɹǝןqɯǝssⱯ ɥʇıʍ suoıʇɔɐɹǝʇuI",
+  "stat.simulated.interact_with_contraption_diagram": "ɯɐɹbɐıᗡ uoıʇdɐɹʇuoƆ ɥʇıʍ suoıʇɔɐɹǝʇuI",
+  "stat.simulated.interact_with_handle": "ǝןpuɐH ɥʇıʍ suoıʇɔɐɹǝʇuI",
+  "stat.simulated.interact_with_steering_wheel": "ןǝǝɥM buıɹǝǝʇS ɥʇıʍ suoıʇɔɐɹǝʇuI",
+  "stat.simulated.portable_engines_fed": "pǝℲ sǝuıbuƎ ǝןqɐʇɹoԀ",
+  "stat.simulated.simulated_contraptions_named": "pǝɯɐN suoıʇdɐɹʇuoƆ pǝʇɐןnɯıS",
+  "stat.simulated.typewriter_key_presses": "sǝʞoɹʇsʎǝʞ ɹǝʇıɹʍǝdʎ⟘"
 }

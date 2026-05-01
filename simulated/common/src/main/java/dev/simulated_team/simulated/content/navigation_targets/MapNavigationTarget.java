@@ -48,30 +48,32 @@ public class MapNavigationTarget implements NavigationTarget {
 		double closestDist = Double.POSITIVE_INFINITY;
 		Vec3 closestPos = null;
 		Kind closestKind = null;
+    
+    for (final MapDecorations.Entry decoration : decorations.decorations().values()) {
+        if(!decoration.type().is(SimTags.Misc.NAV_TABLE_FINDABLE))
+            continue;
 
-		for (final MapDecorations.Entry decoration : decorations.decorations().values()) {
-			if(!decoration.type().is(SimTags.Misc.NAV_TABLE_FINDABLE))
-				continue;
+        final double dist = pos.distanceToSqr(decoration.x(), pos.y(), decoration.z());
+        if(dist < closestDist) {
+            closestPos = new Vec3(decoration.x(), pos.y(), decoration.z());
+            closestDist = dist;
+            closestKind = Kind.DECORATION;
+        }
+    }
 
-			final double dist = pos.distanceToSqr(decoration.x(), pos.y(), decoration.z());
-			if(dist < closestDist) {
-				closestPos = new Vec3(decoration.x(), pos.y(), decoration.z());
-				closestDist = dist;
-				closestKind = Kind.DECORATION;
-			}
-		}
+    final MapItemSavedData mapData = level.getMapData(mapId);
+    if (mapData != null) {
+        for (final MapBanner banner : mapData.getBanners()) {
+            final Vec3 bannerPos = banner.pos().getCenter();
+            final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
+            if(dist < closestDist) {
+                closestPos = bannerPos;
+                closestDist = dist;
+                closestKind = Kind.BANNER;
+            }
+        }
+    }
 
-		final MapItemSavedData mapData = level.getMapData(mapId);
-		final Collection<MapBanner> banners = mapData.getBanners();
-		for (final MapBanner banner : banners) {
-			final Vec3 bannerPos = banner.pos().getCenter();
-			final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
-			if(dist < closestDist) {
-				closestPos = bannerPos;
-				closestDist = dist;
-				closestKind = Kind.BANNER;
-			}
-		}
 
 		return closestPos == null ? null : new Resolved(closestPos, closestKind);
 	}

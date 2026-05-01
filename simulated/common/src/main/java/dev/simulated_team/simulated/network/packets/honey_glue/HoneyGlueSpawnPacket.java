@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -75,6 +76,7 @@ public record HoneyGlueSpawnPacket(BlockPos from, BlockPos to) implements Custom
             level.addFreshEntity(entity);
             entity.spawnParticles();
 
+            player.awardStat(Stats.ITEM_USED.get(honeyGlueItem.getItem()));
             SimAdvancements.NOT_GONNA_SUGARCOAT_IT.awardTo(player);
         }
     }

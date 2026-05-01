@@ -14,6 +14,7 @@ import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimSoundEvents;
+import dev.simulated_team.simulated.index.SimStats;
 import dev.simulated_team.simulated.multiloader.inventory.ContainerSlot;
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
 import dev.simulated_team.simulated.service.SimItemService;
@@ -300,6 +301,11 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
                     this.level.setBlock(front, state.cycle(CakeBlock.BITES), 2);
                 } else {
                     this.level.removeBlock(front, false);
+                    final AABB aabb = new AABB(this.getBlockPos()).inflate(8);
+                    final List<Player> nearbyPlayers = this.level.getEntitiesOfClass(Player.class, aabb);
+                    for (final Player player : nearbyPlayers) {
+                        SimStats.PORTABLE_ENGINES_FED.awardTo(player);
+                    }
                 }
                 this.burnTime += 20 * 5;
                 this.level.playSound(null, this.getBlockPos(), SoundEvents.GENERIC_EAT, SoundSource.BLOCKS, 1.0f, 1.0f);

@@ -3,6 +3,7 @@ package dev.simulated_team.simulated.network.packets;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.steering_wheel.SteeringWheelBlockEntity;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
+import dev.simulated_team.simulated.index.SimStats;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,6 +32,7 @@ public record SteeringWheelPacket(boolean shouldStop, float targetAngle, BlockPo
                 be.stopHolding();
             } else {
                 be.startHolding();
+                SimStats.INTERACT_WITH_STEERING_WHEEL.awardTo(player);
                 SimAdvancements.UNPOWERED_STEERING.awardTo(player);
             }
         }

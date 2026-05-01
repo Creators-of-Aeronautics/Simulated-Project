@@ -376,5 +376,20 @@
       "block_bounciness": "bounciness is %s",
       "block_bounciness.inverted": "bounciness is not %s"
     }
+  },
+
+  "stat.simulated": {
+    "format": {
+      "meals": "%s Meals",
+      "short_stories": "%s Short Stories"
+    },
+
+    "interact_with_assembler": "Interactions with Assembler",
+    "interact_with_contraption_diagram": "Interactions with Contraption Diagram",
+    "interact_with_handle": "Interactions with Handle",
+    "interact_with_steering_wheel": "Interactions with Steering Wheel",
+    "portable_engines_fed": "Portable Engines Fed",
+    "simulated_contraptions_named": "Simulated Contraptions Named",
+    "typewriter_key_presses": "Typewriter Keystrokes"
   }
 }

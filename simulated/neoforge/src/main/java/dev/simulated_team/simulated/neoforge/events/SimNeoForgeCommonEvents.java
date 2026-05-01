@@ -12,6 +12,7 @@ import dev.simulated_team.simulated.events.SimulatedCommonEvents;
 import dev.simulated_team.simulated.index.SimArmInteractions;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.index.SimTags;
+import dev.simulated_team.simulated.index.neoforge.NeoForgeSimStats;
 import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.multiloader.inventory.neoforge.ContainerWrapper;
 import dev.simulated_team.simulated.multiloader.tanks.SingleTank;
@@ -35,6 +36,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -224,6 +226,11 @@ public class SimNeoForgeCommonEvents {
 				}
 			}
 
+		}
+
+		@SubscribeEvent
+		public static void postRegister(final FMLLoadCompleteEvent event) {
+			NeoForgeSimStats.bootstrap();
 		}
 	}
 

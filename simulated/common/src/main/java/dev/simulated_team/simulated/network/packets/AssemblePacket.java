@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.network.packets;
 
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.physics_assembler.PhysicsAssemblerBlockEntity;
+import dev.simulated_team.simulated.index.SimStats;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -29,6 +30,7 @@ public record AssemblePacket(BlockPos pos) implements CustomPacketPayload {
 
         if (blockEntity instanceof final PhysicsAssemblerBlockEntity assembler) {
             assembler.assembleOrDisassemble();
+            SimStats.INTERACT_WITH_ASSEMBLER.awardTo(context.player());
         }
     }
 }
