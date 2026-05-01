@@ -104,7 +104,7 @@ public abstract class RotationPropagatorMixin {
         }
     }
 
-    @Inject(method = "getPotentialNeighbourLocations", at = @At("TAIL"), remap = false)
+    @Inject(method = "getPotentialNeighbourLocations", at = @At("TAIL"), cancellable = true, remap = false)
     private static void simulated$getExtraKineticsBlockPositions(final KineticBlockEntity be, final CallbackInfoReturnable<List<BlockPos>> cir) {
         final List<BlockPos> list = cir.getReturnValue();
         final List<BlockPos> extraKinetics = new ArrayList<>();
@@ -117,7 +117,13 @@ public abstract class RotationPropagatorMixin {
             }
         }
 
-        list.addAll(extraKinetics);
+        try {
+            list.addAll(extraKinetics);
+        } catch (final UnsupportedOperationException ignored) {
+            final List<BlockPos> mutableList = new ArrayList<>(list);
+            mutableList.addAll(extraKinetics);
+            cir.setReturnValue(mutableList);
+        }
     }
 
     @Unique
