@@ -1,7 +1,7 @@
 package dev.eriksonn.aeronautics.api.levitite_blend_crystallization;
 
-import dev.eriksonn.aeronautics.index.AeroTags;
 import dev.eriksonn.aeronautics.network.packets.LevititeCatalystCrystallizationPacket;
+import dev.eriksonn.aeronautics.util.CatalyzerHelper;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.click_interactions.InteractCallback;
 import foundry.veil.api.network.VeilPacketManager;
@@ -21,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static com.simibubi.create.foundation.utility.RaycastHelper.getTraceTarget;
 
-public class LevititeCatalyzerHandler implements InteractCallback {
+public class LevititeClientCatalyzerHandler implements InteractCallback {
     @NotNull
     private static ClipContext gatherContext(final Player player) {
         final Vec3 origin = player.getEyePosition();
@@ -34,10 +34,6 @@ public class LevititeCatalyzerHandler implements InteractCallback {
                 player);
     }
 
-    public static boolean isCatalyzer(final ItemStack item) {
-        return item.is(AeroTags.ItemTags.LEVITITE_CATALYZER) || item.is(AeroTags.ItemTags.LEVITITE_SOUL_CATALYZER);
-    }
-
     @Override
     public Result onUse(final int modifiers, final int action, final KeyMapping rightKey) {
 
@@ -48,7 +44,7 @@ public class LevititeCatalyzerHandler implements InteractCallback {
             //Gather catalyzer
             final InteractionHand hand = InteractionHand.MAIN_HAND;
             final ItemStack catalyzer = player.getItemInHand(hand);
-            if (!isCatalyzer(catalyzer))
+            if (!CatalyzerHelper.isCatalyzer(catalyzer))
                 return Result.empty();
 
             final ClipContext context = gatherContext(player);
