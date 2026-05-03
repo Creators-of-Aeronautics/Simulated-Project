@@ -25,8 +25,8 @@
 
     "linked_typewriter": {
       "title": "Linked Typewriter",
-      "start_controlling": "Now controlling Linked Typewriter",
-      "stop_controlling": "Stopped controlling Linked Typewriter",
+      "start_controlling": "Now controlling %s",
+      "stop_controlling": "Stopped controlling %s",
       "bind_mode": "Bind mode active",
       "press_keybind": "Press any key to bind this Remote's frequencies to the Linked Typewriter",
       "key_bound": "Frequency bound to %1$s",

@@ -19,6 +19,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -66,12 +68,16 @@ public class LinkedTypewriterInteractionHandler {
             MODE = Mode.IDLE;
             stopInteraction();
 
-            if (TYPEWRITER.get() != null) {
-                player.displayClientMessage(SimLang.translate("linked_typewriter.stop_controlling").component(), true);
+            final LinkedTypewriterBlockEntity associatedTypeWriter = TYPEWRITER.get();
+            if (associatedTypeWriter != null) {
+                final Component customName = associatedTypeWriter.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
+                player.displayClientMessage(SimLang.translate("linked_typewriter.stop_controlling", customName.getString()).component(), true);
             }
         } else {
             MODE = Mode.ACTIVE;
-            player.displayClientMessage(SimLang.translate("linked_typewriter.start_controlling").component(), true);
+
+            final Component customName = be.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
+            player.displayClientMessage(SimLang.translate("linked_typewriter.start_controlling", customName.getString()).component(), true);
         }
 
         TYPEWRITER = new WeakReference<>(be);
