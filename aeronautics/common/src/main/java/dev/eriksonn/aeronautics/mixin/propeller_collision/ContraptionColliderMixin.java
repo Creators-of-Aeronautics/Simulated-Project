@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
 import com.simibubi.create.content.contraptions.ContraptionCollider;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.contraption.PropellerBearingContraptionEntity;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
@@ -22,6 +23,16 @@ public abstract class ContraptionColliderMixin {
     @Shadow
     static Vec3 collide(final Vec3 p_20273_, final Entity e) {
         return null;
+    }
+
+    @Inject(method = "collideEntities", at = @At("HEAD"), cancellable = true)
+    private static void aeronautics$nullAxisGuard(
+            final AbstractContraptionEntity contraptionEntity,
+            final CallbackInfo ci) {
+        if (contraptionEntity instanceof final ControlledContraptionEntity controlled
+                && controlled.getRotationAxis() == null) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "collideEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isAlive()Z"))

@@ -32,11 +32,13 @@ public class PropellerBearingContraptionEntity extends ControlledContraptionEnti
     }
 
     public static ControlledContraptionEntity create(final Level world, final IControlContraption controller,
-                                                     final Contraption contraption) {
+                                                     final Contraption contraption,
+                                                     final Direction.Axis rotationAxis) {
         final PropellerBearingContraptionEntity entity =
                 new PropellerBearingContraptionEntity(AeroEntityTypes.PROPELLER_CONTROLLED_CONTRAPTION.get(), world);
         entity.setControllerPos(controller.getBlockPosition());
         entity.setContraption(contraption);
+        entity.setRotationAxis(rotationAxis);
         return entity;
     }
 

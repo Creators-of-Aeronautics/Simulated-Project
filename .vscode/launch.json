@@ -1,0 +1,93 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Offroad NeoForge Data (:offroad:neoforge)",
+      "presentation": {
+        "group": "Mod Development - neoforge",
+        "order": 0
+      },
+      "projectName": "offroad-neoforge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\build\\moddev\\dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dsimulated%%C:\\mods_mine_fix\\Simulated-Project\\simulated\\neoforge\\bin\\main;offroad%%C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\offroad\\neoforge\\runs\\data",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Client (:all-neoforge)",
+      "presentation": {
+        "group": "Mod Development - all-neoforge",
+        "order": 0
+      },
+      "projectName": "all-neoforge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003daeronautics%%C:\\mods_mine_fix\\Simulated-Project\\aeronautics\\neoforge\\bin\\main;simulated%%C:\\mods_mine_fix\\Simulated-Project\\simulated\\neoforge\\bin\\main;offroad%%C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\all-neoforge\\runs\\client",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge ClientAuth (:all-neoforge)",
+      "presentation": {
+        "group": "Mod Development - all-neoforge",
+        "order": 1
+      },
+      "projectName": "all-neoforge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\clientAuthRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\clientAuthRunVmArgs.txt",
+        "-Dfml.modFolders\u003daeronautics%%C:\\mods_mine_fix\\Simulated-Project\\aeronautics\\neoforge\\bin\\main;simulated%%C:\\mods_mine_fix\\Simulated-Project\\simulated\\neoforge\\bin\\main;offroad%%C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\all-neoforge\\runs\\client",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Server (:all-neoforge)",
+      "presentation": {
+        "group": "Mod Development - all-neoforge",
+        "order": 2
+      },
+      "projectName": "all-neoforge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\mods_mine_fix\\Simulated-Project\\all-neoforge\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003daeronautics%%C:\\mods_mine_fix\\Simulated-Project\\aeronautics\\neoforge\\bin\\main;simulated%%C:\\mods_mine_fix\\Simulated-Project\\simulated\\neoforge\\bin\\main;offroad%%C:\\mods_mine_fix\\Simulated-Project\\offroad\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\all-neoforge\\runs\\server",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}
