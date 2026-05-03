@@ -41,6 +41,11 @@ public class GimbalSensorBlock extends Block implements IBE<GimbalSensorBlockEnt
     }
 
 
+    @Override
+    public boolean isSignalSource(final BlockState state) {
+        return true;
+    }
+
     public int getSignal(final BlockState pState, final BlockGetter pLevel, final BlockPos pPos, final Direction side) {
         final GimbalSensorBlockEntity be = this.getBlockEntity(pLevel, pPos);
         if (be == null)
