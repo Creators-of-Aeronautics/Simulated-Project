@@ -1,13 +1,17 @@
 package dev.simulated_team.simulated.content.blocks.steering_wheel;
 
+import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.network.packets.SteeringWheelPacket;
+import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.hold_interaction.BlockHoldInteraction;
 import dev.simulated_team.simulated.util.hold_interaction.HoldInteractionManager;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -20,6 +24,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
     private static float effectiveAngle = 0;
     private static boolean wasShiftKeyDown = false;
     private static int angleSgn = 1;
+    private static float angleLimit = 0;
 
     @Override
     public void startHold(final Level level, final Player player, final BlockPos blockPos) {
@@ -28,7 +33,88 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         rawAngle = blockEntity.getInteractionAngle(Minecraft.getInstance().getTimer().getGameTimeDeltaTicks());
         angleSgn = (int) blockEntity.directionConvert(1);
         updated = true;
+        angleLimit = blockEntity.angleInput.getValue();
         this.setTargetAngle(rawAngle);
+    }
+
+
+    @Override
+    public void renderOverlay(GuiGraphics guiGraphics, int width1, int height1, boolean hideGui) {
+        Minecraft mc = Minecraft.getInstance();
+        if (hideGui) return;
+
+        ResourceLocation tex = Simulated.path("textures/gui/steering_wheel.png");
+        float shits = 0.56f;
+
+        int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().miscConfig.steeringWheelXOffset.get();
+        int y = 10 + SimConfigService.INSTANCE.client().miscConfig.steeringWheelYOffset.get();
+        int centerX = x + 111 - 4;
+
+        float realDegrees = -effectiveAngle;
+        float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : Mth.wrapDegrees(realDegrees);
+
+        float offset = Mth.wrapDegrees(angleLimit) * shits;
+
+        guiGraphics.blit(tex, x, y, 0, 0, 223, 31, 256, 256);
+
+
+        int activeWidth = (int) Math.abs(offset);
+
+        if (Math.abs(angleLimit) <= 180) {
+
+            int leftDeadZoneWidth = (centerX - x) - activeWidth + 4;
+            if (leftDeadZoneWidth > 0) {
+                guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
+            }
+
+            int rightSideStart = (centerX + activeWidth) + 8;
+            int rightDeadZoneWidth = (x + 223) - rightSideStart;
+            if (rightDeadZoneWidth > 0)
+                guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+        } else {
+            if (realDegrees < -180) {
+                int rightSideStart = (centerX - activeWidth) + 4;
+                int rightDeadZoneWidth = (x + 223) - rightSideStart;
+                if (rightDeadZoneWidth > 0)
+                    guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+            }
+            if (realDegrees > 180) {
+                int leftDeadZoneWidth = (centerX - x) + activeWidth + 4;
+                if (leftDeadZoneWidth > 0)
+                    guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
+            }
+        }
+
+        if (Math.abs(angleLimit) > 180) {
+            if (-realDegrees > 180) {
+                guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+            }
+            if (-realDegrees < -180) {
+                guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+            }
+        } else {
+            guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+            guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+        }
+
+        int markerX = (int) (centerX - degrees * shits) + 1;
+
+        guiGraphics.blit(tex, markerX, y + 11, 224, 0, 9, 18, 256, 256);
+
+        String text = (int) -realDegrees + "°";
+        int textWidth = mc.font.width(text);
+
+        int centeredX = markerX + 6 - (textWidth / 2);
+
+        for (int xoff = -1; xoff < 2; xoff++) {
+            for (int yoff = -1; yoff < 2; yoff++) {
+                if (xoff == 0 && yoff == 0) continue;
+
+                guiGraphics.drawString(mc.font, text, centeredX + xoff, y + yoff, (int) Long.parseLong("2b2117", 16), false);
+            }
+        }
+
+        guiGraphics.drawString(mc.font, text, centeredX, y, (int) Long.parseLong("886539", 16), false);
     }
 
     @Override
