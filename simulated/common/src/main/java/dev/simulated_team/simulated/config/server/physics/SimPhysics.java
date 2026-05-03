@@ -24,6 +24,8 @@ public class SimPhysics extends ConfigBase {
     public final ConfigFloat physicsStaffAngularStiffness = this.f(10000.0f, 0, Float.MAX_VALUE, "physics_staff_angular_stiffness", SimPhysics.Comments.physicsStaffAngularStiffness);
     public final ConfigFloat physicsStaffAngularDamping = this.f(850.0f, 0, Float.MAX_VALUE, "physics_staff_angular_damping", SimPhysics.Comments.physicsStaffAngularDamping);
 
+    public final ConfigFloat symmetricSailParallelDragScalar = this.f(1.75f, 0.0f, Float.MAX_VALUE, "symmetric_sail_parallel_drag_scalar", Comments.symmetricSailParallelDragScalar);
+
 
     @Override
     public String getName() {
@@ -44,6 +46,8 @@ public class SimPhysics extends ConfigBase {
         private static final String dockingConnectorAngleTolerance = "The angle tolerance in degrees for docking connectors to link";
         private static final String dockingConnectorDistanceTolerance = "The distance tolerance in blocks for docking connectors to link";
         private static final String handleMaxForce = "The maximum force handles are allowed to apply to the contraption they are attached to";
+
+        private static final String symmetricSailParallelDragScalar = "The parallel drag scalar of symmetric sail";
 
         public static String physicsStaffLinearStiffness = "The linear stiffness of the joint motors used to hold sub-levels by the Creative Physics Staff";
         public static String physicsStaffLinearDamping = "The linear damping of the joint motors used to hold sub-levels by the Creative Physics Staff";
