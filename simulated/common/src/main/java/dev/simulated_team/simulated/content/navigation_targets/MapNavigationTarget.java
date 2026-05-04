@@ -14,13 +14,14 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
 
 public class MapNavigationTarget implements NavigationTarget {
 	@Override
 	public @Nullable Vec3 getTarget(final NavTableBlockEntity navBE, final ItemStack self) {
-		final Level level = navBE.getLevel();
-		final Vec3 pos = navBE.getProjectedSelfPos();
-		return getNearestDecorationPos(level, pos, self);
+		final Resolved resolved = resolveNearest(navBE.getLevel(), navBE.getProjectedSelfPos(), self);
+		return resolved == null ? null : resolved.pos();
 	}
 
 	@Override
@@ -28,40 +29,56 @@ public class MapNavigationTarget implements NavigationTarget {
 		return 0;
 	}
 
-	private static Vec3 getNearestDecorationPos(final Level level, final Vec3 pos, final ItemStack stack) {
+	@Override
+	public Map<String, Object> getPeripheralMetadata(final NavTableBlockEntity be, final ItemStack self) {
+		final Resolved resolved = resolveNearest(be.getLevel(), be.getProjectedSelfPos(), self);
+		if (resolved == null) {
+			return Map.of();
+		}
+		return Map.of("kind", resolved.kind().name().toLowerCase(Locale.ROOT));
+	}
+
+	private static @Nullable Resolved resolveNearest(final Level level, final Vec3 pos, final ItemStack stack) {
 		final MapDecorations decorations = stack.getComponents().get(DataComponents.MAP_DECORATIONS);
 		final MapId mapId = stack.getComponents().get(DataComponents.MAP_ID);
-		if(decorations != null && mapId != null) {
-
-			double closestDist = Double.POSITIVE_INFINITY;
-			Vec3 closestPos = null;
-			for (final MapDecorations.Entry decoration : decorations.decorations().values()) {
-				if(!decoration.type().is(SimTags.Misc.NAV_TABLE_FINDABLE))
-					continue;
-
-				final double dist = pos.distanceToSqr(decoration.x(), pos.y(), decoration.z());
-				if(dist < closestDist) {
-					closestPos = new Vec3(decoration.x(), pos.y(), decoration.z());
-					closestDist = dist;
-				}
-			}
-
-			final MapItemSavedData mapData = level.getMapData(mapId);
-			if (mapData != null) {
-				final Collection<MapBanner> banners = mapData.getBanners();
-				for (final MapBanner banner : banners) {
-					final Vec3 bannerPos = banner.pos().getCenter();
-					final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
-					if(dist < closestDist) {
-						closestPos = bannerPos;
-						closestDist = dist;
-					}
-				}
-			}
-
-			return closestPos;
+		if(decorations == null || mapId == null) {
+			return null;
 		}
 
-		return null;
+		double closestDist = Double.POSITIVE_INFINITY;
+		Vec3 closestPos = null;
+		Kind closestKind = null;
+    
+    for (final MapDecorations.Entry decoration : decorations.decorations().values()) {
+        if(!decoration.type().is(SimTags.Misc.NAV_TABLE_FINDABLE))
+            continue;
+
+        final double dist = pos.distanceToSqr(decoration.x(), pos.y(), decoration.z());
+        if(dist < closestDist) {
+            closestPos = new Vec3(decoration.x(), pos.y(), decoration.z());
+            closestDist = dist;
+            closestKind = Kind.DECORATION;
+        }
+    }
+
+    final MapItemSavedData mapData = level.getMapData(mapId);
+    if (mapData != null) {
+        for (final MapBanner banner : mapData.getBanners()) {
+            final Vec3 bannerPos = banner.pos().getCenter();
+            final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
+            if(dist < closestDist) {
+                closestPos = bannerPos;
+                closestDist = dist;
+                closestKind = Kind.BANNER;
+            }
+        }
+    }
+
+
+		return closestPos == null ? null : new Resolved(closestPos, closestKind);
 	}
+
+	private enum Kind { DECORATION, BANNER }
+
+	private record Resolved(Vec3 pos, Kind kind) { }
 }
