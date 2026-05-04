@@ -20,11 +20,6 @@ public class KeyboardHandlerMixin {
     @Inject(method = "keyPress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0, opcode = 180/*GETFIELD*/), cancellable = true)
     private void simulated$preOnPress(final long windowPointer, final int key, final int scanCode, final int action, final int modifiers, final CallbackInfo ci) {
         if (this.minecraft.screen == null) {
-            if (action == GLFW.GLFW_REPEAT) { // todo test more thoroughly: this might break input at some point eventually? but like what would use specifically repeat keyboard inputs besides text guis
-                ci.cancel();
-                return;
-            }
-
             if (SimDistUtil.getClientPlayer() != null && !SimDistUtil.getClientPlayer().isSpectator()) {
                 final InteractCallback.Result status = SimulatedCommonClientEvents.onBeforeMouseInput(InteractCallback.Input.key(key, scanCode), modifiers, action);
                 if (status.cancelled()) {
