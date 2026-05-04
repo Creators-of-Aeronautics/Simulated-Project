@@ -57,7 +57,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
 
         guiGraphics.blit(tex, x, y, 0, 0, 223, 31, 256, 256);
 
-        final float offset = Mth.wrapDegrees(angleLimit) * magicOffset;
+        final float offset = wrapDegrees(angleLimit) * magicOffset;
         final int activeWidth = (int) Math.abs(offset);
 
         final int centerX = x + 111 - 4;
@@ -74,7 +74,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
                 guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
             }
         } else {
-            if (realDegrees < -180) {
+            if (realDegrees <= -180) {
                 final int rightSideStart = (centerX - activeWidth) + 4;
                 final int rightDeadZoneWidth = (x + 223) - rightSideStart;
                 if (rightDeadZoneWidth > 0) {
@@ -82,7 +82,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
                 }
             }
 
-            if (realDegrees > 180) {
+            if (realDegrees >= 180) {
                 final int leftDeadZoneWidth = (centerX - x) + activeWidth + 4;
                 if (leftDeadZoneWidth > 0) {
                     guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
@@ -91,11 +91,11 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         }
 
         if (Math.abs(angleLimit) > 180) {
-            if (-realDegrees > 180) {
+            if (-realDegrees >= 180) {
                 guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
 
-            if (-realDegrees < -180) {
+            if (-realDegrees <= -180) {
                 guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
         } else {
@@ -103,7 +103,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
             guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
         }
 
-        final float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : Mth.wrapDegrees(realDegrees);
+        final float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : wrapDegrees(realDegrees);
         final int markerX = (int) (centerX - degrees * magicOffset) + 1;
         guiGraphics.blit(tex, markerX, y + 11, 224, 0, 9, 18, 256, 256);
 
@@ -120,6 +120,19 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         }
 
         guiGraphics.drawString(mc.font, text, centeredX, y, (int) Long.parseLong("886539", 16), false);
+    }
+
+    //custom wrap because mc is a jerk (we need else if here otherwise it'll pass both if statements
+    public static float wrapDegrees(float value) {
+        float f = value % 360.0F;
+
+        if (f >= 180.0F) {
+            f -= 360.0F;
+        } else if (f <= -180.0F) {
+            f += 360.0F;
+        }
+
+        return f;
     }
 
     @Override
