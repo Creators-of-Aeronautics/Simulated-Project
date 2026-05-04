@@ -31,9 +31,14 @@ import java.util.List;
 @Mixin(RotationPropagator.class)
 public abstract class RotationPropagatorMixin {
 
-    @Redirect(method = {"handleRemoved", "propagateMissingSource", "findConnectedNeighbour"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
-    private static BlockEntity simulated$accountForExtraKinetics(final Level level, final BlockPos pos) {
-        return simulated$getBlockEntityAccountingExtraKinetics(level, pos);
+    @WrapOperation(method = {"handleRemoved", "propagateMissingSource", "findConnectedNeighbour"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
+    private static BlockEntity simulated$accountForExtraKinetics(final Level instance, final BlockPos pos, final Operation<BlockEntity> original) {
+        final BlockEntity be = original.call(instance, pos);
+        if (be instanceof final ExtraKinetics ek && pos instanceof ExtraBlockPos) {
+            return ek.getExtraKinetics();
+        }
+
+        return be;
     }
 
     @WrapOperation(method = "getRotationSpeedModifier", at = {
@@ -118,16 +123,6 @@ public abstract class RotationPropagatorMixin {
         }
 
         list.addAll(extraKinetics);
-    }
-
-    @Unique
-    private static @Nullable BlockEntity simulated$getBlockEntityAccountingExtraKinetics(final Level level, final BlockPos blockPos) {
-        final BlockEntity be = level.getBlockEntity(blockPos);
-        if (be instanceof final ExtraKinetics ek && blockPos instanceof ExtraBlockPos) {
-            return ek.getExtraKinetics();
-        }
-
-        return be;
     }
 
     @Unique
