@@ -4,6 +4,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
+import com.simibubi.create.content.contraptions.TranslatingContraption;
 import com.simibubi.create.content.contraptions.ContraptionCollider;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.contraption.PropellerBearingContraptionEntity;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
@@ -28,8 +30,9 @@ public abstract class ContraptionColliderMixin {
     private static void aeronautics$nullAxisGuard(
             final AbstractContraptionEntity contraptionEntity,
             final CallbackInfo ci) {
-        if (contraptionEntity instanceof final PropellerBearingContraptionEntity propeller
-                && propeller.getRotationAxis() == null) {
+        if (contraptionEntity instanceof final ControlledContraptionEntity controlled
+                && controlled.getRotationAxis() == null
+                && !(controlled.getContraption() instanceof TranslatingContraption)) {
             ci.cancel();
         }
     }
