@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 
 public class SimClient extends ConfigBase {
     public final SimItemConfigs itemConfig = this.nested(0, SimItemConfigs::new, SimClient.Comments.itemConfig);
-    public final SimBlockConfigs miscConfig = this.nested(0, SimBlockConfigs::new, SimClient.Comments.blockConfig);
+    public final SimBlockConfigs blockConfig = this.nested(0, SimBlockConfigs::new, SimClient.Comments.blockConfig);
 
     @Override
     @NonNull

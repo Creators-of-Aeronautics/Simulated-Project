@@ -48,8 +48,8 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         final ResourceLocation tex = Simulated.path("textures/gui/steering_wheel.png");
         final float magicOffset = 0.56f;
 
-        final int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().miscConfig.steeringWheelXOffset.get();
-        final int y = 10 + SimConfigService.INSTANCE.client().miscConfig.steeringWheelYOffset.get();
+        final int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().blockConfig.steeringWheelXOffset.get();
+        final int y = 10 + SimConfigService.INSTANCE.client().blockConfig.steeringWheelYOffset.get();
 
         guiGraphics.blit(tex, x, y, 0, 0, 223, 31, 256, 256);
 
