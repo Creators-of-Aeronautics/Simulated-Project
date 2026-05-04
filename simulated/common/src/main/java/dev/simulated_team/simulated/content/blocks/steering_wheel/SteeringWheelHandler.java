@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.steering_wheel;
 
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.network.packets.SteeringWheelPacket;
@@ -34,7 +35,6 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         angleSgn = (int) blockEntity.directionConvert(1);
         updated = true;
         angleLimit = blockEntity.angleInput.getValue();
-        this.setTargetAngle(rawAngle);
     }
 
 
@@ -42,6 +42,10 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
     public void renderOverlay(final GuiGraphics guiGraphics, final int width1, final int height1, final boolean hideGui) {
         final Minecraft mc = Minecraft.getInstance();
         if (hideGui) {
+            return;
+        }
+
+        if (mc.player != null && !GogglesItem.isWearingGoggles(mc.player)) {
             return;
         }
 
@@ -57,7 +61,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         final int activeWidth = (int) Math.abs(offset);
 
         final int centerX = x + 111 - 4;
-        final float realDegrees = -effectiveAngle;
+        final float realDegrees = angleSgn * -effectiveAngle;
         if (Math.abs(angleLimit) <= 180) {
             final int leftDeadZoneWidth = (centerX - x) - activeWidth + 4;
             if (leftDeadZoneWidth > 0) {
