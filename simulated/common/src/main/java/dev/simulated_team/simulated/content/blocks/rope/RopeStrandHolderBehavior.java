@@ -133,7 +133,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
             if (alreadyTrackingPlayers.add(uuid)) {
                 this.ownedServerStrand.updatePose();
-                VeilPacketManager.player(player).sendPacket(this.makeUpdatePacket());
+                VeilPacketManager.player(player).sendPacket(this.makeUpdatePacket(this.ownedServerStrand));
             }
         }
     }
@@ -157,21 +157,21 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     }
 
     @NotNull
-    public ClientboundRopeDataPacket makeUpdatePacket() {
+    public ClientboundRopeDataPacket makeUpdatePacket(ServerRopeStrand strand) {
         final ServerSubLevelContainer container = (ServerSubLevelContainer) SubLevelContainer.getContainer(this.getLevel());
         assert container != null;
 
         final SubLevelTrackingSystem trackingSystem = container.trackingSystem();
 
         //todo can be null from schematics
-        final RopeAttachment startAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.START);
-        final RopeAttachment endAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.END);
+        final RopeAttachment startAttachment = strand.getAttachment(RopeAttachmentPoint.START);
+        final RopeAttachment endAttachment = strand.getAttachment(RopeAttachmentPoint.END);
 
         return new ClientboundRopeDataPacket(
                 trackingSystem.getInterpolationTick(),
                 this.blockEntity.getBlockPos(),
-                this.ownedServerStrand.getUUID(),
-                new ObjectArrayList<>(this.ownedServerStrand.getPoints()),
+                strand.getUUID(),
+                new ObjectArrayList<>(strand.getPoints()),
                 startAttachment != null ? startAttachment.blockAttachment() : null,
                 endAttachment != null ? endAttachment.blockAttachment() : null
         );

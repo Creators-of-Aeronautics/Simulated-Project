@@ -75,7 +75,7 @@ public class ServerRopeTrackingSystem implements SubLevelTrackingPlugin {
                     continue;
                 }
 
-                holder.getStrandPacketSink().sendPacket(holder.makeUpdatePacket());
+                holder.getStrandPacketSink().sendPacket(holder.makeUpdatePacket(strand));
                 strand.justSynced();
             } else if (!strand.networkingStopped) {
                 strand.networkingStopped = true;
