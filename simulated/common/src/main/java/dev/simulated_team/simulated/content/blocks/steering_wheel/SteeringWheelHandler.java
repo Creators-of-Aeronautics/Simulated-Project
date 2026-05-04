@@ -39,49 +39,50 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
 
 
     @Override
-    public void renderOverlay(GuiGraphics guiGraphics, int width1, int height1, boolean hideGui) {
-        Minecraft mc = Minecraft.getInstance();
-        if (hideGui) return;
+    public void renderOverlay(final GuiGraphics guiGraphics, final int width1, final int height1, final boolean hideGui) {
+        final Minecraft mc = Minecraft.getInstance();
+        if (hideGui) {
+            return;
+        }
 
-        ResourceLocation tex = Simulated.path("textures/gui/steering_wheel.png");
-        float shits = 0.56f;
+        final ResourceLocation tex = Simulated.path("textures/gui/steering_wheel.png");
+        final float magicOffset = 0.56f;
 
-        int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().miscConfig.steeringWheelXOffset.get();
-        int y = 10 + SimConfigService.INSTANCE.client().miscConfig.steeringWheelYOffset.get();
-        int centerX = x + 111 - 4;
-
-        float realDegrees = -effectiveAngle;
-        float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : Mth.wrapDegrees(realDegrees);
-
-        float offset = Mth.wrapDegrees(angleLimit) * shits;
+        final int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().miscConfig.steeringWheelXOffset.get();
+        final int y = 10 + SimConfigService.INSTANCE.client().miscConfig.steeringWheelYOffset.get();
 
         guiGraphics.blit(tex, x, y, 0, 0, 223, 31, 256, 256);
 
+        final float offset = Mth.wrapDegrees(angleLimit) * magicOffset;
+        final int activeWidth = (int) Math.abs(offset);
 
-        int activeWidth = (int) Math.abs(offset);
-
+        final int centerX = x + 111 - 4;
+        final float realDegrees = -effectiveAngle;
         if (Math.abs(angleLimit) <= 180) {
-
-            int leftDeadZoneWidth = (centerX - x) - activeWidth + 4;
+            final int leftDeadZoneWidth = (centerX - x) - activeWidth + 4;
             if (leftDeadZoneWidth > 0) {
                 guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
             }
 
-            int rightSideStart = (centerX + activeWidth) + 8;
-            int rightDeadZoneWidth = (x + 223) - rightSideStart;
-            if (rightDeadZoneWidth > 0)
+            final int rightSideStart = (centerX + activeWidth) + 8;
+            final int rightDeadZoneWidth = (x + 223) - rightSideStart;
+            if (rightDeadZoneWidth > 0) {
                 guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+            }
         } else {
             if (realDegrees < -180) {
-                int rightSideStart = (centerX - activeWidth) + 4;
-                int rightDeadZoneWidth = (x + 223) - rightSideStart;
-                if (rightDeadZoneWidth > 0)
+                final int rightSideStart = (centerX - activeWidth) + 4;
+                final int rightDeadZoneWidth = (x + 223) - rightSideStart;
+                if (rightDeadZoneWidth > 0) {
                     guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+                }
             }
+
             if (realDegrees > 180) {
-                int leftDeadZoneWidth = (centerX - x) + activeWidth + 4;
-                if (leftDeadZoneWidth > 0)
+                final int leftDeadZoneWidth = (centerX - x) + activeWidth + 4;
+                if (leftDeadZoneWidth > 0) {
                     guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
+                }
             }
         }
 
@@ -89,6 +90,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
             if (-realDegrees > 180) {
                 guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
+
             if (-realDegrees < -180) {
                 guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
@@ -97,15 +99,14 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
             guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
         }
 
-        int markerX = (int) (centerX - degrees * shits) + 1;
-
+        final float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : Mth.wrapDegrees(realDegrees);
+        final int markerX = (int) (centerX - degrees * magicOffset) + 1;
         guiGraphics.blit(tex, markerX, y + 11, 224, 0, 9, 18, 256, 256);
 
-        String text = (int) -realDegrees + "°";
-        int textWidth = mc.font.width(text);
+        final String text = (int) -realDegrees + "°";
+        final int textWidth = mc.font.width(text);
 
-        int centeredX = markerX + 6 - (textWidth / 2);
-
+        final int centeredX = markerX + 6 - (textWidth / 2);
         for (int xoff = -1; xoff < 2; xoff++) {
             for (int yoff = -1; yoff < 2; yoff++) {
                 if (xoff == 0 && yoff == 0) continue;
