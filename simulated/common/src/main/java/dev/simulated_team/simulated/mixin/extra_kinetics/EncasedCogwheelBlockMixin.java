@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(EncasedCogwheelBlock.class)
 public class EncasedCogwheelBlockMixin {
     @WrapOperation(method = "handleEncasing", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/kinetics/base/IRotate;hasShaftTowards(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"))
-    private boolean test(final IRotate instance, final LevelReader level, final BlockPos pos, final BlockState state, final Direction direction, final Operation<Boolean> original) {
+    private boolean simulated$handleEncasingExtraKinetics(final IRotate instance, final LevelReader level, final BlockPos pos, final BlockState state, final Direction direction, final Operation<Boolean> original) {
         final boolean bl = original.call(instance, level, pos, state, direction);
         if (!bl && level.getBlockEntity(pos) instanceof final ExtraKinetics ek) {
             final KineticBlockEntity extraKinetics = ek.getExtraKinetics();

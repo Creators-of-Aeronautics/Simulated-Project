@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class KineticBlockMixin {
 
     @Inject(method = "updateIndirectNeighbourShapes", at = @At("TAIL"))
-    public void extraKineticsReset(final BlockState stateIn, final LevelAccessor worldIn, final BlockPos pos, final int flags, final int count, final CallbackInfo ci, @Local final BlockEntity be) {
+    public void simulated$extraKineticsReset(final BlockState stateIn, final LevelAccessor worldIn, final BlockPos pos, final int flags, final int count, final CallbackInfo ci, @Local final BlockEntity be) {
         if (be instanceof final ExtraKinetics ek) {
             final KineticBlockEntity extraKinetics = ek.getExtraKinetics();
             if (extraKinetics != null) {

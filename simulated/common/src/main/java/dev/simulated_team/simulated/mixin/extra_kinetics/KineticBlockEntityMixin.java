@@ -54,7 +54,7 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
     }
 
     @Inject(method = "switchToBlockState", at = @At("TAIL"))
-    private static void switchExtraKinetics(final Level world, final BlockPos pos, final BlockState state, final CallbackInfo ci, @Local final BlockEntity be) {
+    private static void simulated$switchExtraKinetics(final Level world, final BlockPos pos, final BlockState state, final CallbackInfo ci, @Local final BlockEntity be) {
         if (be instanceof final ExtraKinetics ek) {
             final KineticBlockEntity extraKinetics = ek.getExtraKinetics();
             if (extraKinetics != null) {
@@ -71,19 +71,6 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
             }
         }
     }
-
-/*    @WrapOperation(method = "switchToBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
-    private static BlockEntity simulated$accountForExtraKinetics(final Level instance, final BlockPos blockPos, final Operation<BlockEntity> original) {
-        final BlockEntity be = original.call(instance, blockPos);
-        if (be instanceof final ExtraKinetics ek) {
-            final KineticBlockEntity extraKinetics = ek.getExtraKinetics();
-            if (extraKinetics != null) {
-                return extraKinetics;
-            }
-        }
-
-        return be;
-    }*/
 
     @Redirect(method = "validateKinetics", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
     public BlockEntity simulated$useProperSource(final Level instance, final BlockPos blockPos) {
@@ -140,7 +127,7 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
     }
 
     @Inject(method = "remove", at = @At("TAIL"), remap = false)
-    public void injectRemove(final CallbackInfo ci) {
+    public void simulated$injectRemove(final CallbackInfo ci) {
         if (this instanceof final ExtraKinetics ek) {
             final KineticBlockEntity extraKinetics = ek.getExtraKinetics();
             if (extraKinetics != null) {
