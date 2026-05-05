@@ -154,6 +154,9 @@ public class ServerRopeStrand extends RopePhysicsObject {
         assert container != null;
 
         final RopeAttachment attachment = this.attachments.get(RopeAttachmentPoint.START);
+        if (attachment == null) {
+            return false;
+        }
         final UUID subLevelID = attachment.subLevelID();
 
         if (subLevelID != null) {
