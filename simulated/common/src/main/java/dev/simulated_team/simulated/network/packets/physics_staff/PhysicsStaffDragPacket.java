@@ -2,6 +2,8 @@ package dev.simulated_team.simulated.network.packets.physics_staff;
 
 import dev.ryanhcode.sable.util.SableBufferUtils;
 import dev.simulated_team.simulated.Simulated;
+import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffAction;
+import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffItem;
 import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffServerHandler;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -35,6 +37,10 @@ public record PhysicsStaffDragPacket(UUID subLevel, Vector3dc playerRelativeGoal
 
     public void handle(final ServerPacketContext context) {
         final ServerPlayer player = context.player();
+
+        if (!PhysicsStaffItem.isHolding(context.player())) {
+            return;
+        }
         final Level level = player.level();
 
         PhysicsStaffServerHandler.get((ServerLevel) level)
