@@ -11,7 +11,9 @@ import dev.simulated_team.simulated.content.blocks.directional_gearshift.Directi
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlockEntity;
 import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBlockEntity;
 import dev.simulated_team.simulated.content.blocks.steering_wheel.SteeringWheelBlockEntity;
+import dev.simulated_team.simulated.content.blocks.torsion_spring.TorsionSpringBlock;
 import dev.simulated_team.simulated.content.blocks.torsion_spring.TorsionSpringBlockEntity;
+import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.ponder.SmoothMovementUtils;
 import dev.simulated_team.simulated.ponder.instructions.*;
 import dev.simulated_team.simulated.service.SimItemService;
@@ -1173,6 +1175,23 @@ public class KineticScenes {
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
             nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
         });
+        scene.idle(20);
+
+        scene.overlay().showControls(util.vector().blockSurface(springPos, Direction.NORTH), Pointing.RIGHT, 30)
+                .withItem(new ItemStack(AllItems.BRASS_SHEET.get()));
+        scene.idle(5);
+        scene.world().setBlock(springPos,
+                SimBlocks.TORSION_SPRING.getDefaultState()
+                        .setValue(TorsionSpringBlock.VARIANT, TorsionSpringBlock.Variant.BRASS)
+                        .setValue(TorsionSpringBlock.FACING, Direction.WEST),
+                true);
+        scene.idle(5);
+        scene.overlay().showText(80)
+                .text("For aesthetic purposes, the metal can be changed with an Brass Sheet")
+                .attachKeyFrame()
+                .pointAt(util.vector().blockSurface(springPos.west(), Direction.WEST))
+                .placeNearTarget();
+        scene.idle(40);
     }
 
     public static void nozzle(final SceneBuilder builder, final SceneBuildingUtil util) {

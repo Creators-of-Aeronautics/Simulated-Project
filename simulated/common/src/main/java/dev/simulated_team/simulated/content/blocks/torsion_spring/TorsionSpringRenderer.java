@@ -31,7 +31,7 @@ public class TorsionSpringRenderer extends KineticBlockEntityRenderer<TorsionSpr
 
         final Direction facing = be.getBlockState().getValue(TorsionSpringBlock.FACING);
 
-        final SuperByteBuffer spring = CachedBuffers.partial(SimPartialModels.TORSION_SPRING, be.getBlockState());
+        final SuperByteBuffer spring = CachedBuffers.partial(be.getBlockState().getValue(TorsionSpringBlock.VARIANT) == TorsionSpringBlock.Variant.IRON ? SimPartialModels.TORSION_SPRING : SimPartialModels.TORSION_SPRING_BRASS, be.getBlockState());
         final float angle = be.interpolatedSpring(partialTicks);
         kineticRotationTransform(spring, be, facing.getAxis(), Mth.DEG_TO_RAD * angle, light);
         if (facing.getAxis().isHorizontal()) {

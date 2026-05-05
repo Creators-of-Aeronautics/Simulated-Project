@@ -1,0 +1,70 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "simulated:block/torsion_spring_brass",
+		"1": "create:block/brass_gearbox",
+		"2": "create:block/funnel/brass_funnel_frame",
+		"3": "simulated:block/torsion_spring_inside_brass",
+		"particle": "simulated:block/torsion_spring_brass"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 6, 16],
+			"faces": {
+				"north": {"uv": [0, 10, 16, 16], "texture": "#0", "cullface": "north"},
+				"east": {"uv": [0, 10, 16, 16], "texture": "#0", "cullface": "east"},
+				"south": {"uv": [0, 10, 16, 16], "texture": "#0", "cullface": "south"},
+				"west": {"uv": [0, 10, 16, 16], "texture": "#0", "cullface": "west"},
+				"up": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#3"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#2", "cullface": "down"}
+			}
+		},
+		{
+			"from": [1.95, 1, 1.95],
+			"to": [14.05, 0, 14.05],
+			"faces": {
+				"north": {"uv": [2, 15, 14, 16], "rotation": 180, "texture": "#1", "cullface": "down"},
+				"east": {"uv": [15, 2, 16, 14], "rotation": 270, "texture": "#1", "cullface": "down"},
+				"south": {"uv": [2, 0, 14, 1], "texture": "#1", "cullface": "down"},
+				"west": {"uv": [0, 2, 1, 14], "rotation": 90, "texture": "#1", "cullface": "down"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#1", "cullface": "down"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 45, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 225, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 3, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 135, 90],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"head": {
+			"translation": [0, 12, 0]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
+}

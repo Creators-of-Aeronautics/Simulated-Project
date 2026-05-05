@@ -1,0 +1,122 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "simulated:block/torsion_spring_brass",
+		"3": "simulated:block/torsion_spring_inside_brass",
+		"particle": "simulated:block/torsion_spring_brass"
+	},
+	"elements": [
+		{
+			"name": "Spring",
+			"from": [2, 6, 2],
+			"to": [14, 14, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [2, 2, 14, 10], "texture": "#0"},
+				"east": {"uv": [2, 2, 14, 10], "texture": "#0"},
+				"south": {"uv": [2, 2, 14, 10], "texture": "#0"},
+				"west": {"uv": [2, 2, 14, 10], "texture": "#0"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#3"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Spring_top",
+			"from": [2, 14, 2],
+			"to": [14, 16, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 14, 8]},
+			"faces": {
+				"north": {"uv": [2, 0, 14, 2], "texture": "#0"},
+				"east": {"uv": [12, 0, 14, 2], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 12], "rotation": 90, "texture": "#0"},
+				"west": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"up": {"uv": [2, 2, 14, 4], "texture": "#3"},
+				"down": {"uv": [2, 12, 14, 14], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Spring_top",
+			"from": [4, 14, 4],
+			"to": [12, 15, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 14, 8]},
+			"faces": {
+				"up": {"uv": [4, 4, 12, 12], "texture": "#3"},
+				"down": {"uv": [4, 4, 12, 12], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Spring_top",
+			"from": [2, 14, 4],
+			"to": [4, 16, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 14, 8]},
+			"faces": {
+				"east": {"uv": [0, 2, 2, 10], "rotation": 270, "texture": "#0"},
+				"west": {"uv": [4, 0, 12, 2], "texture": "#0"},
+				"up": {"uv": [2, 4, 4, 12], "texture": "#3"},
+				"down": {"uv": [2, 4, 4, 12], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Spring_top",
+			"from": [12, 14, 4],
+			"to": [14, 16, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 14, 8]},
+			"faces": {
+				"east": {"uv": [4, 0, 12, 2], "texture": "#0"},
+				"west": {"uv": [0, 2, 2, 10], "rotation": 270, "texture": "#0"},
+				"up": {"uv": [12, 4, 14, 12], "texture": "#3"},
+				"down": {"uv": [12, 4, 14, 12], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Spring_top",
+			"from": [2, 14, 12],
+			"to": [14, 16, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 14, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 12], "rotation": 90, "texture": "#0"},
+				"east": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"south": {"uv": [2, 0, 14, 2], "texture": "#0"},
+				"west": {"uv": [12, 0, 14, 2], "texture": "#0"},
+				"up": {"uv": [2, 12, 14, 14], "texture": "#3"},
+				"down": {"uv": [2, 2, 14, 4], "texture": "#3"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 45, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -135, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 3, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 135, 90],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"head": {
+			"translation": [0, 12, 0]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
+}

@@ -257,13 +257,14 @@ public class SimBlocks {
             .item()
             .transform(customItemModel())
             .register();
+
     public static final BlockEntry<TorsionSpringBlock> TORSION_SPRING =
             REGISTRATE.block("torsion_spring", TorsionSpringBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate((c, p) -> p.directionalBlock(c.get(),
-                            blockState -> p.models().getExistingFile(p.modLoc("block/torsion_spring/block"))))
+                            blockState -> p.models().getExistingFile(p.modLoc("block/torsion_spring/block_" + (blockState.getValue(TorsionSpringBlock.VARIANT).getSerializedName())))))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .transform(SimStress.setImpact(16.0))
