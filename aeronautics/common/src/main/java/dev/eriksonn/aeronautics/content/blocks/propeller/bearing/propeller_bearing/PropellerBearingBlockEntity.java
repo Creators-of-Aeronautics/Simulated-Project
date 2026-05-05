@@ -348,10 +348,9 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
         }
 
         contraption.removeBlocksFromWorld(this.level, BlockPos.ZERO);
-        this.movedContraption = PropellerBearingContraptionEntity.create(this.level, this, contraption);
+        this.movedContraption = PropellerBearingContraptionEntity.create(this.level, this, contraption, direction.getAxis());
         final BlockPos anchor = this.worldPosition.relative(direction);
         this.movedContraption.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
-        this.movedContraption.setRotationAxis(direction.getAxis());
         this.level.addFreshEntity(this.movedContraption);
 
         AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(this.level, this.worldPosition);
