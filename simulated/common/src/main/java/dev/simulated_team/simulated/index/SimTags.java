@@ -79,6 +79,9 @@ public class SimTags {
         public static final TagKey<Item> HANDLE_VARIANTS = create("handle_variants");
         public static final TagKey<Item> SPRING_ADJUSTER = create("spring_adjuster");
 
+        public static final TagKey<Item> IRON_SHEET = AllTags.commonItemTag("plates/iron");
+        public static final TagKey<Item> BRASS_SHEET = AllTags.commonItemTag("plates/brass");
+
         private static TagKey<Item> create(final String path) {
             return TagKey.create(Registries.ITEM, Simulated.path(path));
         }

@@ -1,54 +1,106 @@
 {
   "variants": {
-    "facing=down,powered=false": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=down,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
       "x": 180
     },
-    "facing=down,powered=true": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=down,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
       "x": 180
     },
-    "facing=east,powered=false": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=down,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
+      "x": 180
+    },
+    "facing=down,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
+      "x": 180
+    },
+    "facing=east,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
       "x": 90,
       "y": 90
     },
-    "facing=east,powered=true": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=east,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
       "x": 90,
       "y": 90
     },
-    "facing=north,powered=false": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=east,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
       "x": 90
     },
-    "facing=north,powered=true": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=north,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
       "x": 90
     },
-    "facing=south,powered=false": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=north,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
+      "x": 90
+    },
+    "facing=north,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
+      "x": 90
+    },
+    "facing=south,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
       "x": 90,
       "y": 180
     },
-    "facing=south,powered=true": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=south,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
       "x": 90,
       "y": 180
     },
-    "facing=up,powered=false": {
-      "model": "simulated:block/torsion_spring/block"
+    "facing=south,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
+      "x": 90,
+      "y": 180
     },
-    "facing=up,powered=true": {
-      "model": "simulated:block/torsion_spring/block"
+    "facing=south,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
+      "x": 90,
+      "y": 180
     },
-    "facing=west,powered=false": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=up,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass"
+    },
+    "facing=up,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron"
+    },
+    "facing=up,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass"
+    },
+    "facing=up,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron"
+    },
+    "facing=west,powered=false,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
       "x": 90,
       "y": 270
     },
-    "facing=west,powered=true": {
-      "model": "simulated:block/torsion_spring/block",
+    "facing=west,powered=false,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,powered=true,variant=brass": {
+      "model": "simulated:block/torsion_spring/block_brass",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,powered=true,variant=iron": {
+      "model": "simulated:block/torsion_spring/block_iron",
       "x": 90,
       "y": 270
     }

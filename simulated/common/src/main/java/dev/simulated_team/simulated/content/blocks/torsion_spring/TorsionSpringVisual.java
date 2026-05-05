@@ -39,7 +39,7 @@ public class TorsionSpringVisual extends OrientedRotatingVisual<TorsionSpringBlo
                 .rotateToFace(Direction.SOUTH, blockEntity.getBlockState().getValue(BlockStateProperties.FACING))
                 .setup(blockEntity.getExtraKinetics())
                 .setPosition(this.getVisualPosition());
-        this.springInstance = this.instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(SimPartialModels.TORSION_SPRING))
+        this.springInstance = this.instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(blockEntity.getBlockState().getValue(TorsionSpringBlock.VARIANT) == TorsionSpringBlock.Variant.IRON ? SimPartialModels.TORSION_SPRING : SimPartialModels.TORSION_SPRING_BRASS))
                 .createInstance()
                 .rotation(this.blockOrientation)
                 .position(this.getVisualPosition());

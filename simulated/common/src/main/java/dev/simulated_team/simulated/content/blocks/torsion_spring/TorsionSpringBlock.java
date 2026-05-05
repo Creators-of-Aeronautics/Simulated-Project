@@ -6,10 +6,19 @@ import com.simibubi.create.foundation.block.IBE;
 import dev.simulated_team.simulated.api.IDirectionalAnalogOutput;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
+import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraKinetics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -20,11 +29,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<TorsionSpringBlockEntity>, ExtraKinetics.ExtraKineticsBlock, IDirectionalAnalogOutput {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final EnumProperty<Variant> VARIANT = EnumProperty.create("variant", Variant.class);
 
     public TorsionSpringBlock(final Properties properties) {
         super(properties);
@@ -33,7 +48,29 @@ public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<T
 
     @Override
     protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(POWERED));
+        super.createBlockStateDefinition(builder.add(POWERED, VARIANT));
+    }
+
+    @Override
+    protected @NotNull ItemInteractionResult useItemOn(final ItemStack itemStack,
+                                                       final @NotNull BlockState blockState,
+                                                       final @NotNull Level level,
+                                                       final @NotNull BlockPos blockPos,
+                                                       final @NotNull Player player,
+                                                       final @NotNull InteractionHand interactionHand,
+                                                       final @NotNull BlockHitResult blockHitResult) {
+        final Variant conversion = Variant.getConversionFromItem(itemStack.getItem());
+
+        if (conversion != null) {
+            final Variant current = blockState.getValue(VARIANT);
+            if (conversion != current) {
+                level.setBlockAndUpdate(blockPos, blockState.setValue(VARIANT, conversion));
+                level.playLocalSound(blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 1, 1, false);
+                return ItemInteractionResult.SUCCESS;
+            }
+        }
+
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
@@ -104,5 +141,24 @@ public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<T
     @Override
     public IRotate getExtraKineticsRotationConfiguration() {
         return TorsionSpringBlockEntity.Output.CONFIG;
+    }
+
+    /**
+        Copied from {@link dev.eriksonn.aeronautics.content.blocks.hot_air.steam_vent.SteamVentBlock#useItemOn}
+    */
+    public enum Variant implements StringRepresentable {
+        IRON,
+        BRASS;
+
+        public static Variant getConversionFromItem(final Item item) {
+            if (item.builtInRegistryHolder().is(SimTags.Items.IRON_SHEET)) return IRON;
+            if (item.builtInRegistryHolder().is(SimTags.Items.BRASS_SHEET)) return BRASS;
+            return null;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return this.toString().toLowerCase(Locale.ROOT);
+        }
     }
 }

@@ -42,6 +42,7 @@ public class SimPartialModels {
             CONTRAPTION_DIAGRAM_3x3 = entity("contraption_diagram_large"),
             SPRING_MIDDLE = block("spring/middle"),
             TORSION_SPRING = block("torsion_spring/spring"),
+            TORSION_SPRING_BRASS = block("torsion_spring/spring_brass"),
             ROPE = block("rope/rope"),
             ROPE_KNOT = block("rope/knot"),
             LINKED_TYPEWRITER_KEY = block("linked_typewriter/key"),
