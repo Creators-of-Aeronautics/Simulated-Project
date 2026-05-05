@@ -50,7 +50,7 @@
   "aeronautics.ponder.envelope.text_3": "Горячий воздух должен удерживаться герметичными блоками",
   "aeronautics.ponder.envelope.text_4": "Валы можно обрамить в оболочку, чтобы сделать их герметичными",
   "aeronautics.ponder.envelope.text_5": "Блоки внутри аэростата уменьшают доступный объём",
-  "aeronautics.ponder.envelope.text_6": "Кликните ПКМ с красителем в руке, чтобы покрасить их",
+  "aeronautics.ponder.envelope.text_6": "Кликните ПКМ с красителем в руке для их покраски",
   "aeronautics.ponder.gyro_pressure.header": "Влиянием давления воздуха на гироскопические пропеллерные подшипники",
   "aeronautics.ponder.gyro_pressure.text_1": "На работу гироскопических пропеллерных подшипников влияет давление воздуха",
   "aeronautics.ponder.gyro_pressure.text_2": "Тяга ослабевает с увеличением высоты",
