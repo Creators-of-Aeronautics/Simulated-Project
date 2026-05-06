@@ -86,7 +86,7 @@ public class RedstoneInductorBlockEntity extends SmartBlockEntity implements IHa
                 // setDischarge(false, level);
             }
 
-            if (this.inputDelay.getValue() != 0 && this.delayTicks > this.inputDelay.getValue()) {
+            if (this.inputDelay.getValue() != 0 && this.delayTicks >= this.inputDelay.getValue()) {
                 this.delayTicks = 0;
 
                 if (tempPower > backSignal) tempPower--;
