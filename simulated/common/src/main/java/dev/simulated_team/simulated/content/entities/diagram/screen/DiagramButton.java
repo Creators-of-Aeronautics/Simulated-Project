@@ -12,13 +12,12 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class DiagramButton extends AbstractWidget {
     private SimGUITextures texture;
     private final Runnable onClick;
-    private Supplier<Component> diagramTooltip;
+    private Supplier<List<Component>> diagramTooltip;
 
     private BooleanSupplier iconSwitch;
 
@@ -49,8 +48,7 @@ public class DiagramButton extends AbstractWidget {
         this.texture.render(guiGraphics, this.getX() - 1, this.getY() - 1, this.isHovered() || this.iconSwitch.getAsBoolean() ? DiagramScreen.BUTTON_COLOR : DiagramScreen.DULL_BUTTON_COLOR);
 
         if (this.diagramTooltip != null && this.isHovered()) {
-            final List<FormattedText> lines = List.of(this.diagramTooltip.get());
-            DiagramScreen.renderTooltip(guiGraphics, mouseX, mouseY, lines);
+            DiagramScreen.renderTooltip(guiGraphics, mouseX, mouseY, (List<FormattedText>) (List<?>) this.diagramTooltip.get());
         }
     }
 
@@ -64,7 +62,7 @@ public class DiagramButton extends AbstractWidget {
 
     }
 
-    public DiagramButton setDiagramTooltip(final Supplier<Component> diagramTooltip) {
+    public DiagramButton setDiagramTooltip(final Supplier<List<Component>> diagramTooltip) {
         this.diagramTooltip = diagramTooltip;
         return this;
     }

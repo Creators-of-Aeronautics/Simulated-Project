@@ -5,6 +5,7 @@ import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.entities.diagram.screen.DiagramScreen;
 import dev.simulated_team.simulated.util.SimCodecUtil;
+import org.joml.Matrix3dc;
 import foundry.veil.api.network.handler.ClientPacketContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -17,12 +18,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import java.util.List;
 import java.util.Map;
 
-public record DiagramDataPacket(Map<ForceGroup, List<QueuedForceGroup.PointForce>> forces, double mass) implements CustomPacketPayload {
+public record DiagramDataPacket(Map<ForceGroup, List<QueuedForceGroup.PointForce>> forces, double mass, Matrix3dc inertiaTensor) implements CustomPacketPayload {
     public static final Type<DiagramDataPacket> TYPE = new Type<>(Simulated.path("diagram_data"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DiagramDataPacket> CODEC = StreamCodec.composite(
             ByteBufCodecs.map(Object2ObjectOpenHashMap::new, SimCodecUtil.STREAM_FORCE_GROUP, SimCodecUtil.STREAM_POINT_FORCE.apply(ByteBufCodecs.list())), DiagramDataPacket::forces,
             ByteBufCodecs.DOUBLE, DiagramDataPacket::mass,
+            SimCodecUtil.STREAM_MATRIX3D, DiagramDataPacket::inertiaTensor,
             DiagramDataPacket::new
     );
 

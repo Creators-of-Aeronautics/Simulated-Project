@@ -13,6 +13,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Matrix3d;
+import org.joml.Matrix3dc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
@@ -34,6 +36,10 @@ public class SimCodecUtil {
 
     public static final StreamCodec<ByteBuf, QueuedForceGroup.PointForce> STREAM_POINT_FORCE = STREAM_VECTOR3DC.apply(ByteBufCodecs.list(2))
             .map(l -> new QueuedForceGroup.PointForce(l.getFirst(), l.get(1)), p -> List.of(p.point(), p.force()));
+
+    public static final StreamCodec<ByteBuf, Matrix3dc> STREAM_MATRIX3D = ByteBufCodecs.DOUBLE.apply(ByteBufCodecs.list(9))
+            .map(l -> new Matrix3d(l.get(0), l.get(1), l.get(2), l.get(3), l.get(4), l.get(5), l.get(6), l.get(7), l.get(8)),
+                    m -> List.of(m.m00(), m.m01(), m.m02(), m.m10(), m.m11(), m.m12(), m.m20(), m.m21(), m.m22()));
 
     public static <T> Codec<T> withAlternative(final Codec<T> first, final Codec<T> second) {
         return new WithAlternativeButGood<>(first, second);

@@ -202,35 +202,52 @@ public class DiagramScreen extends AbstractSimiScreen {
         final DiagramButton forceButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_FORCES, diagramX + 9, diagramY + 9, Component.empty(), () -> {
             this.paperVisible = !this.paperVisible;
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1.0F));
-        }).setDiagramTooltip(() -> SimLang.translate("contraption_diagram.toggle_paper").component());
+        }).setDiagramTooltip(() -> List.of(SimLang.translate("contraption_diagram.toggle_paper").component()));
 
         this.mergeButton = new DiagramButton(this.getMergeIcon(), diagramX + 9, diagramY + 9 + 20, Component.empty(), () -> {
             this.config.setMergeForces(!this.config.mergeForces());
             this.mergeButton.setTexture(this.getMergeIcon());
             this.setConfigDirty();
-        }).setDiagramTooltip(() -> {
-            return SimLang.translate("contraption_diagram.merge_forces").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.mergeForces() ? "contraption_diagram.merged" : "contraption_diagram.unmerged").color(0xffffffff)).component();
-        });
+        }).setDiagramTooltip(() -> List.of(
+            SimLang.translate("contraption_diagram.merge_forces").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.mergeForces() ? "contraption_diagram.merged" : "contraption_diagram.unmerged").color(0xffffffff)).component()
+        ));
 
         final DiagramButton centerOfMassButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_COM_TOGGLE, diagramX + 9, diagramY + 9 + 20 * 2, Component.empty(), () -> {
             this.config.setDisplayCenterOfMass(!this.config.displayCenterOfMass());
             this.setConfigDirty();
-        }).setDiagramTooltip(() -> {
-            return SimLang.translate("contraption_diagram.center_of_mass").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.displayCenterOfMass() ? "contraption_diagram.shown" : "contraption_diagram.hidden").color(0xffffffff)).component();
-        });
+        }).setDiagramTooltip(() -> List.of(
+            SimLang.translate("contraption_diagram.center_of_mass").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.displayCenterOfMass() ? "contraption_diagram.shown" : "contraption_diagram.hidden").color(0xffffffff)).component()
+        ));
 
         final DiagramButton massButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_MASS, diagramX + 9, diagramY + 9 + 20 * 3, Component.empty(), () -> {
 
         }).setDiagramTooltip(() -> {
             final String massString = this.serverData != null ? String.format("%,.2f", this.serverData.mass()) : "---";
-            return SimLang.translate("contraption_diagram.total_mass").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate("contraption_diagram.mass", massString).color(0xffffffff)).component();
+            return List.of(SimLang.translate("contraption_diagram.total_mass").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate("contraption_diagram.mass", massString).color(0xffffffff)).component());
         });
 
         massButton.active = false;
 
+        final DiagramButton inertiaTensorButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_INERTIA_TENSOR, diagramX + 9, diagramY + 9 + 20 * 4, Component.empty(), () -> {
+        }).setDiagramTooltip(() -> {
+            if (this.serverData == null) {
+                return List.of(SimLang.translate("contraption_diagram.inertia_tensor").color(TOOLTIP_LABEL_COLOR).component());
+            }
+            final org.joml.Matrix3dc t = this.serverData.inertiaTensor();
+            return List.of(
+                SimLang.translate("contraption_diagram.inertia_tensor").color(TOOLTIP_LABEL_COLOR).component(),
+                SimLang.translate("contraption_diagram.inertia_tensor_row", fmt(t.m00()), fmt(t.m10()), fmt(t.m20())).color(0xffffffff).component(),
+                SimLang.translate("contraption_diagram.inertia_tensor_row", fmt(t.m01()), fmt(t.m11()), fmt(t.m21())).color(0xffffffff).component(),
+                SimLang.translate("contraption_diagram.inertia_tensor_row", fmt(t.m02()), fmt(t.m12()), fmt(t.m22())).color(0xffffffff).component()
+            );
+        });
+
+        inertiaTensorButton.active = false;
+
         this.addRenderableWidget(forceButton);
         this.addRenderableWidget(centerOfMassButton);
         this.addRenderableWidget(massButton);
+        this.addRenderableWidget(inertiaTensorButton);
         this.addRenderableWidget(this.mergeButton);
 
         this.addRotationGizmo(diagramX, diagramY);
@@ -985,6 +1002,10 @@ public class DiagramScreen extends AbstractSimiScreen {
 
     private SimGUITextures getMergeIcon() {
         return this.config.mergeForces() ? SimGUITextures.DIAGRAM_ICON_FORCES_MERGED : SimGUITextures.DIAGRAM_ICON_FORCES_SEPARATED;
+    }
+
+    private static String fmt(final double v) {
+        return String.format("%,.2f", v);
     }
 
     public float getPaperOffset(final float partialTicks) {

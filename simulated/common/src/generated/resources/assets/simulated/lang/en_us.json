@@ -246,6 +246,8 @@
   "simulated.contraption_diagram.force_arrow": "%s force of %s",
   "simulated.contraption_diagram.force_arrow_magnitude": "%s pN",
   "simulated.contraption_diagram.hidden": "Hidden",
+  "simulated.contraption_diagram.inertia_tensor": "Inertia Tensor:",
+  "simulated.contraption_diagram.inertia_tensor_row": "[%s  %s  %s]",
   "simulated.contraption_diagram.mass": "%s kpg",
   "simulated.contraption_diagram.merge_forces": "Force Arrows: ",
   "simulated.contraption_diagram.merged": "Merged",

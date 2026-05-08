@@ -185,7 +185,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
 
         sentForces.put(ForceGroups.GRAVITY.get(), List.of(new QueuedForceGroup.PointForce(new Vector3d(centerOfMass), localGravity)));
 
-        return new DiagramDataPacket(sentForces, massTracker.getMass());
+        return new DiagramDataPacket(sentForces, massTracker.getMass(), massTracker.getInertiaTensor());
     }
 
     @Override

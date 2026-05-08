@@ -29,6 +29,7 @@ public enum SimGUITextures implements ScreenElement {
     DIAGRAM_ICON_FORCES_MERGED("diagram", 48, 32, 16, 16, 512, 256),
     DIAGRAM_ICON_MASS("diagram", 16, 48, 16, 16, 512, 256),
     DIAGRAM_ICON_COM_TOGGLE("diagram", 32, 48, 16, 16, 512, 256),
+    DIAGRAM_ICON_INERTIA_TENSOR("diagram", 0, 0, 16, 16, 512, 256),
     DIAGRAM_ICON_COM("diagram", 48, 48, 16, 16, 512, 256),
     DIAGRAM_ICON_COM_TINY("diagram", 48, 0, 16, 16, 512, 256),
     DIAGRAM_ICON_COM_ARROW("diagram", 48, 16, 16, 16, 512, 256),

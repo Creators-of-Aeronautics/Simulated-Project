@@ -59,7 +59,10 @@
       "force_arrow": "%s force of %s",
       "merged_force_arrow": "%s %s forces totalling %s",
       "merging_numeral": "%s",
-      "force_arrow_magnitude": "%s pN"
+      "force_arrow_magnitude": "%s pN",
+
+      "inertia_tensor": "Inertia Tensor:",
+      "inertia_tensor_row": "[%s  %s  %s]"
     },
 
     "analog_transmission": {

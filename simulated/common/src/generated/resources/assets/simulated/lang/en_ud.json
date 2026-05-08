@@ -246,6 +246,8 @@
   "simulated.contraption_diagram.force_arrow": "%s ɟo ǝɔɹoɟ %s",
   "simulated.contraption_diagram.force_arrow_magnitude": "Nd %s",
   "simulated.contraption_diagram.hidden": "uǝppıH",
+  "simulated.contraption_diagram.inertia_tensor": ":ɹosuǝ⟘ ɐıʇɹǝuI",
+  "simulated.contraption_diagram.inertia_tensor_row": "]%s  %s  %s[",
   "simulated.contraption_diagram.mass": "bdʞ %s",
   "simulated.contraption_diagram.merge_forces": " :sʍoɹɹⱯ ǝɔɹoℲ",
   "simulated.contraption_diagram.merged": "pǝbɹǝW",
