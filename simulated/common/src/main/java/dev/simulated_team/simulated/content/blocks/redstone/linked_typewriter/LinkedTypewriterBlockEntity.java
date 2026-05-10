@@ -118,6 +118,10 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         return user.equals(this.currentUser);
     }
 
+    public boolean isInUse() {
+        return this.currentUser != null;
+    }
+
     /**
      * Disconnects the current user.
      */

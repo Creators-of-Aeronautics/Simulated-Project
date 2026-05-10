@@ -17,6 +17,7 @@ import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -33,10 +34,12 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -46,6 +49,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
     private static final int MAX_ACCELERATION = 5;
     private static final Vector3d STORED_MUT_POS = new Vector3d();
     private static final Vector3d STORED_TRANSFORMED_THRUST = new Vector3d();
+    private static final Vector3d TEMP_CLIP_START = new Vector3d(), TEMP_CLIP_END = new Vector3d();
     private static final Vector3d globalThrust = new Vector3d();
     private static final Vector3d relativeDiff = new Vector3d();
     private static final Vector3d normal = new Vector3d();
@@ -82,6 +86,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
     public void addPropellerLayer(final PropellerLayer layer) {
         this.radius = Math.max(this.radius, layer.outerRadius);
         this.propellerLayers.add(layer);
+        this.propellerLayers.sort(Comparator.comparingDouble(propellerLayer -> propellerLayer.offset));
     }
 
     public void addSimpleLayer(final double offset, final double radius) {
@@ -148,8 +153,6 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
         final List<Entity> entities = this.getWorld().getEntities(null, aabb.toMojang());
         if (!entities.isEmpty()) {
             for (final Entity entity : entities) {
-                // TODO: add raycast to see if the entity is actually pushable by this behaviour
-
                 if (entity instanceof AbstractContraptionEntity ||
                         AirCurrent.isPlayerCreativeFlying(entity) ||
                         DivingBootsItem.isWornBy(entity)) {
@@ -170,6 +173,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
                 STORED_MUT_POS.fma(-entityDistance, STORED_TRANSFORMED_THRUST);
                 final double radialDistanceSq = STORED_MUT_POS.lengthSquared();
                 double layerForceScale = 0;
+                double minLayerDistance = 100;
                 for (final PropellerLayer layer : this.propellerLayers) {
                     double layerDistance = entityDistance - layer.offset;
                     layerDistance *= thrustFlowMult;
@@ -180,24 +184,40 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
                             innerRadiusScale = (layer.innerRadiusSquared() - radialDistanceSq) / (layer.innerRadius * layer.outerRadius);
                             innerRadiusScale *= innerRadiusScale * 12;
                         }
+                        minLayerDistance = layerDistance;
                         layerForceScale = Math.max(layerForceScale, Math.exp(-distanceScale - innerRadiusScale));
                     }
                 }
 
                 if (layerForceScale > 0) {
-                    final float modifier = entity.isShiftKeyDown() ? 0.125f : 1;
-                    // 0.55 is the acceleration required to keep living entities aloft,
-                    // and this scaling causes those entities to float at the edge of the particle range at asymptotically high airflows
-                    final double forceScale = PropellerAirParticle.frictionScale * PropellerAirParticle.lifeTime * 0.55;
-                    final double acceleration = forceScale * this.getAirflowTickSpeed() * modifier * layerForceScale * Math.min(this.getAirPressure(), 1);
+                    TEMP_CLIP_START.set(qc.x, qc.y, qc.z).fma(thrustFlowMult * -minLayerDistance, STORED_TRANSFORMED_THRUST);
+                    TEMP_CLIP_END.set(qc.x, qc.y, qc.z);
 
-                    final Vec3 previousMotion = entity.getDeltaMovement();
-                    entity.setDeltaMovement(previousMotion.add(
-                            Math.min(Math.max(STORED_TRANSFORMED_THRUST.x() * acceleration - previousMotion.x, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f),
-                            Math.min(Math.max(STORED_TRANSFORMED_THRUST.y() * acceleration - previousMotion.y, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f),
-                            Math.min(Math.max(STORED_TRANSFORMED_THRUST.z() * acceleration - previousMotion.z, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f)));
+                    final Vec3 mojStart = JOMLConversion.toMojang(TEMP_CLIP_START);
+                    final Vec3 mojEnd = JOMLConversion.toMojang(TEMP_CLIP_END);
+                    final ClipContext ctx = new ClipContext(
+                            mojStart,
+                            mojEnd,
+                            ClipContext.Block.COLLIDER,
+                            ClipContext.Fluid.ANY,
+                            CollisionContext.empty()
+                    );
 
-                    entity.fallDistance = 0;
+                    if (this.getWorld().clip(ctx).getType() == HitResult.Type.MISS) {
+                        final float modifier = entity.isShiftKeyDown() ? 0.125f : 1;
+                        // 0.55 is the acceleration required to keep living entities aloft,
+                        // and this scaling causes those entities to float at the edge of the particle range at asymptotically high airflows
+                        final double forceScale = PropellerAirParticle.frictionScale * PropellerAirParticle.lifeTime * 0.55;
+                        final double acceleration = forceScale * this.getAirflowTickSpeed() * modifier * layerForceScale * Math.min(this.getAirPressure(), 1);
+
+                        final Vec3 previousMotion = entity.getDeltaMovement();
+                        entity.setDeltaMovement(previousMotion.add(
+                                Math.min(Math.max(STORED_TRANSFORMED_THRUST.x() * acceleration - previousMotion.x, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f),
+                                Math.min(Math.max(STORED_TRANSFORMED_THRUST.y() * acceleration - previousMotion.y, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f),
+                                Math.min(Math.max(STORED_TRANSFORMED_THRUST.z() * acceleration - previousMotion.z, -MAX_ACCELERATION), MAX_ACCELERATION) * (1 / 8f)));
+
+                        entity.fallDistance = 0;
+                    }
                 }
             }
         }
@@ -216,7 +236,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
     }
 
     public float getParticleSpeed() {
-        float speed = this.getAirflowTickSpeed();
+        final float speed = this.getAirflowTickSpeed();
         return Math.clamp(speed, -5, 5);
     }
 
