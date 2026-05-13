@@ -76,7 +76,7 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
                 it.remove();
                 this.setChanged();
             } else {
-                if (constraint == null || !constraint.hasJoint()) {
+                if (constraint == null || (!constraint.hasJoint() && Mth.equal(-1, constraint.scrollDistance))) {
                     player.resetFallDistance();
                 }
             }
