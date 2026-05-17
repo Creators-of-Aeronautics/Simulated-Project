@@ -26,6 +26,7 @@ import net.createmod.catnip.animation.LerpedFloat;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -360,7 +361,7 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
         @Override
         public Sided fromSide(final Direction direction) {
             this.direction = direction;
-            if (direction == Direction.UP) {
+            if (CatnipServices.PLATFORM.getEnv().isClient() && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {
@@ -406,7 +407,7 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
 
         @Override
         protected boolean isSideActive(final BlockState state, final Direction direction) {
-            if (direction == Direction.UP) {
+            if (CatnipServices.PLATFORM.getEnv().isClient() && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {
