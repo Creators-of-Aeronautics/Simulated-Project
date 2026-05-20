@@ -112,6 +112,15 @@ public interface NavigationTarget {
 
     default void onInsert(final ItemStack itemStack, final NavTableBlockEntity be, final Player player) { }
 
+    /**
+     * Metadata to surface on the ComputerCraft peripheral for this target. Implementations should return
+     * only information the target wants to expose (e.g. search state, kind, source), not absolute world
+     * coordinates. Returned as a Lua table. Empty map means "no extra metadata".
+     */
+    default java.util.Map<String, Object> getPeripheralMetadata(final NavTableBlockEntity be, final ItemStack self) {
+        return java.util.Map.of();
+    }
+
     static Vec3 getPlaneProjectedPos(final Vec3 targetPos, final Vec3i normal) {
         final double dot = targetPos.dot(Vec3.atLowerCornerOf(normal));
         return targetPos.subtract(Vec3.atLowerCornerOf(normal).scale(dot));

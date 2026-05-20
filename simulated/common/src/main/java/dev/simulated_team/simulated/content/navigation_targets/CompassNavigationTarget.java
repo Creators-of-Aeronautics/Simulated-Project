@@ -33,4 +33,12 @@ public class CompassNavigationTarget implements NavigationTarget {
 	public float getMaxRange() {
 		return 0;
 	}
+
+	@Override
+	public java.util.Map<String, Object> getPeripheralMetadata(final NavTableBlockEntity be, final ItemStack self) {
+		if (self.has(SimDataComponents.LODESTONE_COMPASS_SUBLEVEL_TRACKER)) {
+			return java.util.Map.of("source", "lodestone");
+		}
+		return java.util.Map.of("source", "spawn");
+	}
 }

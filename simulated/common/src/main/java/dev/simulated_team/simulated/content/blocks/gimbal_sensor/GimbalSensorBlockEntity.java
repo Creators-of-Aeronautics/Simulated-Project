@@ -13,9 +13,11 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollVa
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelHelper;
+import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
+import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.data.SimLang;
@@ -77,6 +79,12 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
     private double ZAngle;
     private double XAngle;
 
+    private final Vector3d angularVelocityBody = new Vector3d();
+    private final Vector3d gravityBody = new Vector3d();
+    private final Vector3d linearAccelerationBody = new Vector3d();
+    private final Vector3d lastLinearVelocity = new Vector3d();
+    private boolean hasLastLinearVelocity = false;
+
     public GimbalSensorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
 
@@ -123,6 +131,30 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
 
         this.setPower(this.XAngle, Direction.SOUTH);
         this.setPower(-this.XAngle, Direction.NORTH);
+
+        if (subLevel instanceof final ServerSubLevel serverSubLevel) {
+            final RigidBodyHandle body = RigidBodyHandle.of(serverSubLevel);
+
+            body.getAngularVelocity(this.angularVelocityBody);
+            serverSubLevel.logicalPose().orientation().transformInverse(this.angularVelocityBody);
+
+            final Vector3dc worldPos = Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.atCenterOf(this.getBlockPos()));
+            this.gravityBody.set(DimensionPhysicsData.getGravity(this.getLevel(), worldPos));
+            serverSubLevel.logicalPose().orientation().transformInverse(this.gravityBody);
+
+            final Vector3d currentLinearVelocity = body.getLinearVelocity(new Vector3d());
+            if (this.hasLastLinearVelocity) {
+                currentLinearVelocity.sub(this.lastLinearVelocity, this.linearAccelerationBody).mul(20.0);
+                serverSubLevel.logicalPose().orientation().transformInverse(this.linearAccelerationBody);
+            } else {
+                this.linearAccelerationBody.zero();
+                this.hasLastLinearVelocity = true;
+            }
+            this.lastLinearVelocity.set(currentLinearVelocity);
+        } else {
+            this.hasLastLinearVelocity = false;
+            this.linearAccelerationBody.zero();
+        }
     }
 
     public void randomNudge() {
@@ -297,6 +329,18 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
 
     public double getXAngle() {
         return this.XAngle;
+    }
+
+    public Vector3dc getAngularVelocityBody() {
+        return this.angularVelocityBody;
+    }
+
+    public Vector3dc getGravityBody() {
+        return this.gravityBody;
+    }
+
+    public Vector3dc getLinearAccelerationBody() {
+        return this.linearAccelerationBody;
     }
 
     @Override

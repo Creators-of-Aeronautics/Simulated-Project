@@ -23,4 +23,9 @@ public class AltitudeSensorPeripheral extends SimPeripheral<AltitudeSensorBlockE
     public double getAirPressure() {
         return this.blockEntity.getAirPressure();
     }
+
+    @LuaFunction
+    public double getVerticalSpeed() {
+        return this.blockEntity.getVerticalSpeed();
+    }
 }

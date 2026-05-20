@@ -39,6 +39,10 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 	public float previousVisualHeight = 0.0f;
 	public boolean updateVisualHeight = true;
 
+	private double verticalSpeed = 0;
+	private float lastWorldHeight = 0;
+	private boolean hasLastWorldHeight = false;
+
 	public AltitudeSensorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
 		super(type, pos, state);
 	}
@@ -74,6 +78,10 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 		return DimensionPhysicsData.getAirPressure(this.getLevel(), Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.atCenterOf(this.getBlockPos())));
 	}
 
+	public double getVerticalSpeed() {
+		return this.verticalSpeed;
+	}
+
 	public float getVisualHeight(final float partialTick) {
 		return this.previousVisualHeight * (1 - partialTick) + this.visualHeight * partialTick;
 	}
@@ -101,6 +109,15 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 
 		if(this.signal != lastSignal) {
             this.updateSignal();
+		}
+
+		if(!this.getLevel().isClientSide()) {
+			final float currentHeight = this.getWorldHeight();
+			if(this.hasLastWorldHeight) {
+				this.verticalSpeed = (currentHeight - this.lastWorldHeight) * 20.0;
+			}
+			this.lastWorldHeight = currentHeight;
+			this.hasLastWorldHeight = true;
 		}
 
 		if(this.getLevel().isClientSide()) {
