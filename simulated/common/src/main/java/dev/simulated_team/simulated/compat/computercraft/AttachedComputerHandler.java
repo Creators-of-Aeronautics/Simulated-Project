@@ -5,6 +5,7 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import org.jspecify.annotations.Nullable;
 
 public class AttachedComputerHandler {
+
     private final AttachedComputerSet attachedComputers = new AttachedComputerSet();
 
     public void attach(IComputerAccess computer) {

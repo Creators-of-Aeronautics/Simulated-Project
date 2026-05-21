@@ -4,17 +4,13 @@ import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import dan200.computercraft.api.peripheral.AttachedComputerSet;
 import dev.ryanhcode.sable.Sable;
 import dev.simulated_team.simulated.compat.computercraft.AttachedComputerHandler;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.LinkedTypewriterMenuCommon;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.mixin_interface.PlayerTypewriterExtension;
-import dev.simulated_team.simulated.service.ServiceUtil;
-import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.SimPlatformService;
-import net.createmod.catnip.platform.services.PlatformHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -31,12 +27,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements MenuProvider, ClipboardCloneable {
+
+    private static final boolean CC_LOADED = SimPlatformService.INSTANCE.isLoaded("computercraft");
 
     private LinkedTypewriterEntries entryMap;
     private final List<Integer> pressedKeys = new ArrayList<>();
@@ -49,10 +46,11 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     public LinkedTypewriterBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
         this.entryMap = new LinkedTypewriterEntries();
-        if (SimPlatformService.INSTANCE.isLoaded("computercraft"))
-            computerHandler = new AttachedComputerHandler();
-        else
-            computerHandler = null;
+        if (CC_LOADED) {
+            this.computerHandler = new AttachedComputerHandler();
+        } else {
+            this.computerHandler = null;
+        }
     }
 
     @Override
@@ -105,7 +103,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
                 this.currentUser = userID;
                 final BlockPos previousTypewriter = player.simulated$getCurrentTypewriter();
                 if (previousTypewriter != null) {
-                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe && nbe != this) {
+                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe) {
                         nbe.disconnectUser();
                     }
                 }
@@ -192,8 +190,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         if (this.typedEntry.length() >= 25) {
             this.typedEntry = this.typedEntry.substring(1);
         }
-        if (SimPlatformService.INSTANCE.isLoaded("computercraft"))
+        if (this.computerHandler != null) {
             this.computerHandler.queueEvent("key", key, entryMap.getEntry(key).isAlive());
+        }
         this.entryMap.activateKey(key, this);
     }
 
@@ -203,8 +202,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     public void releaseKey(final int key) {
         this.pressedKeys.remove((Integer) key);
         this.entryMap.deactivateKey(key);
-        if (SimPlatformService.INSTANCE.isLoaded("computercraft"))
+        if (this.computerHandler != null) {
             this.computerHandler.queueEvent("key_up", key);
+        }
     }
 
     @Override
@@ -277,8 +277,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
 
     @Override
     public boolean readFromClipboard(final HolderLookup.@NotNull Provider registries, final CompoundTag tag, final Player player, final Direction side, final boolean simulate) {
-        if (simulate)
+        if (simulate) {
             return true;
+        }
         this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
         return true;
     }
