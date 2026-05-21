@@ -126,8 +126,8 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         final ItemStack filterItem = this.filter.getFilter();
         if (context.getType() != HitResult.Type.MISS) {
             if (!filterItem.isEmpty()) {
-                if(!hitFluid.isEmpty()) {
-                    final Fluid fluidInItem = SimFluidService.INSTANCE.getFluidInItem(filterItem);
+                final Fluid fluidInItem = SimFluidService.INSTANCE.getFluidInItem(filterItem);
+                if (fluidInItem != null && !hitFluid.isEmpty()) {
                     passed = fluidInItem.isSame(hitFluid.getType());
                 } else {
                     passed = !hitBlock.isAir() && this.filter.test(new ItemStack(hitBlock.getBlock()));
