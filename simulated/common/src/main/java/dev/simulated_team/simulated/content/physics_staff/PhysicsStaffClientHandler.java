@@ -17,11 +17,11 @@ import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.click_interactions.InteractCallback;
 import foundry.veil.api.network.VeilPacketManager;
-import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.data.Pair;
 import net.createmod.catnip.outliner.LineOutline;
 import net.createmod.catnip.render.DefaultSuperRenderTypeBuffer;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
@@ -417,7 +417,7 @@ public class PhysicsStaffClientHandler {
 
         dragSessions.clear();
         for (final Pair<UUID, Vector3d> pair : newSessions) {
-            dragSessions.put(pair.key(), pair.value());
+            dragSessions.put(pair.getFirst(), pair.getSecond());
         }
     }
 

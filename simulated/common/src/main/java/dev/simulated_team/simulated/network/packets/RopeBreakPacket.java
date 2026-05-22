@@ -60,7 +60,7 @@ public record RopeBreakPacket(UUID uuid) implements CustomPacketPayload {
                 return;
             }
 
-            holder.destroyRope(player, null);
+            holder.destroyRope(player, null, !player.hasInfiniteMaterials());
         }
     }
 }

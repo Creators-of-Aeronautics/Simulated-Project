@@ -111,6 +111,10 @@ public class SpringBlock extends WrenchableDirectionalBlock implements IBE<Sprin
         }
 
         final SpringBlockEntity partner = be.getPairedSpring();
+        if (partner == null) {
+            return InteractionResult.SUCCESS;
+        }
+
         final BlockState partnerState = partner.getBlockState();
         final BlockPos partnerPos = partner.getBlockPos();
         final Size size = state.getValue(SIZE);

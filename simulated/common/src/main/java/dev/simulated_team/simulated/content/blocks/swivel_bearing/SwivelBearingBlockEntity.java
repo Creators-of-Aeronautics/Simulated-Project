@@ -15,6 +15,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import dev.ryanhcode.sable.Sable;
+import dev.ryanhcode.sable.api.SubLevelAssemblyHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.rotary.RotaryConstraintConfiguration;
@@ -39,6 +40,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimAssemblyHelper;
 import dev.simulated_team.simulated.util.SimLevelUtil;
+import dev.simulated_team.simulated.util.assembly.SimAssemblyException;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraBlockPos;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraKinetics;
 import net.createmod.catnip.lang.FontHelper;
@@ -75,6 +77,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 
@@ -168,7 +171,16 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             return;
         }
 
-        final SubLevel attached = this.getAttachedSubLevel();
+        // assemble or disassemble
+        if (this.assembleNextTick) {
+            if (!this.isAssembled()) {
+                this.assemble();
+            } else {
+                this.disassemble();
+            }
+        }
+
+        final ServerSubLevel attached = (ServerSubLevel) this.getAttachedSubLevel();
 
         // update our powered state and reattach constraints
         final int bestSignal = this.level.getBestNeighborSignal(this.getBlockPos());
@@ -177,7 +189,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         if (shouldLock && !this.isLocking()) {
             this.level.setBlockAndUpdate(this.getBlockPos(), this.getBlockState().setValue(BlockStateProperties.POWERED, true));
 
-            if (this.handle != null && attached != null) {
+            if (this.handle != null) {
                 //update our constraint
                 this.reattachConstraint(attached, false);
             }
@@ -192,7 +204,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         } else if (!shouldLock && this.isLocking()) {
             this.level.setBlockAndUpdate(this.getBlockPos(), this.getBlockState().setValue(BlockStateProperties.POWERED, false));
 
-            if (this.handle != null && attached != null) {
+            if (this.handle != null) {
                 //update our constraint
                 this.reattachConstraint(attached, false);
             }
@@ -203,20 +215,11 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             this.checkPersistence(this.getSubLevelID());
         }
 
-        // assemble or disassemble
-        if (this.assembleNextTick) {
-            if (!this.isAssembled()) {
-                this.assemble();
-            } else {
-                this.disassemble();
-            }
-        }
-
         // update our target angles
         this.lastTargetAngleDegrees = this.targetAngleDegrees;
         float angularSpeed = convertToAngular(this.limitCogSpeed(this.cogwheel.getSpeed()));
 
-        boolean shouldUpdateAngle = true;
+        boolean shouldUpdateAngle = this.isAssembled();
 
         if (this.sequencedAngleLimit >= 0) {
             angularSpeed = (float) Mth.clamp(angularSpeed, -this.sequencedAngleLimit, this.sequencedAngleLimit);
@@ -435,7 +438,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             final BlockPos plotAnchor = plot.getCenterBlock();
             final Vector3dc centerOfMass = assembledSubLevel.getMassTracker().getCenterOfMass();
-            Vector3d subLevelCenter = JOMLConversion.atLowerCornerOf(pos);
+            final Vector3d subLevelCenter = JOMLConversion.atLowerCornerOf(pos);
 
             if (centerOfMass != null) {
                 subLevelCenter.add(centerOfMass.x() - plotAnchor.getX(), centerOfMass.y() - plotAnchor.getY(), centerOfMass.z() - plotAnchor.getZ());
@@ -449,6 +452,11 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
             final SubLevelPhysicsSystem physicsSystem = container.physicsSystem();
             final PhysicsPipeline pipeline = physicsSystem.getPipeline();
+
+            final SubLevel containingSubLevel = this.getContainingSubLevel();
+            if (containingSubLevel != null) {
+                SubLevelAssemblyHelper.kickFromContainingSubLevel((ServerLevel) this.level, physicsSystem, pipeline, assembledSubLevel, containingSubLevel);
+            }
 
             pipeline.teleport(assembledSubLevel, assembledSubLevel.logicalPose().position(), assembledSubLevel.logicalPose().orientation());
             assembledSubLevel.updateLastPose();
@@ -481,19 +489,20 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         this.removeHandle();
-        if (this.getSubLevelID() != null) {
-            final SubLevel subLevel = SubLevelContainer.getContainer(this.level).getSubLevel(this.getSubLevelID());
-            if (subLevel != null) {
-                BlockPos platePos = this.getPlatePos();
-                if (platePos != null) {
-                    this.destroyPlate();
+        final SubLevel subLevel = SubLevelContainer.getContainer(this.level).getSubLevel(this.getSubLevelID());
+        final BlockPos platePos = this.getPlatePos();
+        if (platePos != null) {
+            this.destroyPlate();
 
-                    // if destroying the plate removed the sub-level, skip disassembling
-                    if (!subLevel.isRemoved()) {
-                        SimAssemblyHelper.disassembleSubLevel(this.level, subLevel, platePos, this.getBlockPos(), Rotation.NONE, true);
-                    } else {
-                        this.level.playSound(null, platePos, SimSoundEvents.SIMULATED_CONTRAPTION_STOPS.event(), SoundSource.BLOCKS, 1.0f, 1.0f);
-                    }
+            if (Objects.equals(subLevel, Sable.HELPER.getContaining(this.level, this.getBlockPos()))) {
+                this.lastException = SimAssemblyException.sameSubLevel();
+                this.level.playSound(null, platePos, SimSoundEvents.ASSEMBLER_FAIL.event(), SoundSource.BLOCKS, 1.0f, 1.0f);
+            } else if (subLevel != null) {
+                // if destroying the plate removed the sub-level, skip disassembling
+                if (!subLevel.isRemoved()) {
+                    SimAssemblyHelper.disassembleSubLevel(this.level, subLevel, platePos, this.getBlockPos(), Rotation.NONE, true);
+                } else {
+                    this.level.playSound(null, platePos, SimSoundEvents.SIMULATED_CONTRAPTION_STOPS.event(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 }
             }
         }
@@ -503,6 +512,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         this.setSubLevelID(null);
         this.setPlatePos(null);
         this.targetAngleDegrees = 0;
+        this.sendData();
     }
 
     private void checkPersistence(final UUID id) {
@@ -517,12 +527,12 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             this.handle = null;
         }
 
-        if (subLevel != null && this.handle == null) {
-            this.reattachConstraint(subLevel, true);
+        if (this.handle == null) {
+            this.reattachConstraint((ServerSubLevel) subLevel, true);
         }
     }
 
-    public void reattachConstraint(final SubLevel toAttach, final boolean updatePlate) {
+    public void reattachConstraint(final @Nullable ServerSubLevel plateSubLevel, final boolean updatePlate) {
         //we also want to "reset" the plate BE here too, so it's correct
         final BlockPos platePos = this.getPlatePos();
         if (platePos != null) {
@@ -538,7 +548,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             if (!plateState.is(SimBlocks.SWIVEL_BEARING_LINK_BLOCK)) return;
 
             final Direction plateFacing = plateState.getValue(SwivelBearingPlateBlock.FACING);
-            this.attachConstraints(toAttach, JOMLConversion.toJOML(platePos.relative(plateFacing).getCenter()));
+            this.attachConstraints(plateSubLevel, JOMLConversion.toJOML(platePos.relative(plateFacing).getCenter()));
         }
     }
 
@@ -551,7 +561,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
     }
 
-    private void attachConstraints(final SubLevel toAttach, final Vector3d attachPos) {
+    private void attachConstraints(final @Nullable ServerSubLevel plateSubLevel, final Vector3d attachPos) {
         final BlockPos platePos = this.getPlatePos();
 
         if (platePos == null) return;
@@ -573,7 +583,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         final ServerSubLevelContainer container = SubLevelContainer.getContainer((ServerLevel) this.getLevel());
         final PhysicsPipeline pipeline = container.physicsSystem().getPipeline();
 
-        this.handle = pipeline.addConstraint((ServerSubLevel) Sable.HELPER.getContaining(this), (ServerSubLevel) toAttach, constraint);
+        this.handle = pipeline.addConstraint((ServerSubLevel) Sable.HELPER.getContaining(this), plateSubLevel, constraint);
     }
 
     @Override
@@ -696,7 +706,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             if (container == null) return;
 
             final SubLevel subLevel = container.getSubLevel(this.subLevelID);
-            if (subLevel == null) return;
+            if (this.subLevelID != null && subLevel == null) return;
 
             if (this.getLevel().getBlockState(platePos).is(SimBlocks.SWIVEL_BEARING_LINK_BLOCK)) {
                 SimBlocks.SWIVEL_BEARING_LINK_BLOCK.get().withBlockEntityDo(this.level, platePos, SwivelBearingPlateBlockEntity::beforeAssembly);

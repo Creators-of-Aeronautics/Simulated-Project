@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.neoforge;
 
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimBlocks;
+import dev.simulated_team.simulated.index.neoforge.NeoForgeSimStats;
 import dev.simulated_team.simulated.index.neoforge.SimNeoForgeRecipeTypes;
 import dev.simulated_team.simulated.index.neoforge.SimParticleTypesImpl;
 import dev.simulated_team.simulated.neoforge.events.SimNeoForgeCommonEvents;
@@ -41,6 +42,8 @@ public final class SimulatedNeoForge {
 
         NeoForgeSimEntityDataSerialization.register(modEventBus);
         Simulated.getRegistrate().registerEventListeners(modEventBus);
+
+        NeoForgeSimStats.register(modEventBus);
 
         if (ModList.get().isLoaded("computercraft")) {
             modEventBus.register(NeoForgeSimPeripheralService.class);

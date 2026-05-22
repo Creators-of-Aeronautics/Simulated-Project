@@ -4,6 +4,7 @@ import com.simibubi.create.api.contraption.transformable.TransformableBlock;
 import com.simibubi.create.content.contraptions.StructureTransform;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -30,7 +31,7 @@ public abstract class AbstractDirectionalAxisBlock extends DirectionalBlock impl
 
     @Override
     public @Nullable BlockState getStateForPlacement(final BlockPlaceContext context) {
-        final boolean shift = context.getPlayer().isShiftKeyDown();
+        final boolean shift = context.isSecondaryUseActive();
         final Direction facing = this.getFacingForPlacement(context);
         boolean alongFirst = false;
         final Direction.Axis faceAxis = facing.getAxis();

@@ -55,7 +55,7 @@ public class KeyEditorScreen {
         });
 
         this.removeAllWidget = new ConfirmationWidgetBase(0, 0, AllIcons.I_TRASH)
-                .withMessage(Component.translatable("simulated.linked_typewriter.confirm_delete"))
+                .withMessage(Component.translatable("simulated.linked_typewriter.confirm_delete_all"))
                 .withCallback(() -> parentScreen.sendNewKeys(true));
 
         this.resetPositions();

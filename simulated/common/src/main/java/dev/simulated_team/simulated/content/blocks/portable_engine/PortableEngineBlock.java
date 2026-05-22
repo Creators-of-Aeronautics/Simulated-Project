@@ -1,6 +1,5 @@
 package dev.simulated_team.simulated.content.blocks.portable_engine;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
@@ -9,6 +8,7 @@ import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.index.SimBlocks;
+import dev.simulated_team.simulated.index.SimStats;
 import dev.simulated_team.simulated.multiloader.inventory.ContainerSlot;
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
 import dev.simulated_team.simulated.service.SimItemService;
@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -143,6 +142,9 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
             if (currentItemStack.isEmpty()) {
                 slot.setStack(heldItem);
                 player.setItemInHand(interactionHand, ItemStack.EMPTY);
+                if (be.getCurrentBurnTime() <= 0) {
+                    SimStats.PORTABLE_ENGINES_FED.awardTo(player);
+                }
             } else if (ItemStack.isSameItem(heldItem, currentItemStack) && ItemStack.isSameItemSameComponents(heldItem, currentItemStack)) {
                 int targetAmount = currentItemStack.getCount() + heldItem.getCount();
                 targetAmount = Math.min(targetAmount, currentItemStack.getMaxStackSize());

@@ -5,9 +5,9 @@ import com.simibubi.create.api.schematic.requirement.SpecialBlockItemRequirement
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.encased.EncasedShaftBlock;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
-import dev.simulated_team.simulated.service.SimItemService;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.eriksonn.aeronautics.index.AeroBlocks;
+import dev.simulated_team.simulated.service.SimItemService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -67,7 +67,7 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
         final Level world = context.getLevel();
         if (world instanceof ServerLevel) {
             final Player player = context.getPlayer();
-            if (player != null && !player.isCreative())
+            if (player != null && !player.hasInfiniteMaterials())
                 player.getInventory().placeItemBackInInventory(AeroBlocks.WHITE_ENVELOPE_BLOCK.asStack());
         }
         return InteractionResult.SUCCESS;
@@ -127,7 +127,7 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
     @Override
     public void handleEncasing(final BlockState state, final Level level, final BlockPos pos, final ItemStack heldItem, final Player player, final InteractionHand hand, final BlockHitResult ray) {
         super.handleEncasing(state, level, pos, heldItem, player, hand, ray);
-        if (!player.isCreative()) {
+        if (!player.hasInfiniteMaterials()) {
             player.getItemInHand(hand).shrink(1);
         }
     }

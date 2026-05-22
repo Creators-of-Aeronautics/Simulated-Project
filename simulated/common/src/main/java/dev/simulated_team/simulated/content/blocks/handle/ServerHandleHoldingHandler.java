@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.handle;
 
+import dev.simulated_team.simulated.index.SimStats;
 import dev.simulated_team.simulated.network.packets.handle.ClientboundPlayersHoldingHandlePacket;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -17,7 +18,9 @@ public class ServerHandleHoldingHandler {
 
 	public static void startHolding(final Player player) {
 		final int count = holdingPlayers.size();
-		holdingPlayers.put(player.getUUID(), 20);
+		if (holdingPlayers.put(player.getUUID(), 20) <= 0) {
+			SimStats.INTERACT_WITH_HANDLE.awardTo(player);
+		}
 
 		if (holdingPlayers.size() != count)
 			sync();

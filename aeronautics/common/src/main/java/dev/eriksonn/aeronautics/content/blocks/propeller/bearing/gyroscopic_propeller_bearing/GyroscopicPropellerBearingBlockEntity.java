@@ -88,11 +88,11 @@ public class GyroscopicPropellerBearingBlockEntity extends PropellerBearingBlock
         final SubLevel subLevel = Sable.HELPER.getContaining(this);
         this.updateTilt(this.tiltVector, subLevel, 1);
         this.applyTilt();
-
-        if (this.movedContraption != null) {
-            ((PropellerBearingContraptionEntity) this.movedContraption).tiltQuat = new Quaternionf(this.tiltQuat);
-            ((PropellerBearingContraptionEntity) this.movedContraption).previousTiltQuat = new Quaternionf(this.previousTiltQuat);
-            ((PropellerBearingContraptionEntity) this.movedContraption).direction = this.getBlockState().getValue(PropellerBearingBlock.FACING);
+        PropellerBearingContraptionEntity propellerContraption = this.getMovedContraption();
+        if (propellerContraption != null) {
+            propellerContraption.tiltQuat = new Quaternionf(this.tiltQuat);
+            propellerContraption.previousTiltQuat = new Quaternionf(this.previousTiltQuat);
+            propellerContraption.direction = this.getBlockState().getValue(PropellerBearingBlock.FACING);
         }
     }
 
@@ -166,7 +166,7 @@ public class GyroscopicPropellerBearingBlockEntity extends PropellerBearingBlock
 
     private double getLerpDistance() {
         double lerpDistance = 1f;
-        if (this.movedContraption == null) {
+        if (this.getMovedContraption() == null) {
             lerpDistance = 0;
         }
 
@@ -186,12 +186,13 @@ public class GyroscopicPropellerBearingBlockEntity extends PropellerBearingBlock
         this.tiltVector.normalize();
         this.tiltQuat = SimMathUtils.getQuaternionfFromVectorRotation(this.blockNormal, this.tiltVector);
         this.thrustDirection.set(this.tiltVector);
-        if (this.movedContraption == null) {
+        PropellerBearingContraptionEntity propellerContraption = this.getMovedContraption();
+        if (propellerContraption == null) {
             return;
         }
 
-        ((PropellerBearingContraptionEntity) this.movedContraption).tiltQuat = new Quaternionf(this.tiltQuat);
-        ((PropellerBearingContraptionEntity) this.movedContraption).direction = this.getBlockState().getValue(PropellerBearingBlock.FACING);
+        propellerContraption.tiltQuat = new Quaternionf(this.tiltQuat);
+        propellerContraption.direction = this.getBlockState().getValue(PropellerBearingBlock.FACING);
     }
 
 

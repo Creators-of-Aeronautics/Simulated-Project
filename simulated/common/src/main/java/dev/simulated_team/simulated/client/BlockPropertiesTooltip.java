@@ -34,6 +34,19 @@ import java.util.Map;
 public class BlockPropertiesTooltip {
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat();
 
+    private static final Component NONE = Component.translatable("simulated.tooltip.mass.none").withStyle(ChatFormatting.GRAY);
+    private static final Component SUPER_LIGHT = Component.translatable("simulated.tooltip.mass.super_light").withStyle(ChatFormatting.AQUA);
+    private static final Component LIGHT = Component.translatable("simulated.tooltip.mass.light").withStyle(ChatFormatting.GREEN);
+    private static final Component HEAVY = Component.translatable("simulated.tooltip.mass.heavy").withStyle(ChatFormatting.YELLOW);
+    private static final Component SUPER_HEAVY = Component.translatable("simulated.tooltip.mass.super_heavy").withColor(SimColors.NUH_UH_RED);
+    private static final Component ABSURDLY_HEAVY = Component.translatable("simulated.tooltip.mass.absurdly_heavy").withColor(SimColors.NUH_UH_RED);
+    private static final Component BOUNCY = Component.translatable("simulated.tooltip.bouncy").withStyle(ChatFormatting.GREEN);
+    private static final Component SLIPPERY = Component.translatable("simulated.tooltip.friction.slippery").withStyle(ChatFormatting.AQUA);
+    private static final Component STICKY = Component.translatable("simulated.tooltip.friction.sticky").withStyle(ChatFormatting.DARK_GREEN);
+    private static final Component FRAGILE = Component.translatable("simulated.tooltip.fragile").withColor(SimColors.NUH_UH_RED);
+    private static final Component AIRTIGHT = Component.translatable("simulated.tooltip.airtight").withStyle(ChatFormatting.WHITE);
+    private static final Component FLOATING = Component.translatable("simulated.tooltip.floating").withStyle(ChatFormatting.DARK_GREEN);
+
     static {
         DECIMAL_FORMAT.setDecimalSeparatorAlwaysShown(false);
         DECIMAL_FORMAT.setMaximumFractionDigits(2);
@@ -94,25 +107,25 @@ public class BlockPropertiesTooltip {
                 properties.sable$getProperty(PhysicsBlockPropertyTypes.MASS.get()) :
                 0;
 
-        MutableComponent comp;
+        Component comp;
         if (mass == 1) {
             return null;
         } else if (mass <= 0) {
-            comp = Component.translatable("simulated.tooltip.mass.none").withStyle(ChatFormatting.GRAY);
+            comp = NONE;
         } else if (mass <= 0.25) {
-            comp = Component.translatable("simulated.tooltip.mass.super_light").withStyle(ChatFormatting.AQUA);
+            comp = SUPER_LIGHT;
         } else if (mass <= 0.5) {
-            comp = Component.translatable("simulated.tooltip.mass.light").withStyle(ChatFormatting.GREEN);
+            comp = LIGHT;
         } else if (mass < 4) {
-            comp = Component.translatable("simulated.tooltip.mass.heavy").withStyle(ChatFormatting.YELLOW);
+            comp = HEAVY;
         } else if (mass < 50) {
-            comp = Component.translatable("simulated.tooltip.mass.super_heavy").withColor(SimColors.NUH_UH_RED);
+            comp = SUPER_HEAVY;
         } else {
-            comp = Component.translatable("simulated.tooltip.mass.absurdly_heavy").withColor(SimColors.NUH_UH_RED);
+            comp = ABSURDLY_HEAVY;
         }
 
         if (showNumbers) {
-            comp = comp.append(formatValue("simulated.unit.mass", mass).withStyle(ChatFormatting.DARK_GRAY));
+            return Component.empty().append(comp).append(formatValue("simulated.unit.mass", mass).withStyle(ChatFormatting.DARK_GRAY));
         }
         return comp;
     }
@@ -124,12 +137,10 @@ public class BlockPropertiesTooltip {
             return null;
         }
 
-        MutableComponent comp = Component.translatable("simulated.tooltip.bouncy").withStyle(ChatFormatting.GREEN);
-
         if (showNumbers) {
-            comp = comp.append(formatValue("simulated.unit.restitution", restitution * 100.0).withStyle(ChatFormatting.DARK_GRAY));
+            return Component.empty().append(BOUNCY).append(formatValue("simulated.unit.restitution", restitution * 100.0).withStyle(ChatFormatting.DARK_GRAY));
         }
-        return comp;
+        return BOUNCY;
     }
 
     public static @Nullable Component getFrictionComponent(final BlockStateExtension properties, final BlockItem item, final boolean showNumbers) {
@@ -139,15 +150,15 @@ public class BlockPropertiesTooltip {
             return null;
         }
 
-        MutableComponent comp;
+        Component comp;
         if (friction < 1) {
-            comp = Component.translatable("simulated.tooltip.friction.slippery").withStyle(ChatFormatting.AQUA);
+            comp = SLIPPERY;
         } else {
-            comp = Component.translatable("simulated.tooltip.friction.sticky").withStyle(ChatFormatting.DARK_GREEN);
+            comp = STICKY;
         }
 
         if (showNumbers) {
-            comp = comp.append(formatValue("simulated.unit.friction", friction).withStyle(ChatFormatting.DARK_GRAY));
+            return Component.empty().append(comp).append(formatValue("simulated.unit.friction", friction).withStyle(ChatFormatting.DARK_GRAY));
         }
         return comp;
     }
@@ -155,14 +166,14 @@ public class BlockPropertiesTooltip {
     public static @Nullable Component getFragileComponent(final BlockStateExtension properties, final BlockItem item, final boolean showNumbers) {
         final boolean fragile = properties.sable$getProperty(PhysicsBlockPropertyTypes.FRAGILE.get());
         if (fragile) {
-            return Component.translatable("simulated.tooltip.fragile").withColor(SimColors.NUH_UH_RED);
+            return FRAGILE;
         }
         return null;
     }
 
     public static @Nullable Component getAirtightComponent(final BlockStateExtension properties, final BlockItem item, final boolean showNumbers) {
         if (item.getBlock().defaultBlockState().is(SimTags.Blocks.AIRTIGHT)) {
-            return Component.translatable("simulated.tooltip.airtight").withStyle(ChatFormatting.WHITE);
+            return AIRTIGHT;
         }
         return null;
     }
@@ -184,11 +195,10 @@ public class BlockPropertiesTooltip {
             return null;
         }
 
-        final MutableComponent comp = Component.translatable("simulated.tooltip.floating").withStyle(ChatFormatting.DARK_GREEN);
         if (showNumbers) {
-            comp.append(formatValue("simulated.unit.floating", liftStrength).withStyle(ChatFormatting.DARK_GRAY));
+            return Component.empty().append(FLOATING).append(formatValue("simulated.unit.floating", liftStrength).withStyle(ChatFormatting.DARK_GRAY));
         }
-        return comp;
+        return FLOATING;
     }
 
     private static MutableComponent formatValue(final String key, final double value) {

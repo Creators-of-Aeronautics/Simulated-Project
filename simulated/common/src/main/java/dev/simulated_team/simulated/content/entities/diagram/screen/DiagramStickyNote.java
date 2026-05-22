@@ -186,7 +186,7 @@ public class DiagramStickyNote extends DiagramButton {
 
         final float currentX = this.renderXStart + this.lerpedOffset(partialTicks);
         final int currentY = this.getY();
-        ps.translate(currentX, currentY, -5);
+        ps.translate(currentX, currentY, 0);
         SimGUITextures.DIAGRAM_STICKY_NOTE.render(guiGraphics, 0, 0);
 
         if (this.active) {

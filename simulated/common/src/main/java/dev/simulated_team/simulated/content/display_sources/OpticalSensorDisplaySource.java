@@ -7,7 +7,6 @@ import com.simibubi.create.foundation.gui.ModularGuiLineBuilder;
 import dev.simulated_team.simulated.content.blocks.lasers.optical_sensor.OpticalSensorBlockEntity;
 import dev.simulated_team.simulated.data.SimLang;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.block.Blocks;
 
 public class OpticalSensorDisplaySource extends NumericSingleLineDisplaySource {
 
@@ -19,21 +18,17 @@ public class OpticalSensorDisplaySource extends NumericSingleLineDisplaySource {
 
         switch (context.sourceConfig().getInt("OpticalSensorSelection")) {
             case 0 -> {
-                return be.getHitBlock() == Blocks.AIR ?
-                        SimLang.text("No Block Detected")
-                                .component() :
-                        be.getHitBlock().getName();
+                return be.hasHit() ? be.getHitBlock().getName() : SimLang.text("No Block Detected").component();
             }
             case 1 -> {
+                if (!be.hasHit()) {
+                    return SimLang.text("No Block Detected").component();
+                }
                 final float rayDistance = be.getRayDistance();
-                return rayDistance > be.getLaserRange() ?
-                        SimLang.text("No Block Detected")
-                                .component() :
-
-                        SimLang.number(rayDistance)
-                                .space()
-                                .text("block" + (rayDistance != 1 ? "s" : ""))
-                                .component();
+                return SimLang.number(rayDistance)
+                        .space()
+                        .text("block" + (rayDistance != 1 ? "s" : ""))
+                        .component();
             }
         }
 

@@ -1,7 +1,6 @@
 package dev.eriksonn.aeronautics.content.ponder;
 
 import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
-import com.simibubi.create.foundation.ponder.PonderWorldBlockEntityFix;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.index.AeroPonderScenes;
 import net.createmod.ponder.api.level.PonderLevel;
@@ -36,7 +35,7 @@ public class AeroPonderPlugin extends CreatePonderPlugin {
 
     @Override
     public void onPonderLevelRestore(final PonderLevel ponderLevel) {
-        PonderWorldBlockEntityFix.fixControllerBlockEntities(ponderLevel);
+
     }
 
     @Override

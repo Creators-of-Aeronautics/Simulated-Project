@@ -41,6 +41,9 @@ public class AeroTags {
 			final TagGen.CreateTagsProvider<Block> prov = new TagGen.CreateTagsProvider<>(provIn, Block::builtInRegistryHolder);
 
 			prov.tag(AIRTIGHT)
+					.addTag(ENVELOPE);
+			// me when i HATE method chaining grrr
+			prov.tag(AIRTIGHT)
 					.addTag(net.minecraft.tags.BlockTags.WOOL);
 
 			prov.tag(DAMPENS_VIBRATIONS)

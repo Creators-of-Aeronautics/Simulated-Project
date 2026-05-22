@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.block.IBE;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.eriksonn.aeronautics.index.AeroBlockShapes;
 import dev.eriksonn.aeronautics.index.AeroTags;
+import net.createmod.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -86,7 +87,7 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
         this.withBlockEntityDo(pLevel, pPos, SteamVentBlockEntity::getAndCacheTank);
         this.withBlockEntityDo(pLevel, pPos, x -> {
             if (!x.updateRawSignal()) {
-                x.syncSignal();
+                x.signalSync();
             }
         });
     }
@@ -94,10 +95,14 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
     @Override
     public void onRemove(final BlockState pState, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState newState, final boolean pIsMoving) {
         this.withBlockEntityDo(level, pos, x -> x.rawSignalStrength = 0);
-        this.withBlockEntityDo(level, pos, SteamVentBlockEntity::syncSignal);
         if (pState.hasBlockEntity() && (!pState.is(newState.getBlock()) || !newState.hasBlockEntity()))
             level.removeBlockEntity(pos);
 
+        for (Direction dir : Iterate.directions) {
+            if (level.getBlockEntity(pos.relative(dir)) instanceof SteamVentBlockEntity vent) {
+                vent.signalSync();
+            }
+        }
         FluidTankBlock.updateBoilerState(pState, level, pos.relative(Direction.DOWN));
     }
 

@@ -76,6 +76,7 @@ if (project.path.endsWith(":common")) {
         // Mod compat
         compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-common-api:$computercraft_tweaked_version")
         compileOnly("maven.modrinth:natures-compass:$minecraft_version-$natures_compass_version-neoforge")
+        compileOnly("maven.modrinth:explorers-compass:$minecraft_version-$explorers_compass_version-neoforge")
         compileOnly("maven.modrinth:sodium:$sodium_version")
         compileOnly("maven.modrinth:iris:$iris_version")
     }

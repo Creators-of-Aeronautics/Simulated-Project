@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.simulated_team.simulated.Simulated;
 import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.ext.VeilMultiBind;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
@@ -17,6 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3dc;
+import org.lwjgl.opengl.GL30;
 
 // todo good rendering for negative physics depthGradient?
 /**
@@ -82,8 +84,8 @@ public class EndSeaRenderer {
         shader.setDefaultUniforms(VertexFormat.Mode.QUADS);
         final AdvancedFbo shadowBuffer = EndSeaShadowRenderer.getShadowsFramebuffer();
 
-        shader.setSampler("ShadowDepthSampler", shadowBuffer.getDepthTextureAttachment().getId());
-        shader.setSampler("ShadowStrengthSampler", shadowBuffer.getColorTextureAttachment(0).getId());
+        shader.setTexture("ShadowDepthSampler", GL30.GL_TEXTURE_2D, shadowBuffer.getDepthTextureAttachment().getId());
+        shader.setTexture("ShadowStrengthSampler", GL30.GL_TEXTURE_2D, shadowBuffer.getColorTextureAttachment(0).getId());
 
         final BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, FORMAT);
 

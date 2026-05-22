@@ -17,4 +17,9 @@ public class DirectionalLinkPeripheral extends SimPeripheral<DirectionalLinkedRe
     public double getClosestAngle() {
         return Math.toDegrees(this.blockEntity.getAngleToClosestLink());
     }
+
+    @LuaFunction
+    public double getClosestAngleRad() {
+        return this.blockEntity.getAngleToClosestLink();
+    }
 }

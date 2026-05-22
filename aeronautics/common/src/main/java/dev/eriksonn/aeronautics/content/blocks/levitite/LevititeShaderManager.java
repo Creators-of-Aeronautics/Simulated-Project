@@ -80,6 +80,7 @@ public class LevititeShaderManager {
         shader.safeGetUniform("linearVelocity").set(0f, 0f, 0f);
         shader.safeGetUniform("angularVelocity").set(0f, 0f, 0f);
         shader.safeGetUniform("onSublevel").set(0);
+        shader.safeGetUniform("gravityStrength").set(0);
         enabled = true;
     }
 
@@ -118,6 +119,7 @@ public class LevititeShaderManager {
 
         subLevel.logicalPose().position().sub(subLevel.lastPose().position(), linearVelocity);
         subLevel.logicalPose().rotationPoint().sub(subLevel.lastPose().rotationPoint(), temp);
+        DimensionPhysicsData.getGravity(subLevel.getLevel(), subLevel.logicalPose().position(), gravityVector1);
         subLevel.logicalPose().orientation().transform(temp);
         linearVelocity.sub(temp);
         SableMathUtils.getAngularVelocity(subLevel.lastPose().orientation(), subLevel.logicalPose().orientation(), angularVelocity);
@@ -133,7 +135,7 @@ public class LevititeShaderManager {
     }
 
     public boolean needsLayers() {
-        return smoothedAngularVelocity.lengthSquared() > 1E-6 || smoothedLinearVelocity.lengthSquared() > 1E-6;
+        return (smoothedAngularVelocity.lengthSquared() > 1E-6 || smoothedLinearVelocity.lengthSquared() > 1E-6) && gravityVector1.lengthSquared() > 0.001;
     }
 
     public void prepareShaderForSublevel(ClientSubLevel subLevel, ShaderInstance shader, double camX, double camY, double camZ) {
@@ -147,7 +149,6 @@ public class LevititeShaderManager {
         lastSmoothedLinearVelocity.lerp(smoothedLinearVelocity, pt, linearVelocity);
         lastSmoothedAngularVelocity.lerp(smoothedAngularVelocity, pt, angularVelocity);
 
-        DimensionPhysicsData.getGravity(subLevel.getLevel(), subLevel.logicalPose().position(), gravityVector1);
         currentOrientation.transformInverse(offset);
         currentOrientation.transformInverse(linearVelocity);
         currentOrientation.transformInverse(angularVelocity);
@@ -160,6 +161,7 @@ public class LevititeShaderManager {
         shader.safeGetUniform("sublevelPosition").set((float) currentPos.x % 10000, (float) currentPos.y % 10000, (float) currentPos.z % 10000);
         shader.safeGetUniform("currentOrientation").set(matrix.set(currentOrientation));
         shader.safeGetUniform("onSublevel").set(1);
+        shader.safeGetUniform("gravityStrength").set((float) gravityVector1.length());
     }
 
     public static boolean isEnabled() {

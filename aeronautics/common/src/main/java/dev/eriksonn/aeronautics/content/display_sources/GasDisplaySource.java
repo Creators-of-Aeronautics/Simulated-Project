@@ -50,12 +50,14 @@ public class GasDisplaySource extends NumericSingleLineDisplaySource {
     static MutableComponent barComponent(final int amount, final int target, final int total) {
         final int lower = Math.min(amount, target - 1);
         final int upper = Math.max(amount - target, 0);
+        final char filledChar = '█';
+        final char halfFillChar = '▒';
+        final char emptyChar = '░';
         return Component.empty()
-                .append(bars(Math.max(0, lower), ChatFormatting.DARK_AQUA, '1'))
-                .append(bars(Math.max(0, target - lower - 1), ChatFormatting.DARK_GRAY, '2'))
-                .append(bars(target == 0 ? 0 : 1, ChatFormatting.GOLD, '3'))
-                .append(bars(upper, ChatFormatting.DARK_AQUA, '4'))
-                .append(bars(Math.max(0, total - target - upper), ChatFormatting.DARK_GRAY, '5'));
+                .append(bars(Math.max(0, lower), ChatFormatting.DARK_AQUA, filledChar))
+                .append(bars(Math.max(0, target - lower - 1), ChatFormatting.DARK_GRAY, halfFillChar))/*
+                .append(bars(upper, ChatFormatting.DARK_AQUA, filledChar))
+                .append(bars(Math.max(0, total - target - upper), ChatFormatting.DARK_GRAY, filledChar))*/;
 
     }
 

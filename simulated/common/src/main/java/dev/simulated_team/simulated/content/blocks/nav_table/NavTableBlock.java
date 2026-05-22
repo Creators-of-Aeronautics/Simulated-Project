@@ -85,21 +85,31 @@ public class NavTableBlock extends DirectionalBlock implements IBE<NavTableBlock
         boolean passed = false;
 
         final ItemStack heldItem = player.getItemInHand(hand);
-        final NavigationTarget navigationTarget = NavigationTarget.ofStack(heldItem);
-        if (heldItem.isEmpty() || navigationTarget != null) {
+        final NavigationTarget newTarget = NavigationTarget.ofStack(heldItem);
+        if (heldItem.isEmpty() || newTarget != null) {
             this.withBlockEntityDo(level, pos, nav -> {
                 final ContainerSlot slot = nav.inventory.slot;
-                final ItemStack save = slot.getStack().copy();
-                final ItemStack oldSlotItem = save.copy();
+                final ItemStack extract = slot.getStack().copy();
+                final ItemStack insert = heldItem.copyWithCount(1);
 
-                if(navigationTarget != null) {
-                    navigationTarget.onInsert(heldItem, nav, player);
+                if (!extract.isEmpty()) {
+                    NavigationTarget oldTarget = nav.getNavTableItem();
+                    if (oldTarget != null) {
+                        oldTarget.onExtract(extract, nav, player);
+                    }
                 }
-                slot.setStack(heldItem.copyWithCount(1));
+
+                if (newTarget != null) {
+                    newTarget.onInsert(insert, nav, player);
+                }
+
+                slot.setStack(insert);
                 if (!player.hasInfiniteMaterials()) {
                     heldItem.shrink(1);
                 }
-                player.getInventory().placeItemBackInInventory(save);
+                if (!extract.isEmpty()) {
+                    player.getInventory().placeItemBackInInventory(extract.copy());
+                }
 
                 final ItemStack newSlotItem = slot.getStack();
                 nav.setChanged();
@@ -108,13 +118,13 @@ public class NavTableBlock extends DirectionalBlock implements IBE<NavTableBlock
                 final float pitch = 0.8f + level.random.nextFloat() * 0.4f;
                 final float volume = .75f;
 
-                if (oldSlotItem.isEmpty() && !newSlotItem.isEmpty()) {
+                if (extract.isEmpty() && !newSlotItem.isEmpty()) {
                     // item inserted
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.PLAYERS, volume, pitch);
-                } else if (!oldSlotItem.isEmpty() && newSlotItem.isEmpty()) {
+                } else if (!extract.isEmpty() && newSlotItem.isEmpty()) {
                     // item picked up
                     level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, volume, pitch);
-                } else if (!oldSlotItem.isEmpty()) {
+                } else if (!extract.isEmpty()) {
                     // item changed
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.PLAYERS, volume, pitch);
                 }

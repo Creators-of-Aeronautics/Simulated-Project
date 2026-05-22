@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.neoforge.service;
 
 import com.simibubi.create.content.contraptions.MountedStorageManager;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import dev.simulated_team.simulated.multiloader.energy.SingleBattery;
 import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.multiloader.inventory.InventoryLoaderWrapper;
 import dev.simulated_team.simulated.multiloader.inventory.neoforge.InventoryLoaderWrapperImpl;
@@ -24,6 +25,7 @@ public class NeoForgeSimInventoryService implements SimInventoryService {
 
     public static Set<InventoryGetterHolder<? extends BlockEntity>> inventoryGetters = new HashSet<>();
     public static Set<TankGetterHolder<? extends BlockEntity>> fluidTankGetters = new HashSet<>();
+    public static Set<EnergyGetterHolder<? extends BlockEntity>> energyGetters = new HashSet<>();
 
     public static HashMap<BlockEntityType<BlockEntity>, Function<BlockEntity, SingleTank>> tankGetters = new HashMap<>();
 
@@ -35,6 +37,11 @@ public class NeoForgeSimInventoryService implements SimInventoryService {
     @Override
     public <T extends BlockEntity> NonNullConsumer<BlockEntityType<T>> registerTank(final BiFunction<T, Direction, SingleTank> getter) {
         return (type) -> fluidTankGetters.add(new TankGetterHolder<>(getter, type));
+    }
+
+    @Override
+    public <T extends BlockEntity> NonNullConsumer<BlockEntityType<T>> registerBattery(final BiFunction<T, Direction, SingleBattery> getter) {
+        return (type) -> energyGetters.add(new EnergyGetterHolder<>(getter, type));
     }
 
     @Override
@@ -69,6 +76,13 @@ public class NeoForgeSimInventoryService implements SimInventoryService {
 
     public record TankGetterHolder<T extends BlockEntity>(BiFunction<T, Direction, SingleTank> getter, BlockEntityType<T> type) {
         public SingleTank castBlockEntityAndGetInv(final BlockEntity be, final Direction dir) {
+            final T casted = (T) be;
+            return this.getter.apply(casted, dir);
+        }
+    }
+
+    public record EnergyGetterHolder<T extends BlockEntity>(BiFunction<T, Direction, SingleBattery> getter, BlockEntityType<T> type) {
+        public SingleBattery castBlockEntityAndGetInv(final BlockEntity be, final Direction dir) {
             final T casted = (T) be;
             return this.getter.apply(casted, dir);
         }

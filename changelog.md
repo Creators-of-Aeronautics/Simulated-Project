@@ -1,7 +1,51 @@
- - Fix Nature's Compass compatibility issues
- - Make all dyed Envelope blocks ponderable
- - Fix issues with String locales causing crashes in some languages
- - Fix hold interactions not working when the Use key is bound to a key instead of a mouse button
- - Fix issues with labels in the value boxes for the Torsion Spring
- - Add #simulated:non_movable tag for blocks for Simulated Contraption assembly
- - Fix issues with the ponder tooltip manager causing crashes
+# Additions
+- Custom GUI for Steering Wheel when you're wearing goggles - *BlazerBo1*
+- Add custom name support for Typewriters
+- Add comparator output for Typewriters when they are in use
+- Add config to hide "new ponder!" tooltip
+- Add statistics to various items
+- Add FE capability to Docking Connectors
+
+# Changes
+- Borehead Bearings no longer break blocks with no collision shape
+- Prevent fake players from using Plunger Launchers
+- Adjust Optical Sensor formatting
+- Remove unused blockstate in Altitude Sensor
+- Velocity Sensor display link readout will no longer be negative
+- Reduce Optical Sensor range by 0.5 blocks
+- Make Laser Pointers use the center of the entity for their hit location instead of feet location.
+- Prevent Swivel Bearings from updating their target angle if they are disassembled
+- Balancing changes for hot air gusts
+- Propellers no longer push entities that they don't have line of sight of
+- Change formatting for ExtraKinetics information to account for localization
+- Scale Levitite shader based on gravity strength
+
+# Fixes
+- Fix redstone inductor charge / discharge speed - *SeppeOngena*
+- Model fix for Inductor - *Lucky56*
+- Fix ServiceLoader crash in large modpacks - *mrosnerr*
+- Fix Borehead Bearings stalling when breaking certain blocks
+- Fix Borehead Bearings occasionally crashing the client
+- Fix Wheel Mount braking not checking redstone from correct direction
+- Fix Linked Typewriter crash
+- Fix a NPE crash in Springs
+- Fix Spring shortening / lengthening issues
+- Fix CC methods not properly using underlying value box numbers
+- Fix crashes with some data components
+- Fix airtight tooltip logic referencing `#simulated:airtight` instead of `#aeronautics:airtight`
+- Fix hot air physics at high pressure gradients
+- Fix client crash pertaining to Levitite catalyzing
+- Fix some ExtraKinetics Issues
+- Fix Propeller particles
+- Fix Spring and Physics Staff rendering with Iris
+- Fix packet validation for Physics Staff
+- Fix performance degradation with Adjustable Burner sounds
+- Fix crash when creating world
+- Fix Honey Glue recipe using `minecraft:honey` instead of `#c:honey`
+- Fix Torsion Spring behavior when angle limit is lowered
+- Fix Steam Burner crash on servers
+- Fix Swivel Bearing constraints not being applied if plate is in world
+- Fix Swivel Bearing disassembly when base and plate are on same sub-level
+- Fix some special physics actors (Spring, Swivel Bearing, Rope Connector/Winch, Docking Connector) being movable on create contraptions and causing unusual behavior
+- Fix Ropes not respecting tile drops gamerule
+- Fix Docking Connector inventory implementation not working with new neoforge inventory changes

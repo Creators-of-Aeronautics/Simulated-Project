@@ -1,0 +1,11 @@
+{
+  "values": [
+    "simulated:swivel_bearing",
+    "simulated:swivel_bearing_link_block",
+    "simulated:rope_winch",
+    "simulated:rope_connector",
+    "simulated:docking_connector",
+    "simulated:paired_docking_connector",
+    "simulated:spring"
+  ]
+}

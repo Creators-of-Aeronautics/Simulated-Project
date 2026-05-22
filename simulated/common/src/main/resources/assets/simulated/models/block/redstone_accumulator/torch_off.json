@@ -8,25 +8,25 @@
 		{
 			"name": "Front Torch",
 			"from": [7, 2, 12],
-			"to": [9, 7, 16],
+			"to": [9, 8, 16],
 			"faces": {
-				"east": {"uv": [6, 5, 10, 10], "texture": "#6"},
-				"west": {"uv": [6, 5, 10, 10], "texture": "#6"}
+				"east": {"uv": [6, 5, 10, 11], "texture": "#6"},
+				"west": {"uv": [6, 5, 10, 11], "texture": "#6"}
 			}
 		},
 		{
 			"name": "Front Torch",
 			"from": [6, 2, 13],
-			"to": [10, 7, 15],
+			"to": [10, 8, 15],
 			"faces": {
-				"north": {"uv": [6, 5, 10, 10], "texture": "#6"},
-				"south": {"uv": [6, 5, 10, 10], "texture": "#6"}
+				"north": {"uv": [6, 5, 10, 11], "texture": "#6"},
+				"south": {"uv": [6, 5, 10, 11], "texture": "#6"}
 			}
 		},
 		{
 			"name": "Front Torch Top",
-			"from": [7, 5, 13],
-			"to": [9, 6, 15],
+			"from": [7, 6, 13],
+			"to": [9, 7, 15],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 2, 0]},
 			"faces": {
 				"up": {"uv": [7, 6, 9, 8], "rotation": 180, "texture": "#6"}

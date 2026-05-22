@@ -53,12 +53,12 @@ public interface AbstractContainer extends NBTSerializable, Container {
     /**
      * Attempts to insert the given ItemStack into desired slot.
      *
-     * @param stack    The stack to insert into this inventory
-     * @param slot     The slot to insert this stack into
-     * @param simulate Whether this action is simulated
+     * @param stack     The stack to insert into this inventory
+     * @param slotIndex The slot to insert this stack into
+     * @param simulate  Whether this action is simulated
      * @return The passed ItemStack or EMPTY if insertion was not successful, or a copy of the ItemStack with a shrunken count
      */
-    ItemStack insertSlot(ItemStack stack, int slot, boolean simulate);
+    ItemStack insertSlot(ItemStack stack, int slotIndex, boolean simulate);
 
     /**
      * Attempts to extract the given Item up to the maxAmount from this inventory.
@@ -73,12 +73,12 @@ public interface AbstractContainer extends NBTSerializable, Container {
     /**
      * Attempts to extract an item from the given index, up to the given amount
      *
-     * @param index           The index to extract from
+     * @param slotIndex       The index to extract from
      * @param amountToExtract The max amount to extract from the given index
      * @param simulate        Whether this action is simulated
      * @return The item extracted
      */
-    ItemStack extractSlot(int index, int amountToExtract, boolean simulate);
+    ItemStack extractSlot(int slotIndex, int amountToExtract, boolean simulate);
 
     /**
      * Checks to see if the incoming item can be inserted into the desired slot of this container

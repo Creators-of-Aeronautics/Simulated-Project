@@ -1,15 +1,14 @@
 package dev.simulated_team.simulated.index;
 
-import com.mojang.serialization.Codec;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import foundry.veil.platform.registry.RegistrationProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
@@ -24,8 +23,10 @@ public class SimDataComponents {
 	public static final DataComponentType<UUID> LODESTONE_COMPASS_SUBLEVEL_TRACKER = register("lodestone_compass_tracker",
 			uuidBuilder -> uuidBuilder.persistent(UUIDUtil.CODEC));
 
-    public static final DataComponentType<String> COMPASS_PLACER_UUID = register("compass_placer",
-    builder -> builder.persistent(Codec.STRING));
+    public static final DataComponentType<UUID> COMPASS_PLACER_UUID = register("compass_placer",
+            builder -> builder.persistent(UUIDUtil.STRING_CODEC));
+    public static final DataComponentType<GlobalPos> LAST_PLAYER_DEATH_LOCATION = register("last_player_death_location",
+            builder -> builder.persistent(GlobalPos.CODEC));
 
     public static final DataComponentType<NavigationTarget> TARGET = register("target", builder -> builder
             .persistent(SimRegistries.NAVIGATION_TARGET.byNameCodec())

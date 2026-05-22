@@ -76,7 +76,7 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
                 it.remove();
                 this.setChanged();
             } else {
-                if (constraint == null || !constraint.hasJoint()) {
+                if (constraint == null || (!constraint.hasJoint() && Mth.equal(-1, constraint.scrollDistance))) {
                     player.resetFallDistance();
                 }
             }
@@ -153,7 +153,7 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
             if (!player.onGround() && !player.isInWater() && !player.getAbilities().flying &&!player.onClimbable()) {
                 return;
             } else {
-                final SubLevel standingSubLevel = EntitySubLevelUtil.getTrackingSubLevel(player);
+                final SubLevel standingSubLevel = Sable.HELPER.getTrackingSubLevel(player);
                 if (standingSubLevel == subLevel) {
                     return;
                 }

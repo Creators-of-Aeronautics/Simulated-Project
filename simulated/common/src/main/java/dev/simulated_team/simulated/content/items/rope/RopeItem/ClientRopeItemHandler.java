@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.content.items.rope.RopeItem;
 
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.simulated_team.simulated.config.server.blocks.SimBlockConfigs;
 import dev.simulated_team.simulated.content.blocks.rope.RopeStrandHolderBehavior;
 import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBlockEntity;
@@ -54,9 +53,9 @@ public class ClientRopeItemHandler {
                 final SimBlockConfigs blockConfig = SimConfigService.INSTANCE.server().blocks;
                 final double maxRopeRange = blockConfig.maxRopeRange.get();
 
-                boolean valid = RopeItem.isValidRopeAttachment(level, hitBlock) && !hitBlock.equals(firstBlock)
-                        && Sable.HELPER.distanceSquaredWithSubLevels(level, firstPoint, hitResult.getLocation()) < maxRopeRange *
-                        maxRopeRange;
+                boolean inRange = Sable.HELPER.distanceSquaredWithSubLevels(level, firstPoint, hitResult.getLocation()) < maxRopeRange * maxRopeRange;
+
+                boolean valid = RopeItem.isValidRopeAttachment(level, hitBlock) && !hitBlock.equals(firstBlock) && inRange;
 
                 final RopeStrandHolderBehavior holderA = RopeItem.getRopeHolder(level, hitBlock);
                 final RopeStrandHolderBehavior holderB = RopeItem.getRopeHolder(level, firstBlock);
@@ -69,14 +68,20 @@ public class ClientRopeItemHandler {
 
                 final Vec3 target = valid ? hitBlock.getCenter() : hitResult.getLocation();
 
-                final Color color = new Color(valid ? SimColors.SUCCESS_LIME : SimColors.NUH_UH_RED);
+                final Color color;
+                if (valid) {
+                    color = new Color(SimColors.SUCCESS_LIME);
+                } else {
+                    color = new Color(inRange ? SimColors.PERCHANCE_ORANGE : SimColors.NUH_UH_RED);
+                }
+
                 Outliner.getInstance().chaseAABB("FirstRopeAttachmentPoint", new AABB(firstPoint, firstPoint))
                         .colored(color)
                         .lineWidth(1 / 3f)
                         .disableLineNormals();
 
                 final Vec3 globalFirstPoint = Sable.HELPER.projectOutOfSubLevel(level, firstPoint);
-                final Vec3 globalTarget = Sable.HELPER.projectOutOfSubLevel(level, target);
+                Vec3 globalTarget = Sable.HELPER.projectOutOfSubLevel(level, target);
 
                 if (valid) {
                     Outliner.getInstance().chaseAABB("SecondRopeAttachmentPoint", new AABB(target, target))
@@ -95,6 +100,12 @@ public class ClientRopeItemHandler {
                                 .lineWidth(1 / 8f)
                                 .disableLineNormals();
                     }
+                } else if (!inRange) {
+                    globalTarget = globalTarget.subtract(globalFirstPoint).normalize().scale(maxRopeRange - 0.5).add(globalFirstPoint);
+                    Outliner.getInstance().chaseAABB("SecondRopeAttachmentPoint", new AABB(globalTarget, globalTarget))
+                            .colored(color)
+                            .lineWidth(1 / 3f)
+                            .disableLineNormals();
                 }
 
                 final DustParticleOptions data = new DustParticleOptions(color.asVectorF(), 1);

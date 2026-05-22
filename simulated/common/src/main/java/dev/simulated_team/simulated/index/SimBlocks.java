@@ -101,7 +101,6 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::wooden)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .blockstate((c, p) -> p.horizontalFaceBlock(c.get(), AssetLookup.partialBaseModel(c, p)))
                     .item()
                     .transform(customItemModel())
@@ -118,6 +117,8 @@ public class SimBlocks {
 
     public static final BlockEntry<SwivelBearingBlock> SWIVEL_BEARING =
             REGISTRATE.block("swivel_bearing", SwivelBearingBlock::new)
+                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::netheriteMetal)
                     .properties((properties -> properties.destroyTime(5f)))
                     .addLayer(() -> RenderType::cutoutMipped)
@@ -126,7 +127,6 @@ public class SimBlocks {
                                     prov.modLoc("block/swivel_bearing/block" + (blockState.getValue(SwivelBearingBlock.ASSEMBLED) ? "_assembled" : "")))))
                     .transform(SimStress.setImpact(4.0))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .item().transform(customItemModel("swivel_bearing", "item"))
                     .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
@@ -142,6 +142,7 @@ public class SimBlocks {
 
     public static final BlockEntry<SwivelBearingPlateBlock> SWIVEL_BEARING_LINK_BLOCK =
             REGISTRATE.block("swivel_bearing_link_block", SwivelBearingPlateBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .blockstate((ctx, prov) ->
                             prov.directionalBlock(ctx.getEntry(), blockState -> prov.models().getExistingFile(prov.modLoc("block/swivel_bearing/bearing_plate"))))
                     .initialProperties(SharedProperties::netheriteMetal)
@@ -161,6 +162,7 @@ public class SimBlocks {
 
     public static final BlockEntry<RopeWinchBlock> ROPE_WINCH =
             REGISTRATE.block("rope_winch", RopeWinchBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate(SimBlockStateGen::directionalKineticAxisBlockstate)
@@ -183,6 +185,7 @@ public class SimBlocks {
 
     public static final BlockEntry<RopeConnectorBlock> ROPE_CONNECTOR =
             REGISTRATE.block("rope_connector", RopeConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate(SimBlockStateGen::directionalAxisBlock)
@@ -537,6 +540,7 @@ public class SimBlocks {
 
     public static final BlockEntry<DockingConnectorBlock> DOCKING_CONNECTOR =
             REGISTRATE.block("docking_connector", DockingConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .transform(pickaxeOnly())
                     .properties(p -> p
@@ -555,6 +559,7 @@ public class SimBlocks {
 
     public static final BlockEntry<PairedDockingConnectorBlock> PAIRED_DOCKING_CONNECTOR =
             REGISTRATE.block("paired_docking_connector", PairedDockingConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .blockstate((c, p) -> p.simpleBlock(c.get(), p.models().getExistingFile(p.modLoc("block/docking_connector/block"))))
                     .transform(pickaxeOnly())
@@ -864,7 +869,7 @@ public class SimBlocks {
                     .blockstate((ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
                             blockState -> prov.models().getExistingFile(
                                     prov.modLoc("block/spring/" + (blockState.getValue(SpringBlock.SIZE) == SpringBlock.Size.MEDIUM ? "" : (blockState.getValue(SpringBlock.SIZE).getSerializedName() + "_")) + "block"))))
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.LIGHT)
+                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, AllTags.AllBlockTags.NON_MOVABLE.tag, SimTags.Blocks.LIGHT)
                     .loot((tables, block) -> {
                         tables.add(block, tables.createSingleItemTable(SimItems.SPRING));
                     })

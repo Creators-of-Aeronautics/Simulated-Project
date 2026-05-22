@@ -102,6 +102,7 @@ publishMods {
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = "676721"
+        projectSlug = "create-aeronautics"
         minecraftVersions.add(minecraft_version)
 
         clientRequired = true
@@ -118,5 +119,21 @@ publishMods {
 
         requires("create")
         requires("sable")
+    }
+
+    discord {
+        webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
+
+        avatarUrl = "https://cdn.modrinth.com/data/oWaK0Q19/f66b5589924884ffd81acb27f3ccb775867a962e_96.webp"
+        username = "Create Aeronautics Updates"
+
+        def modrinthLink = "https://modrinth.com/mod/create-aeronautics"
+        def curseForgeLink = "<https://www.curseforge.com/minecraft/mc-mods/create-aeronautics>"
+
+        setPlatforms(publishMods.platforms.modrinth)
+
+        content = changelog.map {
+            "# Create Aeronautics release $project.version \n$it\nModrinth: $modrinthLink\nCurseForge: $curseForgeLink"
+        }
     }
 }

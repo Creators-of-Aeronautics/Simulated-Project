@@ -18,7 +18,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -115,7 +117,16 @@ public class RedstoneAccumulatorBlockEntity extends SmartBlockEntity implements 
     }
 
     public void setOutputSignal(final int output){
+        boolean update = output != this.outputSignal;
         this.outputSignal = Mth.clamp(output, 0, 15);
+        if (update) {
+            this.updateFacingBlock(this.getBlockState().getBlock(), this.level);
+        }
+    }
+
+    private void updateFacingBlock(final Block block, final Level levelIn) {
+        levelIn.updateNeighborsAt(this.worldPosition, block);
+        levelIn.updateNeighborsAt(this.worldPosition.relative(this.getBlockState().getValue(RedstoneAccumulatorBlock.FACING).getOpposite()), block);
     }
 
     private int step(final ScrollValueBehaviour.StepContext context) {

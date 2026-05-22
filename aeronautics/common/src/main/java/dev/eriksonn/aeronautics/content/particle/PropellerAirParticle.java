@@ -15,7 +15,6 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
 
     public static final double frictionScale = 0.2;
     public static final int lifeTime = 20;
-    Vec3 motion;
     private boolean stoppedByCollision;
     boolean isVirtual;
 
@@ -33,7 +32,9 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
         this.xo = x;
         this.yo = y;
         this.zo = z;
-        this.motion = new Vec3(dx, dy, dz);
+        this.xd = dx;
+        this.yd = dy;
+        this.zd = dz;
         this.setPos(x+dx, y+dy, z+dz);
         this.setAlpha(.25f);
     }
@@ -56,14 +57,14 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
         } else {
             this.selectSprite((int) Mth.clamp((this.age / (float) this.lifetime) * 8, 0, 7));
 
-            this.xd = this.motion.x;
-            this.yd = this.motion.y;
-            this.zd = this.motion.z;
-            double friction = frictionScale * this.motion.length();
+            double friction = frictionScale * new Vec3(this.xd, this.yd, this.zd).length();
             friction = Math.min(friction, 0.5f);
-            this.motion = this.motion.scale(1.0 - friction);
 
             this.move(this.xd, this.yd, this.zd);
+            this.xd *= 1.0 - friction;
+            this.yd *= 1.0 - friction;
+            this.zd *= 1.0 - friction;
+
         }
 
     }

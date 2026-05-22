@@ -1,6 +1,5 @@
 {
   "values": [
-    "simulated:physics_assembler",
     "simulated:swivel_bearing",
     "simulated:laser_pointer",
     "simulated:velocity_sensor",

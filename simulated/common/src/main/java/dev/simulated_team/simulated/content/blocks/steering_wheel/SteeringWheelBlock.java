@@ -6,10 +6,10 @@ import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.block.IHaveBigOutline;
 import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import dev.simulated_team.simulated.api.IDirectionalAnalogOutput;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.index.SimClickInteractions;
@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class SteeringWheelBlock extends HorizontalDirectionalBlock
-        implements IBE<SteeringWheelBlockEntity>, ProperWaterloggedBlock, IRotate, IHaveBigOutline, QuietUse {
+        implements IBE<SteeringWheelBlockEntity>, ProperWaterloggedBlock, IRotate, IHaveBigOutline, QuietUse, IDirectionalAnalogOutput {
 
     public static final BooleanProperty ON_FLOOR = BooleanProperty.create("on_floor");
     public static final MapCodec<SteeringWheelBlock> CODEC = simpleCodec(SteeringWheelBlock::new);
@@ -199,16 +199,14 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock
         return true;
     }
 
-    public static Direction comparatorDir = Direction.NORTH;
-
     @Override
-    protected int getAnalogOutputSignal(final BlockState blockState, final Level level, final BlockPos blockPos) {
+    public int getAnalogOutputSignalFrom(final BlockState blockState, final Level level, final BlockPos blockPos, final Direction dir) {
         final Direction facing = blockState.getValue(FACING);
         final SteeringWheelBlockEntity be = this.getBlockEntity(level, blockPos);
 
         final float frac = Mth.clamp(be.targetAngleToUpdate / be.angleInput.getValue(), -1, 1);
 
-        if (facing == comparatorDir) {
+        if (facing == dir) {
             return be.held ? 15 : 0;
         }
 
@@ -218,9 +216,9 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock
         final int value = (int) (((frac < 0 ? Math.floor(frac * 15) : Math.ceil(frac * 15)) *
                 ((facing.getStepX() == 1 || facing.getStepZ() == 1) ? -1 : 1)));
 
-        if (facing.getClockWise() == comparatorDir && value > 0) {
+        if (facing.getClockWise() == dir && value > 0) {
             return value;
-        } else if (facing.getCounterClockWise() == comparatorDir && value < 0) {
+        } else if (facing.getCounterClockWise() == dir && value < 0) {
             return -value;
         }
         return 0;
