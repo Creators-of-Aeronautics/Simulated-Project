@@ -226,6 +226,8 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
 
                 this.angle += angularSpeed;
 
+                this.level.updateNeighborsAt(this.getBlockPos(), this.getParentBlockEntity().getBlockState().getBlock());
+
                 if (this.rotationProgressTicks == this.rotationDurationTicks) {
                     this.sequenceContext = null;
                     this.rotationProgressTicks = -1;
@@ -258,7 +260,7 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
                 }
             } else if (!parentStopped && this.currentState == State.STOPPED) {
                 // start rotating if the parent is, and we're stopped
-                final double targetAngle = this.parent.angleInput.getValue() * Math.signum(this.lastSpringSpeed);
+                final double targetAngle = this.parent.angleInput.getValue() * Math.signum(this.parent.getSpeed());
                 this.beginTurnTo(targetAngle);
             }
         }

@@ -23,11 +23,6 @@ public class MapNavigationTarget implements NavigationTarget {
 		return getNearestDecorationPos(level, pos, self);
 	}
 
-	@Override
-	public float getMaxRange() {
-		return 0;
-	}
-
 	private static Vec3 getNearestDecorationPos(final Level level, final Vec3 pos, final ItemStack stack) {
 		final MapDecorations decorations = stack.getComponents().get(DataComponents.MAP_DECORATIONS);
 		final MapId mapId = stack.getComponents().get(DataComponents.MAP_ID);
@@ -47,13 +42,15 @@ public class MapNavigationTarget implements NavigationTarget {
 			}
 
 			final MapItemSavedData mapData = level.getMapData(mapId);
-			final Collection<MapBanner> banners = mapData.getBanners();
-			for (final MapBanner banner : banners) {
-				final Vec3 bannerPos = banner.pos().getCenter();
-				final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
-				if(dist < closestDist) {
-					closestPos = bannerPos;
-					closestDist = dist;
+			if (mapData != null) {
+				final Collection<MapBanner> banners = mapData.getBanners();
+				for (final MapBanner banner : banners) {
+					final Vec3 bannerPos = banner.pos().getCenter();
+					final double dist = pos.distanceToSqr(bannerPos.x(), pos.y(), bannerPos.z());
+					if(dist < closestDist) {
+						closestPos = bannerPos;
+						closestDist = dist;
+					}
 				}
 			}
 

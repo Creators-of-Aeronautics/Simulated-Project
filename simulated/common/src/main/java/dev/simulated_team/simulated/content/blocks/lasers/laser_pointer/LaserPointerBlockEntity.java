@@ -53,7 +53,7 @@ public class LaserPointerBlockEntity extends AbstractLaserBlockEntity implements
         ).between(1, rangeMax);
         this.range.value = rangeMax;
 
-        this.sensorInteraction = new LaserSensorInteractorBehaviour(this, this::gatherStartAndEnd, this::getLaserRange, this::getPower, this::matchesSensor);
+        this.sensorInteraction = new LaserSensorInteractorBehaviour(this, this::gatherStartAndEnd, this::getRaycastLength, this::getPower, this::matchesSensor);
         this.sensorInteraction.setShouldCast(this::shouldCast);
 
         behaviours.add(this.sensorInteraction);
@@ -138,7 +138,7 @@ public class LaserPointerBlockEntity extends AbstractLaserBlockEntity implements
     }
 
     @Override
-    public float getLaserRange() {
+    public float getRaycastLength() {
         return this.range.value;
     }
 

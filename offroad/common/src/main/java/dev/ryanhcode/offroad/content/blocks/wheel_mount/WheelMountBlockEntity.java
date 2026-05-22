@@ -13,25 +13,24 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import dev.ryanhcode.sable.Sable;
-import dev.simulated_team.simulated.multiloader.inventory.SingleSlotContainer;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.ryanhcode.offroad.content.components.TireLike;
 import dev.ryanhcode.offroad.data.OffroadLang;
 import dev.ryanhcode.offroad.index.OffroadDataComponents;
-import dev.ryanhcode.sable.api.SubLevelHelper;
+import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.math.OrientedBoundingBox3d;
-import dev.ryanhcode.sable.companion.math.Pose3d;
-import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.api.physics.force.ForceTotal;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.physics.mass.MassData;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.ryanhcode.sable.companion.math.Pose3d;
+import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.mixinterface.clip_overwrite.ClipContextExtension;
 import dev.ryanhcode.sable.physics.config.block_properties.PhysicsBlockPropertyHelper;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.simulated_team.simulated.multiloader.inventory.SingleSlotContainer;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
@@ -206,7 +205,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
                 this.touchingFriction = 1.0;
             }
 
-            final double brakeStrength = this.level.getSignal(blockPos.above(), Direction.DOWN) / 15.0;
+            final double brakeStrength = this.level.getSignal(blockPos.above(), Direction.UP) / 15.0;
             final double surfaceBraking = Math.min(this.touchingFriction, 1.0);
             final double brakingFrictionStrength = (0.075 + brakeStrength * 0.3) * surfaceBraking;
 
@@ -265,7 +264,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
         final Direction facing = this.getBlockState().getValue(WheelMountBlock.HORIZONTAL_FACING);
         final float speed = facing.getAxis() == Direction.Axis.X ? -this.getSpeed() : this.getSpeed();
-        final double rpt = speed * Math.PI * 2.0 / 60.0 / 20.0 * (15 - this.level.getSignal(this.getBlockPos().above(), Direction.DOWN)) / 15.0;
+        final double rpt = speed * Math.PI * 2.0 / 60.0 / 20.0 * (15 - this.level.getSignal(this.getBlockPos().above(), Direction.UP)) / 15.0;
         final double attemptedAngularVelocity = Mth.lerp(0.2, this.angularVelocity, rpt);
 
         if (subLevel == null || this.liftedUp) {

@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.network.packets.linked_typewriter;
 
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterBlockEntity;
+import dev.simulated_team.simulated.index.SimStats;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
@@ -27,7 +28,11 @@ public record TypewriterKeyInteractionPacket(BlockPos interactionPos, int key, i
         final BlockEntity be = level.getBlockEntity(this.interactionPos);
 
         if (be instanceof final LinkedTypewriterBlockEntity typeWriter) {
-            typeWriter.onKeyInteraction(context.player().getUUID(), null, this.key, this.action == GLFW.GLFW_PRESS);
+            final boolean pressed = this.action == GLFW.GLFW_PRESS;
+            if (pressed) {
+                SimStats.TYPEWRITER_KEY_PRESSES.awardTo(context.player());
+            }
+            typeWriter.onKeyInteraction(context.player().getUUID(), null, this.key, pressed);
         }
     }
 

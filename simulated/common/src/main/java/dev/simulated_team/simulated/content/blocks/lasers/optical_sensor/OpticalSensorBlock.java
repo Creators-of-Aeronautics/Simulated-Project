@@ -99,7 +99,7 @@ public class OpticalSensorBlock extends DirectedDirectionalBlock implements IBE<
 
         int power = 0;
         if (be != null && this.isSignalSource(blockState) && side != blockState.getValue(FACING).getOpposite()) {
-            power = Math.round((be.getLaserRange() - be.getRayDistance()) * (15f / be.getLaserRange()));
+            power = Math.round((be.getRaycastLength() - be.getRayDistance()) * (15f / be.getRaycastLength()));
         }
 
         return power;

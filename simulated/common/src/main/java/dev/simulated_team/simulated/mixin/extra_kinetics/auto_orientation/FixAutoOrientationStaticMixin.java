@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class FixAutoOrientationStaticMixin {
 
     @WrapOperation(method = "*", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/kinetics/base/IRotate;hasShaftTowards(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z", remap = false))
-    private static boolean test(final IRotate instance, final LevelReader world, final BlockPos pos, final BlockState state, final Direction incomingDir, final Operation<Boolean> originalWrap) {
+    private static boolean simulated$handleAutoOrientationWithExtraKinetics(final IRotate instance, final LevelReader world, final BlockPos pos, final BlockState state, final Direction incomingDir, final Operation<Boolean> originalWrap) {
         Boolean original = originalWrap.call(instance, world, pos, state, incomingDir);
 
         if (!original)  { //if the original call does not succeed, check to see if we have internal block entities, and check those

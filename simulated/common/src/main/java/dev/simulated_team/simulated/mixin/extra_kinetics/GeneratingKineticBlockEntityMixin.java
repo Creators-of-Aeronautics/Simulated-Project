@@ -23,7 +23,7 @@ public abstract class GeneratingKineticBlockEntityMixin extends KineticBlockEnti
 
     @WrapOperation(method = "setSource", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
     //TODO: figure out how to do this without needing to mixin into overrides of setSource
-    public BlockEntity getExtraKinetics(final Level instance, final BlockPos blockPos, final Operation<BlockEntity> original) {
+    public BlockEntity simulated$getExtraKinetics(final Level instance, final BlockPos blockPos, final Operation<BlockEntity> original) {
         BlockEntity be = instance.getBlockEntity(blockPos);
         if (be instanceof final ExtraKinetics ek && blockPos instanceof ExtraBlockPos) {
             be = ek.getExtraKinetics();

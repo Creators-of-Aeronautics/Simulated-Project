@@ -20,4 +20,9 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     public List<Double> getAngles() {
         return List.of(Math.toDegrees(this.blockEntity.getXAngle()), Math.toDegrees(this.blockEntity.getZAngle()));
     }
+
+    @LuaFunction
+    public List<Double> getAnglesRad() {
+        return List.of(this.blockEntity.getXAngle(), this.blockEntity.getZAngle());
+    }
 }

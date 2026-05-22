@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.index;
 
 import com.simibubi.create.AllItems;
-import com.simibubi.create.AllTags;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -21,6 +20,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
@@ -84,6 +84,7 @@ public class SimItems {
             REGISTRATE.item("honey_glue", HoneyGlueItem::new)
                     .properties(p -> p.stacksTo(1)
                             .durability(100))
+                    .tag(ItemTags.DURABILITY_ENCHANTABLE)
                     .register();
 
     public static final ItemEntry<PhysicsStaffItem> PHYSICS_STAFF =
@@ -96,6 +97,7 @@ public class SimItems {
             REGISTRATE.item("plunger_launcher", PlungerLauncherItem::new)
                     .properties(p -> p.stacksTo(1).durability(200))
                     .model(AssetLookup.itemModelWithPartials())
+                    .tag(Tags.Items.ENCHANTABLES, ItemTags.DURABILITY_ENCHANTABLE)
                     .register();
 
     private static ItemEntry<Item> ingredient(final String name) {

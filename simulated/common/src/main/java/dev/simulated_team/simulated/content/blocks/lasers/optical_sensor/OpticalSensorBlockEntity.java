@@ -13,7 +13,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringB
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import dev.simulated_team.simulated.content.blocks.lasers.LaserBehaviour;
@@ -27,6 +26,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeItem;
@@ -44,7 +44,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.awt.*;
@@ -57,8 +56,8 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
     public LaserBehaviour laser;
 
     private Block hitBlock = Blocks.AIR;
-    private float rayDistance = this.getLaserRange();
-    private float lastRayDistance = this.getLaserRange();
+    private float rayDistance = this.getRaycastLength();
+    private float lastRayDistance = this.getRaycastLength();
 
     private float opacity = 1;
 
@@ -67,10 +66,16 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
     }
 
     public float getHitBlockDistance() {
+        if (this.hitBlock.defaultBlockState().isAir()) {
+            return this.getRaycastLength();
+        }
         final Vector3dc pos = Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.atCenterOf(this.getBlockPos()));
         final Vector3dc hitPos = Sable.HELPER.projectOutOfSubLevel(this.getLevel(), JOMLConversion.toJOML(this.laser.getBlockHitResult().getLocation()));
+        return (float) pos.distance(hitPos);
+    }
 
-        return this.hitBlock.defaultBlockState().isAir() ? 15 : (float) pos.distance(hitPos);
+    public boolean hasHit() {
+        return !this.hitBlock.defaultBlockState().isAir();
     }
 
     public OpticalSensorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
@@ -85,7 +90,7 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
                 SimLang.translate("optical_sensor.max_length").component(), this, new RangeValueBoxTransform()
             ).between(1, maxRange));
         this.range.value = maxRange;
-        behaviours.add(this.laser = new LaserBehaviour(this, this::gatherStartAndEnd, this::getLaserRange));
+        behaviours.add(this.laser = new LaserBehaviour(this, this::gatherStartAndEnd, this::getRaycastLength));
     }
 
     @Override
@@ -153,8 +158,17 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         return true;
     }
 
-    public float getLaserRange() {
-        return this.range.getValue() + 1;
+    public float getRaycastLength() {
+        return this.range.getValue() + 0.5f;
+    }
+
+    public int getRange() {
+        return this.range.getValue();
+    }
+
+    public void setRange(final int blocks) {
+        final int max = SimConfigService.INSTANCE.server().blocks.opticalSensorRange.get();
+        this.range.setValue(Math.clamp(blocks, 1, max));
     }
 
     public float getRayDistance() {
@@ -288,7 +302,12 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         @Override
         public ValueSettingsBoard createBoard(final Player player, final BlockHitResult hitResult) {
             return new ValueSettingsBoard(this.label, this.max, 15, ImmutableList.of(Component.translatable("simulated.unit.length_blocks")),
-                    new ValueSettingsFormatter(ValueSettings::format));
+                    new ValueSettingsFormatter(this::formatSettings));
+        }
+
+        public MutableComponent formatSettings(final ValueSettings settings) {
+            final int value = Math.max(1, settings.value());
+            return Component.literal(String.valueOf(value));
         }
     }
 }

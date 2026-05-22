@@ -72,7 +72,7 @@ public class PairedDockingConnectorBlock extends DirectionalBlock {
     @Override
     public @NotNull BlockState playerWillDestroy(final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState state, final @NotNull Player player) {
         if (!level.isClientSide()) {
-            if (player.isCreative()) {
+            if (player.hasInfiniteMaterials()) {
                 final BlockPos connectorPos = pos.relative(state.getValue(FACING));
                 final BlockState connectorState = level.getBlockState(connectorPos);
                 if (connectorState.is(SimBlocks.DOCKING_CONNECTOR)) {

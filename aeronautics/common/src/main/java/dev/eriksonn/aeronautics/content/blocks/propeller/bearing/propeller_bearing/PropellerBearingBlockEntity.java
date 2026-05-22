@@ -1,5 +1,6 @@
 package dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
@@ -14,7 +15,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIc
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.ServerSpeedProvider;
-import dev.simulated_team.simulated.api.BearingSlowdownController;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.config.AeroConfig;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.contraption.PropellerBearingContraptionEntity;
@@ -23,14 +23,15 @@ import dev.eriksonn.aeronautics.content.blocks.propeller.behaviour.PropellerActo
 import dev.eriksonn.aeronautics.data.AeroLang;
 import dev.eriksonn.aeronautics.index.AeroAdvancements;
 import dev.eriksonn.aeronautics.util.AeroSoundDistUtil;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.propeller.BlockEntityPropeller;
 import dev.ryanhcode.sable.api.block.propeller.BlockEntitySubLevelPropellerActor;
+import dev.simulated_team.simulated.api.BearingSlowdownController;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
@@ -400,6 +401,24 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
         this.findSails();
     }
 
+    public float getSailPower(final StructureTemplate.StructureBlockInfo info) {
+        BlockState state = info.state();
+        if (AllBlocks.COPYCAT_PANEL.has(state)) {
+            final BlockState newState = NbtUtils.readBlockState(this.blockHolderGetter(), info.nbt().getCompound("Material"));
+            if (!newState.isAir()) {
+                state = newState;
+            }
+        }
+
+        float power = 0;
+
+        if (state.is(AllTags.AllBlockTags.WINDMILL_SAILS.tag)) {
+            power += 1;
+        }
+
+        return power;
+    }
+
     public void findSails() {
         this.sailPositions = new ArrayList<>();
         this.totalSailPower = 0;
@@ -411,18 +430,13 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
             final HashMap<Integer, Tuple<Integer, Integer>> layerHashMap = new HashMap<>();
 
             for (final Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo> entry : Blocks.entrySet()) {
-                final BlockState state = entry.getValue().state();
-                float count = 0;
+                final float sailPower = this.getSailPower(entry.getValue());
 
-                if (AllTags.AllBlockTags.WINDMILL_SAILS.matches(state)) {
-                    count++;
-                }
-
-                if (count > 0) {
+                if (sailPower > 0) {
                     BlockPos currentPos = entry.getKey();
                     this.sailPositions.add(currentPos);
                     final int offset = direction.getX() * currentPos.getX() + direction.getY() * currentPos.getY() + direction.getZ() * currentPos.getZ();
-                    this.totalSailPower += count;
+                    this.totalSailPower += sailPower;
                     currentPos = currentPos.offset(direction.multiply(-offset));
                     final int radius = currentPos.getX() * currentPos.getX() + currentPos.getY() * currentPos.getY() + currentPos.getZ() * currentPos.getZ();
                     if (layerHashMap.containsKey(offset)) {
@@ -508,7 +522,9 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     }
 
     public PropellerBearingContraptionEntity getMovedContraption() {
-        return (PropellerBearingContraptionEntity) this.movedContraption;
+        if(this.movedContraption instanceof PropellerBearingContraptionEntity propellerBearingContraptionEntity)
+            return propellerBearingContraptionEntity;
+        return null;
     }
 
     public enum ThrustDirection implements INamedIconOptions {

@@ -23,6 +23,7 @@ import dev.eriksonn.aeronautics.index.AeroLiftingGasTypes;
 import dev.eriksonn.aeronautics.index.AeroSoundEvents;
 import dev.eriksonn.aeronautics.util.AeroSoundDistUtil;
 import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.client.Minecraft;
@@ -34,6 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -45,7 +47,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntityLiftingGasProvider, IHaveGoggleInformation {
     // Steam vents can only be placed on top of fluid tanks, so this is valid
@@ -108,7 +112,10 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
         final FluidTankBlockEntity fluidTank = this.source.get();
 
         if (fluidTank != null) {
-            this.efficiency = Mth.clamp(fluidTank.boiler.getEngineEfficiency(fluidTank.getTotalTankSize()), 0, 1);
+            final FluidTankBlockEntity controller = fluidTank.getControllerBE();
+            if (controller != null) {
+                this.efficiency = Mth.clamp(controller.boiler.getEngineEfficiency(controller.getTotalTankSize()), 0, 1);
+            }
         } else {
             this.efficiency = 0;
         }
@@ -187,7 +194,7 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
             }
 
             this.rawSignalStrength = newStrength;
-            this.syncSignal();
+            this.signalSync();
             return true;
         }
         return false;
@@ -208,24 +215,52 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
         }
     }
 
-    protected void syncSignal() {
-        final FluidTankBlockEntity ftbe = this.source.get();
-        if (ftbe != null) {
-            int maxSignal = 0;
-            final List<SteamVentBlockEntity> ventList = new ArrayList<>();
-            for (int x = 0; x < ftbe.getWidth(); x++) {
-                for (int z = 0; z < ftbe.getWidth(); z++) {
-                    if (this.level.getBlockEntity(ftbe.getBlockPos().offset(x, ftbe.getHeight(), z)) instanceof final SteamVentBlockEntity vent) {
-                        ventList.add(vent);
-                        maxSignal = Math.max(maxSignal, vent.rawSignalStrength);
+    public static boolean inTankBounds(final BlockPos pos, final FluidTankBlockEntity controller) {
+        final int minX = controller.getBlockPos().getX();
+        final int minZ = controller.getBlockPos().getZ();
+        final int maxX = minX + controller.getWidth();
+        final int maxZ = minZ + controller.getWidth();
+        return pos.getX() >= minX && pos.getX() < maxX &&
+                pos.getZ() >= minZ && pos.getZ() < maxZ;
+    }
+
+    public void signalSync() {
+        final FluidTankBlockEntity fluidTank = this.source.get();
+        if (fluidTank != null) {
+            final FluidTankBlockEntity controller = fluidTank.getControllerBE();
+            if (controller != null) {
+                final List<SteamVentBlockEntity> adjacent = new ArrayList<>();
+                adjacent.add(this);
+                final int maxRaw = this.searchSignalSync(controller, new HashSet<>(), adjacent);
+
+                for (final SteamVentBlockEntity steamVentBlockEntity : adjacent) {
+                    steamVentBlockEntity.updateSignal(maxRaw);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param visited set of blocks to not recursively go over ad infinitum
+     * @param vents list to mutate of all vents connect adjacently
+     * @return maximum raw power from all future visited vents
+     */
+    protected int searchSignalSync(final FluidTankBlockEntity controller, final Set<BlockPos> visited, final List<SteamVentBlockEntity> vents) {
+        int maxRaw = this.rawSignalStrength;
+        final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+        for (final Direction dir : Iterate.horizontalDirections) {
+            mutablePos.setWithOffset(this.getBlockPos(), dir);
+            if (inTankBounds(mutablePos, controller)) {
+                if (!visited.contains(mutablePos)) {
+                    visited.add(mutablePos.immutable());
+                    if (this.level.getBlockEntity(mutablePos) instanceof final SteamVentBlockEntity vent) {
+                        vents.add(vent);
+                        maxRaw = Math.max(maxRaw, vent.searchSignalSync(controller, visited, vents));
                     }
                 }
             }
-
-            for (final SteamVentBlockEntity vent : ventList) {
-                vent.updateSignal(maxSignal);
-            }
         }
+        return maxRaw;
     }
 
     // Make sure we are getting the fluid tank from the middle steam vent be position
@@ -237,7 +272,7 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
 
             final BlockEntity be = this.level.getBlockEntity(check);
             if (be instanceof final FluidTankBlockEntity fluidTank) {
-                this.source = new WeakReference<>(fluidTank.getControllerBE());
+                this.source = new WeakReference<>(fluidTank);
             }
         }
     }
@@ -326,7 +361,9 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
         @Override
         public Sided fromSide(final Direction direction) {
             this.direction = direction;
-            if (direction == Direction.UP) {
+
+            Level level = this.be.getLevel();
+            if (level != null && level.isClientSide && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {
@@ -372,7 +409,8 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
 
         @Override
         protected boolean isSideActive(final BlockState state, final Direction direction) {
-            if (direction == Direction.UP) {
+            Level level = this.be.getLevel();
+            if (level != null && level.isClientSide && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {

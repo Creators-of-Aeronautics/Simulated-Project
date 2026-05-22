@@ -17,8 +17,9 @@ import dev.simulated_team.simulated.network.packets.physics_staff.PhysicsStaffDr
 import dev.simulated_team.simulated.network.packets.physics_staff.PhysicsStaffLocksPacket;
 import dev.simulated_team.simulated.service.SimConfigService;
 import foundry.veil.api.network.VeilPacketManager;
-import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.createmod.catnip.data.Pair;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -40,7 +41,9 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 public class PhysicsStaffServerHandler extends SavedData {
@@ -69,7 +72,12 @@ public class PhysicsStaffServerHandler extends SavedData {
     }
 
     private static @NotNull PhysicsStaffDragSessionsPacket makeSessionsPacket(final ServerLevel level, final PhysicsStaffServerHandler handler) {
-        return new PhysicsStaffDragSessionsPacket(level.dimension(), handler.draggingSessions.entrySet().stream().map(pair -> Pair.of(pair.getKey(), pair.getValue().plotAnchor)).toList());
+        List<Pair<UUID, Vector3d>> sessions = new ObjectArrayList<>(handler.draggingSessions.size());
+        
+        for (Entry<UUID, DragSession> entry : handler.draggingSessions.entrySet())
+            sessions.add(Pair.of(entry.getKey(), entry.getValue().plotAnchor));
+        
+        return new PhysicsStaffDragSessionsPacket(level.dimension(), sessions);
     }
 
     private static FixedConstraintHandle addConstraint(final ServerSubLevelContainer container, final ServerSubLevel subLevel) {

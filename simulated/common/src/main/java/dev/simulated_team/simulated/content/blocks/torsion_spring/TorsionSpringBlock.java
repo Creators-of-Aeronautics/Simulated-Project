@@ -3,6 +3,7 @@ package dev.simulated_team.simulated.content.blocks.torsion_spring;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
+import dev.simulated_team.simulated.api.IDirectionalAnalogOutput;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraKinetics;
@@ -22,7 +23,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<TorsionSpringBlockEntity>, ExtraKinetics.ExtraKineticsBlock {
+public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<TorsionSpringBlockEntity>, ExtraKinetics.ExtraKineticsBlock, IDirectionalAnalogOutput {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public TorsionSpringBlock(final Properties properties) {
@@ -65,9 +66,8 @@ public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<T
         return blockState.getValue(FACING).getAxis().isHorizontal();
     }
 
-    public static Direction comparatorDir = Direction.NORTH;
     @Override
-    protected int getAnalogOutputSignal(final BlockState blockState, final Level level, final BlockPos blockPos) {
+    public int getAnalogOutputSignalFrom(final BlockState blockState, final Level level, final BlockPos blockPos, final Direction dir) {
         final Direction facing = blockState.getValue(FACING);
         final TorsionSpringBlockEntity be = this.getBlockEntity(level, blockPos);
 
@@ -78,9 +78,9 @@ public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<T
         final int value = (int) (((frac < 0 ? Math.floor(frac * 15) : Math.ceil(frac * 15)) *
                         ((facing.getStepX() == 1 || facing.getStepZ() == 1) ? -1 : 1)));
 
-        if (facing.getClockWise() == comparatorDir && value > 0) {
+        if (facing.getClockWise() == dir && value > 0) {
             return value;
-        } else if (facing.getCounterClockWise() == comparatorDir && value < 0) {
+        } else if (facing.getCounterClockWise() == dir && value < 0) {
             return -value;
         }
         return 0;

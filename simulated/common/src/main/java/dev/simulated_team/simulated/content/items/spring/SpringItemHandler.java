@@ -177,7 +177,7 @@ public class SpringItemHandler implements InteractCallback {
                     .lineWidth(1 / 16f);
 
             final HitResult clientHit = Minecraft.getInstance().hitResult;
-            if (clientHit.getType() != HitResult.Type.MISS && clientHit instanceof final BlockHitResult hit) {
+            if (clientHit != null && clientHit.getType() != HitResult.Type.MISS && clientHit instanceof final BlockHitResult hit) {
                 final BlockPos pos = hit.getBlockPos();
                 final Direction dir = hit.getDirection();
 

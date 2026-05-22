@@ -3,13 +3,14 @@ package dev.simulated_team.simulated.index;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+import com.simibubi.create.foundation.render.RenderTypes;
 import dev.simulated_team.simulated.Simulated;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.function.Function;
 
 public final class SimRenderTypes extends RenderType {
@@ -57,11 +58,11 @@ public final class SimRenderTypes extends RenderType {
                     .createCompositeState(true));
 
     private static final VertexFormat SPRING_FORMAT = VertexFormat.builder()
-            .add("Position",VertexFormatElement.POSITION)
-            .add("Stress",VertexFormatElement.COLOR)
-            .add("UV0",VertexFormatElement.UV0)
-            .add("UV2",VertexFormatElement.UV2)
-            .add("Normal",VertexFormatElement.NORMAL)
+            .add("Position", VertexFormatElement.POSITION)
+            .add("Stress", VertexFormatElement.COLOR)
+            .add("UV0", VertexFormatElement.UV0)
+            .add("UV2", VertexFormatElement.UV2)
+            .add("Normal", VertexFormatElement.NORMAL)
             .padding(1)
             .build();
 
@@ -90,6 +91,7 @@ public final class SimRenderTypes extends RenderType {
                     .setShaderState(VeilRenderBridge.shaderState(Simulated.path("rope/rope")))
                     .setTextureState(new RenderStateShard.TextureStateShard(Simulated.path("textures/block/rope_particle.png"), false, false))
                     .setLightmapState(LIGHTMAP)
+                    .setCullState(CULL)
                     .createCompositeState(false));
 
     private static final Function<ResourceLocation, RenderType> SPRING = Util.memoize((ResourceLocation texture) -> {
@@ -103,7 +105,8 @@ public final class SimRenderTypes extends RenderType {
         return create("spring", SPRING_FORMAT, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, false, state);
     });
 
-    private SimRenderTypes(final String name, final VertexFormat format, final VertexFormat.Mode mode, final int bufferSize, final boolean affectsCrumbling, final boolean sortOnUpload, final Runnable setupState, final Runnable clearState) {
+    private SimRenderTypes(final String name, final VertexFormat format, final VertexFormat.Mode mode, final int bufferSize, final boolean affectsCrumbling, final boolean sortOnUpload,
+                           final Runnable setupState, final Runnable clearState) {
         super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
     }
 
@@ -125,6 +128,14 @@ public final class SimRenderTypes extends RenderType {
 
     public static RenderType rope() {
         return ROPE;
+    }
+
+    public static RenderType itemGlowingSolid(boolean shadersActive) {
+        return shadersActive ? Sheets.solidBlockSheet() : RenderTypes.itemGlowingSolid();
+    }
+
+    public static RenderType itemGlowingTranslucent(boolean shadersActive) {
+        return shadersActive ? Sheets.translucentCullBlockSheet() : RenderTypes.itemGlowingTranslucent();
     }
 
     public static RenderType spring(final ResourceLocation texture) {

@@ -5,9 +5,9 @@
       "item": "create:iron_sheet"
     },
     {
-      "type": "neoforge:single",
+      "type": "neoforge:tag",
       "amount": 500,
-      "fluid": "create:honey"
+      "tag": "c:honey"
     }
   ],
   "results": [

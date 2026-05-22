@@ -4,9 +4,9 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
+import dev.simulated_team.simulated.index.SimStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -267,9 +267,12 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
     public void setName(final String name, final boolean updateNameplates, @Nullable final Player player) {
         this.name = name;
         if (this.connectedSubLevel != null && !this.waxed) {
-            this.connectedSubLevel.setName(name);
-            if (player != null) {
-                SimAdvancements.I_DECLARE_THEE.awardTo(player);
+            if (!Objects.equals(this.connectedSubLevel.getName(), name)) {
+                this.connectedSubLevel.setName(name);
+                if (player != null) {
+                    SimStats.SIMULATED_CONTRAPTIONS_NAMED.awardTo(player);
+                    SimAdvancements.I_DECLARE_THEE.awardTo(player);
+                }
             }
         }
 

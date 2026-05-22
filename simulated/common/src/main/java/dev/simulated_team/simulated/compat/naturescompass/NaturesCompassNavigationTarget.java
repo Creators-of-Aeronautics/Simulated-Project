@@ -19,9 +19,4 @@ public class NaturesCompassNavigationTarget implements NavigationTarget {
 
 		return null;
 	}
-
-	@Override
-	public float getMaxRange() {
-		return 0;
-	}
 }

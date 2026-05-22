@@ -129,7 +129,7 @@ public class SimulatedCommonEvents {
     }
 
     public static void onPostPhysicsTick(final SubLevelPhysicsSystem physicsSystem, final double timeStep) {
-        DiagramEntity.postPhysicsTick();
+        DiagramEntity.postPhysicsTick(physicsSystem.getLevel());
     }
 
     private static void onContainerReady(final Level level, final SubLevelContainer subLevelContainer) {

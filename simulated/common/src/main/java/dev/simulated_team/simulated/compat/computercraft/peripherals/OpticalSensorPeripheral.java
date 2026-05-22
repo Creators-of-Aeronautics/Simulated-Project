@@ -16,6 +16,11 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
     }
 
     @LuaFunction
+    public boolean hasHit() {
+        return this.blockEntity.hasHit();
+    }
+
+    @LuaFunction
     public float getDistance() {
         return this.blockEntity.getHitBlockDistance();
     }
@@ -23,5 +28,15 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
     @LuaFunction
     public String getBlock() {
         return BuiltInRegistries.BLOCK.getKey(this.blockEntity.getHitBlock()).toString();
+    }
+
+    @LuaFunction
+    public float getRange() {
+        return this.blockEntity.getRange();
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void setRange(final int blocks) {
+        this.blockEntity.setRange(blocks);
     }
 }

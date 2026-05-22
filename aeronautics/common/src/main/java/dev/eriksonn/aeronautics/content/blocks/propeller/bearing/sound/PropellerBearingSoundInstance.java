@@ -38,13 +38,16 @@ public class PropellerBearingSoundInstance extends AbstractTickableSoundInstance
             total += layer.offset() * w;
             weight += w;
         }
-        total /= weight;
 
-        final Vec3i normal = be.getBlockDirection().getNormal();
+        if (weight > 0) {
+            total /= weight;
 
-        this.x += total * normal.getX();
-        this.y += total * normal.getY();
-        this.z += total * normal.getZ();
+            final Vec3i normal = be.getBlockDirection().getNormal();
+
+            this.x += total * normal.getX();
+            this.y += total * normal.getY();
+            this.z += total * normal.getZ();
+        }
     }
 
     public float getLayerVolume() {
