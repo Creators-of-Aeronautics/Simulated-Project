@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.network.packets;
 
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.spring.SpringBlock;
@@ -45,6 +44,9 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
     public void handle(final ServerPacketContext ctx) {
         final ServerPlayer player = ctx.player();
         double range = player.blockInteractionRange() + 4;
+        if (childPos.equals(parentPos)) {
+            return;
+        }
         if (player.distanceToSqr(childPos.getCenter()) > range*range) {
             return;
         }
