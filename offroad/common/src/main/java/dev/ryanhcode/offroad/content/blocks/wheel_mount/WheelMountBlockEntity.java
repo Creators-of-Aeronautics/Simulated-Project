@@ -440,8 +440,8 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         final Direction d2 = facing.getCounterClockWise();
         final BlockPos pos = this.getBlockPos();
 
-        final int signalLeft = this.level.getSignal(pos.relative(d1), d2);
-        final int signalRight = this.level.getSignal(pos.relative(d2), d1);
+        final int signalLeft = this.level.getSignal(pos.relative(d1), d1);
+        final int signalRight = this.level.getSignal(pos.relative(d2), d2);
         final int signal = signalLeft - signalRight;
 
         final boolean sendData = signal != this.lastServerSteeringSignal || signalLeft != this.lastServerSteeringSignalLeft || signalRight != this.lastServerSteeringSignalRight;
