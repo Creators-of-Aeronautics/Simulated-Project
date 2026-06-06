@@ -4,12 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 
-import java.util.Set;
-
 public interface LevititeBlendDummyInterface {
     default void levititeBlendTick(final Level level, final BlockPos pos, final FluidState state) {
-        final Set<BlockPos> tickedPositions = LevititeCrystallizerManager.getTickedPositions(level);
-        if (tickedPositions.contains(pos))
+        if (LevititeCrystallizerManager.isTickedPosition(level, pos))
             return;
 
         //temp
