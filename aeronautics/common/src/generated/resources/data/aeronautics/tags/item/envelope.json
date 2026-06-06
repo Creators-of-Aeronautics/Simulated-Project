@@ -31,6 +31,22 @@
     "aeronautics:brown_envelope_encased_shaft",
     "aeronautics:green_envelope_encased_shaft",
     "aeronautics:red_envelope_encased_shaft",
-    "aeronautics:black_envelope_encased_shaft"
+    "aeronautics:black_envelope_encased_shaft",
+    "aeronautics:white_envelope_encased_fluid_pipe",
+    "aeronautics:orange_envelope_encased_fluid_pipe",
+    "aeronautics:magenta_envelope_encased_fluid_pipe",
+    "aeronautics:light_blue_envelope_encased_fluid_pipe",
+    "aeronautics:yellow_envelope_encased_fluid_pipe",
+    "aeronautics:lime_envelope_encased_fluid_pipe",
+    "aeronautics:pink_envelope_encased_fluid_pipe",
+    "aeronautics:gray_envelope_encased_fluid_pipe",
+    "aeronautics:light_gray_envelope_encased_fluid_pipe",
+    "aeronautics:cyan_envelope_encased_fluid_pipe",
+    "aeronautics:purple_envelope_encased_fluid_pipe",
+    "aeronautics:blue_envelope_encased_fluid_pipe",
+    "aeronautics:brown_envelope_encased_fluid_pipe",
+    "aeronautics:green_envelope_encased_fluid_pipe",
+    "aeronautics:red_envelope_encased_fluid_pipe",
+    "aeronautics:black_envelope_encased_fluid_pipe"
   ]
 }

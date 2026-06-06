@@ -7,16 +7,11 @@ import com.simibubi.create.content.kinetics.simpleRelays.encased.EncasedShaftBlo
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.eriksonn.aeronautics.index.AeroBlocks;
-import dev.simulated_team.simulated.service.SimItemService;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Envelope, SpecialBlockItemRequirement {
 
@@ -47,30 +41,13 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
 
     @Override
     protected ItemInteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
-        final DyeColor color = SimItemService.getDyeColor(itemStack);
-
-        if (color != null) {
-            if (!level.isClientSide())
-                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.random.nextFloat() * .2f);
-
-            EnvelopeBlock.applyDye(blockState, level, blockPos, color);
-            return ItemInteractionResult.SUCCESS;
-        }
-
-
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return EnvelopeBlockHelper.useItemOnHelper(itemStack, blockState, level, blockPos);
     }
 
     @Override
     public InteractionResult onSneakWrenched(final BlockState state, final UseOnContext context) {
         super.onSneakWrenched(state, context);
-        final Level world = context.getLevel();
-        if (world instanceof ServerLevel) {
-            final Player player = context.getPlayer();
-            if (player != null && !player.hasInfiniteMaterials())
-                player.getInventory().placeItemBackInInventory(AeroBlocks.WHITE_ENVELOPE_BLOCK.asStack());
-        }
-        return InteractionResult.SUCCESS;
+        return EnvelopeBlockHelper.onSneakWrenchedHelper(context);
     }
 
     @Override
@@ -102,21 +79,13 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
         if (pEntity.isSuppressingBounce()) {
             super.updateEntityAfterFallOn(pLevel, pEntity);
         } else {
-            this.bounceUp(pEntity);
+            EnvelopeBlockHelper.encasedBounceUp(pEntity);
         }
     }
 
     @Override
     public ItemStack getCloneItemStack(final BlockState state, final HitResult target, final LevelReader level, final BlockPos pos, final Player player) {
         return this.getCasing().asItem().getDefaultInstance();
-    }
-
-    public void bounceUp(final Entity pEntity) {
-        final Vec3 vec3 = pEntity.getDeltaMovement();
-        if (vec3.y < 0.0D) {
-            final double d0 = pEntity instanceof LivingEntity ? 0.5D : 0.25D;
-            pEntity.setDeltaMovement(vec3.x, -vec3.y * d0, vec3.z);
-        }
     }
 
     @Override

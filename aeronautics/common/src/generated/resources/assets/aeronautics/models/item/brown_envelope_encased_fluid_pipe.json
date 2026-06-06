@@ -1,0 +1,7 @@
+{
+  "parent": "aeronautics:block/envelope_encased_fluid_pipe/item",
+  "textures": {
+    "0": "aeronautics:block/envelope_block/envelope_brown",
+    "1": "aeronautics:block/envelope_block/pipe_brown"
+  }
+}

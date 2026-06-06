@@ -1,5 +1,6 @@
 package dev.eriksonn.aeronautics.index;
 
+import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
@@ -63,6 +64,11 @@ public class AeroBlockEntityTypes {
             .visual(() -> SingleAxisRotatingVisual::shaft, false)
             .validBlocks(AeroBlocks.ENVELOPE_ENCASED_SHAFTS.toArray())
             .renderer(() -> ShaftRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<FluidPipeBlockEntity> ENVELOPE_ENCASED_FLUID_PIPE = REGISTRATE
+            .blockEntity("envelope_encased_fluid_pipe", FluidPipeBlockEntity::new)
+            .validBlocks(AeroBlocks.ENVELOPE_ENCASED_FLUID_PIPES.toArray())
             .register();
 
     public static final BlockEntityEntry<AndesitePropellerBlockEntity> ANDESITE_PROPELLER = REGISTRATE
