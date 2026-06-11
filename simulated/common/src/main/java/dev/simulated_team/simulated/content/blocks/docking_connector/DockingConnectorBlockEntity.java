@@ -1,5 +1,9 @@
 package dev.simulated_team.simulated.content.blocks.docking_connector;
 
+import com.simibubi.create.content.fluids.FluidPropagator;
+import com.simibubi.create.content.fluids.FluidTransportBehaviour;
+import com.simibubi.create.content.fluids.PipeConnection;
+import com.simibubi.create.content.fluids.pump.PumpBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
@@ -17,6 +21,8 @@ import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorW
 import dev.simulated_team.simulated.content.blocks.redstone_magnet.*;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
+import dev.simulated_team.simulated.mixin.accessor.PipeConnectionAccessor;
+import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimMathUtils;
@@ -34,6 +40,7 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -47,9 +54,12 @@ import java.lang.Math;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class DockingConnectorBlockEntity extends SmartBlockEntity implements SimMagnet, BlockEntitySubLevelActor, Clearable {
+    private static final int PIPE_NETWORK_REFRESH_DELAY = 2;
+
     public static MagnetMap<DockingConnectorBlockEntity> MAGNET_CONTROLLER = new MagnetMap<>();
     public boolean powered;
     public LerpedFloat extension = LerpedFloat.linear().chase(0, 0.1, LerpedFloat.Chaser.LINEAR);
@@ -67,6 +77,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public final DockingConnectorWiredElement ccWiredElement;
 
     private ConstraintSmoother constraintSmoother = null;
+    private int pipeNetworkRefreshDelay = 0;
 
     public DockingConnectorBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
@@ -101,22 +112,22 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         final DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
 
         if (otherConnector != null && this.constraintHandle == null && otherConnector.constraintHandle == null) {
-            final MagnetMap<DockingConnectorBlockEntity> controller = DockingConnectorBlockEntity.MAGNET_CONTROLLER;
-            if (controller.getPair(this.level, this.getBlockPos(), this.otherConnectorPosition) == null) {
-                controller.tryAddPair(this.level, this.getBlockPos(), this.otherConnectorPosition, DockingConnectorPair::new);
-                final DockingConnectorPair pair = (DockingConnectorPair) controller.getPair(this.level, this.getBlockPos(), this.otherConnectorPosition);
-
-                if (pair != null) {
-                    pair.dock(true);
-                    this.notifyUpdate();
-                }
-            }
+            this.restoreDockingPair(otherConnector);
+            this.notifyUpdate();
         }
     }
 
     @Override
     public void tick() {
         super.tick();
+
+        if (this.pipeNetworkRefreshDelay > 0) {
+            this.pipeNetworkRefreshDelay--;
+            if (this.pipeNetworkRefreshDelay == 0) {
+                this.refreshPipeNetwork();
+            }
+        }
+
         final BlockState state = this.getBlockState();
         final Direction direction = state.getValue(BlockStateProperties.FACING);
         final BlockPos pos = this.getBlockPos();
@@ -136,8 +147,12 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             }
         }
 
-        if (this.otherConnectorPosition != null && !this.level.isClientSide) {
-            if (!(this.level.getBlockEntity(this.otherConnectorPosition) instanceof final DockingConnectorBlockEntity be && Objects.equals(be.otherConnectorPosition, this.getBlockPos()))) {
+        if (this.otherConnectorPosition != null && !this.level.isClientSide && this.level.isLoaded(this.otherConnectorPosition)) {
+            if (this.level.getBlockEntity(this.otherConnectorPosition) instanceof final DockingConnectorBlockEntity be && Objects.equals(be.otherConnectorPosition, this.getBlockPos())) {
+                if (!this.tank.isConnectedTo(be.tank)) {
+                    this.restoreDockingPair(be);
+                }
+            } else {
                 this.unDock();
                 this.state = DockingConnectorState.EXTENDED;
                 this.sendData();
@@ -282,6 +297,15 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         }
     }
 
+    private void restoreDockingPair(final DockingConnectorBlockEntity otherConnector) {
+        final MagnetMap<DockingConnectorBlockEntity> controller = DockingConnectorBlockEntity.MAGNET_CONTROLLER;
+        controller.tryAddPair(this.level, this.getBlockPos(), otherConnector.getBlockPos(), DockingConnectorPair::new);
+        final DockingConnectorPair pair = (DockingConnectorPair) controller.getPair(this.level, this.getBlockPos(), otherConnector.getBlockPos());
+        if (pair != null) {
+            pair.dock(true);
+        }
+    }
+
     private void updateState() {
 
         if (this.powered) {
@@ -361,6 +385,40 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             rotation *= rotation;
         }
         return rotation;
+    }
+
+    void onFluidConnectionChanged() {
+        if (this.level != null && !this.level.isClientSide()) {
+            SimPlatformService.INSTANCE.invalidateCapabilities(this);
+            this.pipeNetworkRefreshDelay = PIPE_NETWORK_REFRESH_DELAY;
+        }
+    }
+
+    private void refreshPipeNetwork() {
+        if (this.level == null || this.level.isClientSide()) {
+            return;
+        }
+
+        for (final Direction direction : Direction.values()) {
+            final BlockPos neighborPos = this.worldPosition.relative(direction);
+            final FluidTransportBehaviour pipe = FluidPropagator.getPipe(this.level, neighborPos);
+            if (pipe == null) {
+                continue;
+            }
+            final PipeConnection endpoint = pipe.getConnection(direction.getOpposite());
+            if (endpoint != null) {
+                final PipeConnectionAccessor endpointAccessor = (PipeConnectionAccessor) endpoint;
+                endpointAccessor.simulated$setSource(Optional.empty());
+                endpointAccessor.simulated$setFlow(Optional.empty());
+            }
+
+            final BlockEntity neighbor = this.level.getBlockEntity(neighborPos);
+            if (neighbor instanceof final PumpBlockEntity pump && pump.isSideAccessible(direction.getOpposite())) {
+                pump.updatePressureChange();
+            } else {
+                FluidPropagator.propagateChangedPipe(this.level, neighborPos, this.level.getBlockState(neighborPos));
+            }
+        }
     }
 
     public void setDock(final DockingConnectorBlockEntity otherConnector, final boolean isLocked, @Nullable final Quaterniondc targetOrientation, final Vector3dc relativePos, final Quaterniondc relativeOrientation) {
