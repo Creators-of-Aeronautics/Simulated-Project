@@ -3,12 +3,10 @@ package dev.simulated_team.simulated.content.blocks.handle;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
-import dev.ryanhcode.sable.api.entity.EntitySubLevelUtil;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
 import dev.ryanhcode.sable.api.physics.constraint.PhysicsConstraintHandle;
-import dev.ryanhcode.sable.api.physics.constraint.free.FreeConstraintConfiguration;
+import dev.ryanhcode.sable.api.physics.constraint.FreeConstraintConfiguration;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
@@ -76,7 +74,7 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
                 it.remove();
                 this.setChanged();
             } else {
-                if (constraint == null || !constraint.hasJoint()) {
+                if (constraint == null || (!constraint.hasJoint() && Mth.equal(-1, constraint.scrollDistance))) {
                     player.resetFallDistance();
                 }
             }

@@ -1,4 +1,4 @@
-// 1.21.1	2026-04-21T01:53:19.8989278	Registrate Provider for aeronautics [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-04-30T18:01:41.8927382	Registrate Provider for aeronautics [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 76db9e2d3c353bb5c288b32e91cd8f313460fbc0 assets/aeronautics/blockstates/adjustable_burner.json
 7b466bcf7cef5bf21bfaaded20f38978c0a776f8 assets/aeronautics/blockstates/andesite_propeller.json
 f994401cf4f3071992268028255a3fe1c37b1b4c assets/aeronautics/blockstates/black_envelope.json
@@ -215,7 +215,7 @@ bd8848ebfae191e593c92fc682514af4b9d17122 data/aeronautics/recipe/red_envelope.js
 63960f76028271de8356b959521f836e93db48dd data/aeronautics/recipe/white_envelope.json
 3cd9396fdfc8aec8fa8fb514d51813527361e8c3 data/aeronautics/recipe/wooden_propeller_from_andesite.json
 4254a46872d9e62cd0753eb4b63b2209996a5f67 data/aeronautics/recipe/yellow_envelope.json
-75dec3ef8adbd1bebb3d0c350774163ba80d16dc data/aeronautics/tags/block/airtight.json
+103a88897dd7c92f2b0da048edb02946fa6ad5d4 data/aeronautics/tags/block/airtight.json
 3eb468eda1818f6c643ed9fe76294ebab0e11d23 data/aeronautics/tags/block/envelope.json
 a82d7186ea92aaf84b9f805fd2bed49584251fa5 data/aeronautics/tags/block/levitite.json
 8ff45ed3cfe3646b1132f097378add21a4200e4a data/aeronautics/tags/block/levitite_adjacent_catalyzer.json

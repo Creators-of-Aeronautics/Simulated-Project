@@ -3,7 +3,6 @@ package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.utility.ControlsUtil;
-import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.mixin.accessor.KeyMappingsAccessor;
 import dev.simulated_team.simulated.network.packets.linked_typewriter.TypewriterDisconnectUser;
@@ -60,18 +59,11 @@ public class LinkedTypewriterInteractionHandler {
     }
 
     public static void associateTypewriter(final LinkedTypewriterBlockEntity be) {
-        final LocalPlayer player = Minecraft.getInstance().player;
-
         if (be == null) {
             MODE = Mode.IDLE;
             stopInteraction();
-
-            if (TYPEWRITER.get() != null) {
-                player.displayClientMessage(SimLang.translate("linked_typewriter.stop_controlling").component(), true);
-            }
         } else {
             MODE = Mode.ACTIVE;
-            player.displayClientMessage(SimLang.translate("linked_typewriter.start_controlling").component(), true);
         }
 
         TYPEWRITER = new WeakReference<>(be);
@@ -124,7 +116,7 @@ public class LinkedTypewriterInteractionHandler {
             if (be != null && !be.isRemoved()) {
                 final LinkedTypewriterEntries.KeyboardEntry frequency = be.getTypewriterEntries().getEntry(key);
 
-                if (key == 256) {
+                if (key == GLFW.GLFW_KEY_ESCAPE) {
                     be.disconnectUser();
                     VeilPacketManager.server().sendPacket(new TypewriterDisconnectUser(be.getBlockPos()));
 

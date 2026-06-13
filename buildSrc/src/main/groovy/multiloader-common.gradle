@@ -128,7 +128,7 @@ processResources {
             'description'                  : project.description,
             'neoforge_version'             : neoforge_version,
             'neoforge_loader_version_range': neoforge_loader_version_range,
-            'sable_mod_version'            : sable_mod_version,
+            'sable_mod_version_range'            : sable_mod_version_range,
             'create_mod_version'           : create_mod_version,
             'flywheel_mod_version'         : flywheel_mod_version,
             'credits'                      : credits,

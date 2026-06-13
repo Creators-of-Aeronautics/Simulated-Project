@@ -70,7 +70,7 @@ public class RopeItem extends Item {
             if (heldStack.has(SimDataComponents.ROPE_FIRST_CONNECTION)) {
 
                 if (!level.isClientSide) {
-                    if (!this.attachRope(level, heldStack.get(SimDataComponents.ROPE_FIRST_CONNECTION), clickedPos)) {
+                    if (!this.attachRope(level, heldStack.get(SimDataComponents.ROPE_FIRST_CONNECTION), clickedPos, !player.hasInfiniteMaterials())) {
                         // failure to connect
                         heldStack.remove(SimDataComponents.ROPE_FIRST_CONNECTION);
                         return InteractionResult.SUCCESS;
@@ -82,7 +82,7 @@ public class RopeItem extends Item {
 
                 heldStack.remove(SimDataComponents.ROPE_FIRST_CONNECTION);
 
-                if (!player.isCreative())
+                if (!player.hasInfiniteMaterials())
                     context.getItemInHand()
                             .shrink(1);
 
@@ -102,7 +102,7 @@ public class RopeItem extends Item {
      * @param posA the position of the first block entity, assumed to have a {@link RopeStrandHolderBehavior}
      * @param posB the position of the second block entity, assumed to have a {@link RopeStrandHolderBehavior}
      */
-    private boolean attachRope(final Level level, final BlockPos posA, final BlockPos posB) {
+    private boolean attachRope(final Level level, final BlockPos posA, final BlockPos posB, final boolean dropItem) {
         RopeStrandHolderBehavior ropeHolderA = getRopeHolder(level, posA);
         if (ropeHolderA == null) return false;
 
@@ -118,7 +118,7 @@ public class RopeItem extends Item {
             return false;
         }
 
-        if (ropeHolderA.createRope(ropeHolderB)) {
+        if (ropeHolderA.createRope(ropeHolderB, dropItem)) {
             level.playSound(null, posA, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5F, 1F);
             level.playSound(null, posB, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5F, 1F);
             return true;

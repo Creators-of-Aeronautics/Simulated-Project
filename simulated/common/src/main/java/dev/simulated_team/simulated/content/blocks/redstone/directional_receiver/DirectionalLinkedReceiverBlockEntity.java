@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.redstone.directional_receiver;
 
+import com.simibubi.create.infrastructure.config.AllConfigs;
 import dev.simulated_team.simulated.content.blocks.redstone.AbstractLinkedReceiverBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +29,7 @@ public class DirectionalLinkedReceiverBlockEntity extends AbstractLinkedReceiver
         final Vec3 normal = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
         final double length = relativePosition.length();
 
-        if (length > 256)
+        if (length > AllConfigs.server().logistics.linkRange.get())
             return new Tuple<>(0, 0.0);
 
         final double dot = relativePosition.dot(normal) / length;
@@ -39,7 +40,8 @@ public class DirectionalLinkedReceiverBlockEntity extends AbstractLinkedReceiver
         final double angle = Math.asin(dot);
         this.angleToClosestLink = Math.acos(dot);
 
-        return new Tuple<>((int) Math.min((29 / Math.PI) * angle + 1, transmittedStrength), Math.toDegrees(angle));
+        final double strengthScalar = Math.clamp((angle / Math.PI) * 2, 0, 1);
+        return new Tuple<>((int) Math.ceil(strengthScalar * transmittedStrength), Math.toDegrees(angle));
     }
 
     public double getAngleToClosestLink() {

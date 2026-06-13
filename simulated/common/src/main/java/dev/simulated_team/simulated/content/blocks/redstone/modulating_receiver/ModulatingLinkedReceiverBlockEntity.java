@@ -88,9 +88,8 @@ public class ModulatingLinkedReceiverBlockEntity extends AbstractLinkedReceiverB
         if (this.minRange == this.maxRange) {
             return new Tuple<>(transmittedStrength, distance);
         } else {
-            final double normalizedStrength = (distance - this.maxRange) / (this.minRange - this.maxRange);
-            final double strength = Math.min(14 * normalizedStrength + 1, transmittedStrength);
-            return new Tuple<>((int) Math.max(0, Math.min(15, strength)), distance);
+            final double strengthScalar = Math.clamp((distance - this.maxRange) / (this.minRange - this.maxRange), 0, 1);
+            return new Tuple<>((int) Math.ceil(strengthScalar * transmittedStrength), distance);
         }
     }
 

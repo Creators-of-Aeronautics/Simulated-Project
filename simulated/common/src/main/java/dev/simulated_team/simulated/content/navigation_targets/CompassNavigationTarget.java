@@ -28,9 +28,4 @@ public class CompassNavigationTarget implements NavigationTarget {
 
 		return level.getSharedSpawnPos().getCenter();
 	}
-
-	@Override
-	public float getMaxRange() {
-		return 0;
-	}
 }

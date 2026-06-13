@@ -9,6 +9,9 @@
             <a href="https://modrinth.com/project/create-aeronautics">
                 <img src="https://img.shields.io/modrinth/dt/create-aeronautics?logo=modrinth&amp;label=&amp;suffix=%20&amp;style=flat&amp;color=242629&amp;labelColor=5CA424&amp;logoColor=1C1C1C" alt="Modrinth Download"/>
             </a>
+            <a href="https://www.curseforge.com/minecraft/mc-mods/create-aeronautics">
+                <img src="https://img.shields.io/curseforge/dt/676721?logo=curseforge&amp;label=&amp;suffix=%20&amp;style=flat&amp;color=242629&amp;labelColor=F16436&amp;logoColor=1C1C1C" alt="CurseForge Download"/>
+            </a>
         </div>
     </h1>
     <p>

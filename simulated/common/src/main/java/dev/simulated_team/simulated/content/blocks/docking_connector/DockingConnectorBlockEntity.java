@@ -4,8 +4,8 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
-import dev.ryanhcode.sable.api.physics.constraint.fixed.FixedConstraintConfiguration;
-import dev.ryanhcode.sable.api.physics.constraint.fixed.FixedConstraintHandle;
+import dev.ryanhcode.sable.api.physics.constraint.FixedConstraintConfiguration;
+import dev.ryanhcode.sable.api.physics.constraint.FixedConstraintHandle;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
@@ -56,6 +56,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public LerpedFloat feet = LerpedFloat.linear().chase(0, 0.15, LerpedFloat.Chaser.LINEAR);
     public DockingConnectorSoloInventory inventory;
     public DockingConnectorTank tank;
+    public DockingConnectorBattery battery;
     public BlockPos otherConnectorPosition = null;
     public UUID otherConnectorSubLevelId = null;
     protected DockingConnectorState state = DockingConnectorState.UNPOWERED;
@@ -71,6 +72,10 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         super(type, pos, state);
         this.inventory = new DockingConnectorSoloInventory();
         this.tank = new DockingConnectorTank(this);
+        this.battery = new DockingConnectorBattery(
+                SimConfigService.INSTANCE.server().blocks.dockingConnectorFECapacity.get(),
+                SimConfigService.INSTANCE.server().blocks.dockingConnectorFEThroughput.get()
+        );
         this.ccWiredElement = DockingConnectorWiredElement.create(this);
     }
 
@@ -374,6 +379,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             if (isLocked) {
                 this.state = DockingConnectorState.LOCKED;
                 this.tank.connect(this.otherConnectorPosition, otherConnector.tank);
+                this.battery.connect(otherConnector.battery);
                 this.ccWiredElement.connect(otherConnector.ccWiredElement);
 
                 this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
@@ -406,6 +412,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
         this.state = this.isExtended() ? DockingConnectorState.EXTENDED : DockingConnectorState.UNPOWERED;
         this.tank.disconnect();
+        this.battery.disconnect();
         this.removeConstraint();
         this.sendData();
 
@@ -444,6 +451,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
         tag.put("Inventory", this.inventory.write(registries));
         tag.put("Tank", this.tank.write());
+        tag.put("Battery", this.battery.write());
         super.write(tag, registries, clientPacket);
     }
 
@@ -470,6 +478,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
         this.inventory.read(registries, tag.getCompound("Inventory"));
         this.tank.read(tag.getCompound("Tank"));
+        this.battery.read(tag.getCompound("Battery"));
         super.read(tag, registries, clientPacket);
     }
 

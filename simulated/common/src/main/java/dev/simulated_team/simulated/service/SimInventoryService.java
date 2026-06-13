@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.service;
 
 import com.simibubi.create.content.contraptions.MountedStorageManager;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import dev.simulated_team.simulated.multiloader.energy.SingleBattery;
 import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.multiloader.inventory.InventoryLoaderWrapper;
 import dev.simulated_team.simulated.multiloader.tanks.SingleTank;
@@ -25,4 +26,6 @@ public interface SimInventoryService {
 	<T extends BlockEntity> NonNullConsumer<BlockEntityType<T>> registerInventory(final BiFunction<T, Direction, AbstractContainer> getter);
 
 	<T extends BlockEntity> NonNullConsumer<BlockEntityType<T>> registerTank(final BiFunction<T, Direction, SingleTank> getter);
+
+	<T extends BlockEntity> NonNullConsumer<BlockEntityType<T>> registerBattery(final BiFunction<T, Direction, SingleBattery> getter);
 }

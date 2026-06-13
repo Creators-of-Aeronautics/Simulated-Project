@@ -182,19 +182,23 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
         return true;
     }
 
+    public static int analogPower(final int burnTime) {
+        if (burnTime > 0) {
+            return Math.min(burnTime / BURN_TIME_THRESHOLD, 14) + 1;
+        }
+        return 0;
+    }
+
     @Override
     public int getAnalogOutputSignal(final BlockState pState, final Level pLevel, final BlockPos pPos) {
         final PortableEngineBlockEntity be = this.getBlockEntity(pLevel, pPos);
-        int power = 0;
+        final int power = 0;
 
         if (be != null) {
             if (be.isTotalFuelInfinite())
                 return 15;
 
-            final int ticks = be.getTotalBurnTime();
-            if (ticks > 0) {
-                power = Math.min(ticks / BURN_TIME_THRESHOLD, 14) + 1;
-            }
+            return analogPower(be.getTotalBurnTime());
         }
 
         return power;

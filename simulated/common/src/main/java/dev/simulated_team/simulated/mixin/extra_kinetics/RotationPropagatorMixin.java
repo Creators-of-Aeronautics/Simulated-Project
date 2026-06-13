@@ -25,15 +25,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Mixin(RotationPropagator.class)
 public abstract class RotationPropagatorMixin {
 
-    @Redirect(method = {"handleRemoved", "propagateMissingSource", "findConnectedNeighbour"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
-    private static BlockEntity simulated$accountForExtraKinetics(final Level level, final BlockPos pos) {
-        return simulated$getBlockEntityAccountingExtraKinetics(level, pos);
+    @WrapOperation(method = {"handleRemoved", "propagateMissingSource", "findConnectedNeighbour"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
+    private static BlockEntity simulated$accountForExtraKinetics(final Level instance, final BlockPos pos, final Operation<BlockEntity> original) {
+        final BlockEntity be = original.call(instance, pos);
+        if (be instanceof final ExtraKinetics ek && pos instanceof ExtraBlockPos) {
+            return ek.getExtraKinetics();
+        }
+
+        return be;
     }
 
     @WrapOperation(method = "getRotationSpeedModifier", at = {
@@ -106,28 +110,19 @@ public abstract class RotationPropagatorMixin {
 
     @Inject(method = "getPotentialNeighbourLocations", at = @At("TAIL"), remap = false)
     private static void simulated$getExtraKineticsBlockPositions(final KineticBlockEntity be, final CallbackInfoReturnable<List<BlockPos>> cir) {
+
+        //This list should NOT be getting replaced ever ever, OR made immutable... whoever is replacing the list with their own IMMUTABLE one needs to fix it on THEIR side. This method provides its own list that should be modified by mixins, OR the block, NOT replaced.
         final List<BlockPos> list = cir.getReturnValue();
-        final List<BlockPos> extraKinetics = new ArrayList<>();
         final Level level = be.getLevel();
 
-        for (final BlockPos pos : list) {
-            final Block block = level.getBlockState(pos).getBlock();
-            if (block instanceof ExtraKinetics.ExtraKineticsBlock) {
-                extraKinetics.add(new ExtraBlockPos(pos));
+        final ListIterator<BlockPos> lIter = list.listIterator();
+        while (lIter.hasNext()) {
+            final BlockPos current = lIter.next();
+            //make sure that we're not actually modifying the list unless there are extra kinetics
+            if (level.getBlockState(current).getBlock() instanceof ExtraKinetics.ExtraKineticsBlock) {
+                lIter.add(new ExtraBlockPos(current));
             }
         }
-
-        list.addAll(extraKinetics);
-    }
-
-    @Unique
-    private static @Nullable BlockEntity simulated$getBlockEntityAccountingExtraKinetics(final Level level, final BlockPos blockPos) {
-        final BlockEntity be = level.getBlockEntity(blockPos);
-        if (be instanceof final ExtraKinetics ek && blockPos instanceof ExtraBlockPos) {
-            return ek.getExtraKinetics();
-        }
-
-        return be;
     }
 
     @Unique

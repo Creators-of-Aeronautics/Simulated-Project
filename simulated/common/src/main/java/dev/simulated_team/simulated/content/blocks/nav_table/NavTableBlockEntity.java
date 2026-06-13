@@ -3,7 +3,6 @@ package dev.simulated_team.simulated.content.blocks.nav_table;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaterniond;
 import org.joml.Quaternionf;
-
 import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.List;
@@ -335,8 +333,17 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     public void dropHeldItem() {
+        ItemStack heldItem = this.getHeldItem();
+        if (heldItem.isEmpty()) {
+            return;
+        }
+
+        NavigationTarget target = this.getNavTableItem();
+        if (target != null) {
+            target.onExtract(heldItem, this, null);
+        }
         final ItemEntity itementity = new ItemEntity(this.level,
-                this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, this.getHeldItem());
+                this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, heldItem);
         itementity.setDefaultPickUpDelay();
         this.level.addFreshEntity(itementity);
         this.inventory.clearContent();

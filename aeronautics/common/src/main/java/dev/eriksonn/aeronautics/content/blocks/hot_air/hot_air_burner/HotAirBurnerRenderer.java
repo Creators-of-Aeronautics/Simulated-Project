@@ -4,12 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
-import dev.ryanhcode.sable.Sable;
-import dev.simulated_team.simulated.util.SimColors;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
-import dev.ryanhcode.sable.api.SubLevelHelper;
+import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import dev.simulated_team.simulated.util.SimColors;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.createmod.catnip.render.CachedBuffers;
@@ -63,26 +62,28 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
             camera = sublevel.logicalPose().transformPositionInverse(camera);
         }
 
-        final float angle  = (float) Math.atan2(camera.z() - center.z(), camera.x() - center.x());
+        final float angle = (float) Math.atan2(camera.z() - center.z(), camera.x() - center.x());
 
         final HotAirBurnerBlock.Variant variant = be.getBlockState().getValue(HotAirBurnerBlock.VARIANT);
         final float palette = variant == HotAirBurnerBlock.Variant.FIRE ? 0.25f : 0.75f;
 
         final ShaderProgram shader = VeilRenderSystem.setShader(BURNER_FLAME_SHADER);
-        final float flameRenderTime = (float) Mth.lerp(partialTicks, be.lastRenderTime, be.renderTime) + be.getTimeOffset();
-        shader.getUniformSafe("FlameRenderTime").setFloat(flameRenderTime);
-        shader.getUniformSafe("Intensity").setFloat(be.getFlameIntensity(partialTicks));
-        shader.getUniformSafe("Palette").setFloat(palette);
+        if (shader != null) {
+            final float flameRenderTime = (float) Mth.lerp(partialTicks, be.lastRenderTime, be.renderTime) + be.getTimeOffset();
+            shader.getUniformSafe("FlameRenderTime").setFloat(flameRenderTime);
+            shader.getUniformSafe("Intensity").setFloat(be.getFlameIntensity(partialTicks));
+            shader.getUniformSafe("Palette").setFloat(palette);
 
-        ms.rotateAround(Axis.YP.rotation((float) (-angle + Math.PI * 0.5f)), 1.0f, 0.0f, 0.0f);
-        renderFlame(ms);
-        ms.popPose();
+            ms.rotateAround(Axis.YP.rotation((float) (-angle + Math.PI * 0.5f)), 1.0f, 0.0f, 0.0f);
+            renderFlame(ms);
+            ms.popPose();
+        }
 
         super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
     }
 
     private static void renderFlame(final PoseStack poseStack) {
-        final float size  = 2.0f;
+        final float size = 2.0f;
 
         final BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 

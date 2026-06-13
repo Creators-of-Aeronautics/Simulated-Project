@@ -36,7 +36,7 @@ public interface NavigationTarget {
      * Ignored if range is 0 or below.
      */
     default float getMaxRange() {
-        return 200;
+        return 0;
     }
 
     default float getModulatingRange() {
@@ -110,7 +110,9 @@ public interface NavigationTarget {
         return -1.0f;
     }
 
-    default void onInsert(final ItemStack itemStack, final NavTableBlockEntity be, final Player player) { }
+    default void onInsert(final ItemStack itemStack, final NavTableBlockEntity be, @Nullable final Player player) { }
+
+    default void onExtract(final ItemStack itemStack, final NavTableBlockEntity be, @Nullable final Player player) { }
 
     static Vec3 getPlaneProjectedPos(final Vec3 targetPos, final Vec3i normal) {
         final double dot = targetPos.dot(Vec3.atLowerCornerOf(normal));

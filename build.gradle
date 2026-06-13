@@ -38,6 +38,10 @@ subprojects {
         }
 
         maven {
+            url = "https://maven.ryanhcode.dev/snapshots"
+        }
+
+        maven {
             url = "https://maven.ryanhcode.dev/private"
 
             authentication {

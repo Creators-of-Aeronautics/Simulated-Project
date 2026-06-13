@@ -23,11 +23,6 @@ public class MapNavigationTarget implements NavigationTarget {
 		return getNearestDecorationPos(level, pos, self);
 	}
 
-	@Override
-	public float getMaxRange() {
-		return 0;
-	}
-
 	private static Vec3 getNearestDecorationPos(final Level level, final Vec3 pos, final ItemStack stack) {
 		final MapDecorations decorations = stack.getComponents().get(DataComponents.MAP_DECORATIONS);
 		final MapId mapId = stack.getComponents().get(DataComponents.MAP_ID);

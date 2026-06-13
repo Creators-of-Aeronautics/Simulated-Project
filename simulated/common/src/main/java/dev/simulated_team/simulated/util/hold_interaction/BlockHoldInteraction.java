@@ -2,8 +2,10 @@ package dev.simulated_team.simulated.util.hold_interaction;
 
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import dev.simulated_team.simulated.mixin.hold_interaction.KeyMappingInvoker;
 import dev.simulated_team.simulated.util.click_interactions.InteractCallback;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -27,7 +29,9 @@ public abstract class BlockHoldInteraction implements InteractCallback {
      * Called only when the interaction has just been started
      */
     @ApiStatus.OverrideOnly
-    public void start() {}
+    public void start() {
+        ((KeyMappingInvoker)Minecraft.getInstance().options.keyAttack).invokeRelease();
+    }
 
     /**
      * Called only when the interaction is about to be stopped
@@ -91,7 +95,7 @@ public abstract class BlockHoldInteraction implements InteractCallback {
 
     @Override
     public Result onAttack(final int modifiers, final int action, final KeyMapping leftKey) {
-        if (this.isActive()) {
+        if (this.isActive() && action != GLFW.GLFW_RELEASE) {
             return new Result(true);
         }
 
@@ -103,6 +107,8 @@ public abstract class BlockHoldInteraction implements InteractCallback {
         if (action == GLFW.GLFW_RELEASE && this.isActive()) {
             this.release();
             HoldInteractionManager.stop();
+            // sometimes minecraft can view keybinds as active even after a release event
+            ((KeyMappingInvoker)Minecraft.getInstance().options.keyUse).invokeRelease();
         }
 
         return InteractCallback.super.onUse(modifiers, action, rightKey);

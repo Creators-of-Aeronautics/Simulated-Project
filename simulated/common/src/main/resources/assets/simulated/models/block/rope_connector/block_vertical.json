@@ -1,5 +1,5 @@
 {
-	"parent": "block",
+	"parent": "minecraft:block/block",
 	"texture_size": [32, 32],
 	"textures": {
 		"1": "simulated:block/rope_winch/winch",
@@ -10,7 +10,6 @@
 			"name": "base",
 			"from": [2.99, 9.99, -1.01],
 			"to": [13.01, 13.01, 2.01],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {
 				"north": {"uv": [0, 12.5, 5, 14], "rotation": 180, "texture": "#1"},
 				"east": {"uv": [0, 13.5, 0.5, 15], "rotation": 90, "texture": "#1"},
@@ -24,7 +23,6 @@
 			"name": "base",
 			"from": [2.99, 2.99, -1.01],
 			"to": [13.01, 6.01, 2.01],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
 			"faces": {
 				"north": {"uv": [0, 12.5, 5, 14], "rotation": 180, "texture": "#1"},
 				"east": {"uv": [0, 13.5, 0.5, 15], "rotation": 90, "texture": "#1"},
@@ -38,7 +36,6 @@
 			"name": "base",
 			"from": [2.01, 2.01, -2.99],
 			"to": [13.99, 13.99, -1.01],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
 			"faces": {
 				"north": {"uv": [8, 6, 14, 12], "rotation": 90, "texture": "#1"},
 				"east": {"uv": [8, 12.5, 14, 11.5], "rotation": 90, "texture": "#1"},
@@ -51,7 +48,6 @@
 		{
 			"from": [6, 6, 2],
 			"to": [10, 10, 6],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
 			"faces": {
 				"north": {"uv": [8.5, 14, 9, 16], "texture": "#1"},
 				"east": {"uv": [7, 14, 9, 16], "texture": "#1"},
@@ -62,7 +58,6 @@
 		{
 			"from": [6, 10, 2],
 			"to": [10, 13, 6],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
 			"faces": {
 				"east": {"uv": [6, 12.5, 8, 14], "texture": "#1"},
 				"south": {"uv": [5, 12.5, 7, 14], "texture": "#1"},
@@ -73,7 +68,6 @@
 		{
 			"from": [6, 3, 2],
 			"to": [10, 6, 6],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
 			"faces": {
 				"east": {"uv": [6, 12.5, 8, 14], "texture": "#1"},
 				"south": {"uv": [5, 12.5, 7, 14], "texture": "#1"},

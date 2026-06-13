@@ -5,13 +5,17 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
+import dev.simulated_team.simulated.compat.computercraft.AttachedComputerHandler;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.LinkedTypewriterMenuCommon;
+import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.mixin_interface.PlayerTypewriterExtension;
+import dev.simulated_team.simulated.service.SimPlatformService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -25,12 +29,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements MenuProvider, ClipboardCloneable {
+
+    private static final boolean CC_LOADED = SimPlatformService.INSTANCE.isLoaded("computercraft");
 
     private LinkedTypewriterEntries entryMap;
     private final List<Integer> pressedKeys = new ArrayList<>();
@@ -38,10 +43,16 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     private String typedEntry = "";
 
     public boolean powered;
+    public final AttachedComputerHandler computerHandler;
 
     public LinkedTypewriterBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
         this.entryMap = new LinkedTypewriterEntries();
+        if (CC_LOADED) {
+            this.computerHandler = new AttachedComputerHandler();
+        } else {
+            this.computerHandler = null;
+        }
     }
 
     @Override
@@ -89,22 +100,24 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
      */
     public boolean checkAndStartUsing(final UUID userID) {
         if (this.currentUser == null) {
-            final PlayerTypewriterExtension player = ((PlayerTypewriterExtension) this.level.getPlayerByUUID(userID));
+            final Player player = this.level.getPlayerByUUID(userID);
             if (player != null) {
+                final PlayerTypewriterExtension playerEx = (PlayerTypewriterExtension) player;
                 this.currentUser = userID;
-                final BlockPos previousTypewriter = player.simulated$getCurrentTypewriter();
+                final BlockPos previousTypewriter = playerEx.simulated$getCurrentTypewriter();
                 if (previousTypewriter != null) {
-                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe && nbe != this) {
+                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe) {
                         nbe.disconnectUser();
                     }
                 }
 
                 this.powered = true;
-                player.simulated$setCurrentTypewriter(this.getBlockPos());
+                playerEx.simulated$setCurrentTypewriter(this.getBlockPos());
                 if (this.level.isClientSide) {
                     LinkedTypewriterInteractionHandler.associateTypewriter(this);
                 } else {
                     this.level.playSound(null, this.worldPosition, AllSoundEvents.CONTROLLER_PUT.getMainEvent(), SoundSource.BLOCKS, 1.0F, 0.95F + 0.1F * this.level.getRandom().nextFloat());
+                    this.sendConnectMessage(player);
                 }
 
                 return true;
@@ -114,17 +127,28 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         return false;
     }
 
+    public void sendConnectMessage(final Player player) {
+        final Component customName = this.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
+        player.displayClientMessage(SimLang.translate("linked_typewriter.start_controlling", customName.getString()).component(), true);
+    }
+
+    public void sendDisconnectMessage(final Player player) {
+        final Component customName = this.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
+        player.displayClientMessage(SimLang.translate("linked_typewriter.stop_controlling", customName.getString()).component(), true);
+    }
+
     public boolean checkUser(final UUID user) {
         return user.equals(this.currentUser);
+    }
+
+    public boolean isInUse() {
+        return this.currentUser != null;
     }
 
     /**
      * Disconnects the current user.
      */
     public void disconnectUser() {
-        this.powered = false;
-        this.currentUser = null;
-
         if (!this.level.isClientSide) {
             this.pressedKeys.clear();
             this.entryMap.deactivateAll();
@@ -132,9 +156,17 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
             this.sendData();
 
             this.level.playSound(null, this.worldPosition, SimSoundEvents.LINKED_TYPEWRITER_DING.event(), SoundSource.BLOCKS, 1.0F, 0.95F + 0.1F * this.level.getRandom().nextFloat());
+            final Player player = this.level.getPlayerByUUID(this.currentUser);
+            if (player != null) {
+                this.sendDisconnectMessage(player);
+                ((PlayerTypewriterExtension)player).simulated$setCurrentTypewriter(null);
+            }
         } else {
             LinkedTypewriterInteractionHandler.associateTypewriter(null);
         }
+
+        this.powered = false;
+        this.currentUser = null;
     }
 
     public List<Integer> getPressedKeys() {
@@ -181,6 +213,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         if (this.typedEntry.length() >= 25) {
             this.typedEntry = this.typedEntry.substring(1);
         }
+        if (this.computerHandler != null) {
+            this.computerHandler.queueEvent("key", key, this.entryMap.getEntry(key).isAlive());
+        }
         this.entryMap.activateKey(key, this);
     }
 
@@ -190,6 +225,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     public void releaseKey(final int key) {
         this.pressedKeys.remove((Integer) key);
         this.entryMap.deactivateKey(key);
+        if (this.computerHandler != null) {
+            this.computerHandler.queueEvent("key_up", key);
+        }
     }
 
     @Override
@@ -262,8 +300,9 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
 
     @Override
     public boolean readFromClipboard(final HolderLookup.@NotNull Provider registries, final CompoundTag tag, final Player player, final Direction side, final boolean simulate) {
-        if (simulate)
+        if (simulate) {
             return true;
+        }
         this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
         return true;
     }

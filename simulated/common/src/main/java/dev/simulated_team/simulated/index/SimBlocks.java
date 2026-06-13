@@ -118,6 +118,7 @@ public class SimBlocks {
     public static final BlockEntry<SwivelBearingBlock> SWIVEL_BEARING =
             REGISTRATE.block("swivel_bearing", SwivelBearingBlock::new)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::netheriteMetal)
                     .properties((properties -> properties.destroyTime(5f)))
                     .addLayer(() -> RenderType::cutoutMipped)
@@ -141,6 +142,7 @@ public class SimBlocks {
 
     public static final BlockEntry<SwivelBearingPlateBlock> SWIVEL_BEARING_LINK_BLOCK =
             REGISTRATE.block("swivel_bearing_link_block", SwivelBearingPlateBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .blockstate((ctx, prov) ->
                             prov.directionalBlock(ctx.getEntry(), blockState -> prov.models().getExistingFile(prov.modLoc("block/swivel_bearing/bearing_plate"))))
                     .initialProperties(SharedProperties::netheriteMetal)
@@ -160,6 +162,7 @@ public class SimBlocks {
 
     public static final BlockEntry<RopeWinchBlock> ROPE_WINCH =
             REGISTRATE.block("rope_winch", RopeWinchBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate(SimBlockStateGen::directionalKineticAxisBlockstate)
@@ -182,6 +185,7 @@ public class SimBlocks {
 
     public static final BlockEntry<RopeConnectorBlock> ROPE_CONNECTOR =
             REGISTRATE.block("rope_connector", RopeConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate(SimBlockStateGen::directionalAxisBlock)
@@ -536,6 +540,7 @@ public class SimBlocks {
 
     public static final BlockEntry<DockingConnectorBlock> DOCKING_CONNECTOR =
             REGISTRATE.block("docking_connector", DockingConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .transform(pickaxeOnly())
                     .properties(p -> p
@@ -554,6 +559,7 @@ public class SimBlocks {
 
     public static final BlockEntry<PairedDockingConnectorBlock> PAIRED_DOCKING_CONNECTOR =
             REGISTRATE.block("paired_docking_connector", PairedDockingConnectorBlock::new)
+                    .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
                     .blockstate((c, p) -> p.simpleBlock(c.get(), p.models().getExistingFile(p.modLoc("block/docking_connector/block"))))
                     .transform(pickaxeOnly())
@@ -652,7 +658,7 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, SimTags.Blocks.SUPER_LIGHT)
+                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
                     .item().transform(customItemModel())
                     .addLayer(() -> RenderType::cutoutMipped)
@@ -672,7 +678,7 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, SimTags.Blocks.SUPER_LIGHT) //Dono what this tag means (contraption safe?).
+                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
                     .item().transform(customItemModel())
                     .addLayer(() -> RenderType::cutoutMipped)
@@ -858,13 +864,12 @@ public class SimBlocks {
 
     public static final BlockEntry<SpringBlock> SPRING =
             REGISTRATE.block("spring", SpringBlock::new)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .transform(pickaxeOnly())
                     .initialProperties(SharedProperties::softMetal)
                     .blockstate((ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
                             blockState -> prov.models().getExistingFile(
                                     prov.modLoc("block/spring/" + (blockState.getValue(SpringBlock.SIZE) == SpringBlock.Size.MEDIUM ? "" : (blockState.getValue(SpringBlock.SIZE).getSerializedName() + "_")) + "block"))))
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.LIGHT)
+                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, AllTags.AllBlockTags.NON_MOVABLE.tag, SimTags.Blocks.LIGHT)
                     .loot((tables, block) -> {
                         tables.add(block, tables.createSingleItemTable(SimItems.SPRING));
                     })

@@ -3,7 +3,6 @@ package dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
@@ -167,7 +166,7 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
         if (be instanceof final SwivelBearingBlockEntity sbe) {
             sbe.setPlatePos(this.getBlockPos());
 
-            final SubLevel newSublevel = Sable.HELPER.getContaining(this);
+            final ServerSubLevel newSublevel = (ServerSubLevel)Sable.HELPER.getContaining(this);
             if (newSublevel != null) {
                 final UUID subLevelID = sbe.getSubLevelID();
                 final UUID newID = newSublevel.getUniqueId();
@@ -176,6 +175,9 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
                     sbe.setSubLevelID(newSublevel.getUniqueId());
                     sbe.reattachConstraint(newSublevel, true);
                 }
+            } else {
+                sbe.setSubLevelID(null);
+                sbe.reattachConstraint(null, true);
             }
         }
     }

@@ -36,15 +36,20 @@ public record ItemInfoWrapper(Item type, DataComponentPatch patchMap) {
      * @return A <b>new</b> {@link ItemStack} containing data from the given wrapper.
      */
     public static @NotNull ItemStack generateFromInfo(final ItemInfoWrapper info) {
-        final ItemStack newstack;
-        newstack = info.type().getDefaultInstance();
+        final ItemStack newStack = info.type().getDefaultInstance();
+        final DataComponentPatch.Builder builder = DataComponentPatch.builder();
         for (final Map.Entry<DataComponentType<?>, Optional<?>> set : info.patchMap().entrySet()) {
-            setDataComponent(set.getKey(), set.getValue(), newstack);
+            setDataComponent(set.getKey(), set.getValue(), builder);
         }
-        return newstack;
+        newStack.applyComponents(builder.build());
+        return newStack;
     }
 
-    private static <T> void setDataComponent(final DataComponentType<?> type, final Optional<?> set, final ItemStack newstack) {
-        newstack.set((DataComponentType<T>) type, (T) set.get());
+    private static <T> void setDataComponent(final DataComponentType<?> type, final Optional<?> set, final DataComponentPatch.Builder builder) {
+        if (set.isEmpty()) {
+            builder.remove(type);
+        } else {
+            builder.set((DataComponentType<T>) type, (T) set.get());
+        }
     }
 }

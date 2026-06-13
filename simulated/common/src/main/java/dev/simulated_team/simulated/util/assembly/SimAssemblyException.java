@@ -21,7 +21,12 @@ public class SimAssemblyException {
     public static AssemblyException tooFarFromGround() {
         return new AssemblyException(SimLang.translate("gui.assembly.exception.tooFarFromGround").component());
     }
+
     public static AssemblyException tooFast() {
         return new AssemblyException(SimLang.translate("gui.assembly.exception.tooFast").component());
+    }
+
+    public static AssemblyException sameSubLevel() {
+        return new AssemblyException(SimLang.translate("gui.assembly.exception.sameSubLevel").component());
     }
 }

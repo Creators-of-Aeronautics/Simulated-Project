@@ -1,7 +1,5 @@
 {
-	"format_version": "1.21.11",
-	"credit": "Made by Farcr",
-	"parent": "block",
+	"parent": "minecraft:block/block",
 	"textures": {
 		"0": "simulated:block/rope_particle",
 		"particle": "simulated:block/rope_particle"
@@ -11,7 +9,6 @@
 			"name": "rope",
 			"from": [5, 5, 6],
 			"to": [11, 11, 10],
-			"rotation": {"angle": 0, "axis": "x", "origin": [8, 4, 8]},
 			"faces": {
 				"north": {"uv": [11, 11, 5, 5], "rotation": 270, "texture": "#0"},
 				"east": {"uv": [10, 13, 6, 7], "texture": "#0"},

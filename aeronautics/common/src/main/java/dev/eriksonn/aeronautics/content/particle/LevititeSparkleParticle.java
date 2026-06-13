@@ -7,11 +7,11 @@ import net.minecraft.client.particle.SimpleAnimatedParticle;
 import net.minecraft.client.particle.SpriteSet;
 import org.jetbrains.annotations.Nullable;
 
-public class LevititeSparklePartcle extends SimpleAnimatedParticle {
-    protected LevititeSparklePartcle(final ClientLevel level,
-                                     final double x, final double y, final double z,
-                                     final double dx, final double dy, final double dz,
-                                     final SpriteSet sprite, final int color) {
+public class LevititeSparkleParticle extends SimpleAnimatedParticle {
+    protected LevititeSparkleParticle(final ClientLevel level,
+                                      final double x, final double y, final double z,
+                                      final double dx, final double dy, final double dz,
+                                      final SpriteSet sprite, final int color) {
         super(level, x, y, z, sprite, level.random.nextFloat() * 0.5f);
         this.hasPhysics = false;
         this.lifetime = 16;
@@ -44,7 +44,7 @@ public class LevititeSparklePartcle extends SimpleAnimatedParticle {
         this.move(this.xd, this.yd, this.zd);
     }
 
-    public static class Factory implements ParticleProvider<LevititeSparklePartcleData> {
+    public static class Factory implements ParticleProvider<LevititeSparkleParticleData> {
         private final SpriteSet spriteSet;
 
         public Factory(final SpriteSet animatedSprite) {
@@ -52,12 +52,12 @@ public class LevititeSparklePartcle extends SimpleAnimatedParticle {
         }
 
         @Override
-        public @Nullable Particle createParticle(final LevititeSparklePartcleData levititeSparklePartcleData, final ClientLevel level,
+        public @Nullable Particle createParticle(final LevititeSparkleParticleData levititeSparkleParticleData, final ClientLevel level,
                                                  final double x, final double y, final double z, final double dx, final double dy, final double dz) {
-            return new LevititeSparklePartcle(
+            return new LevititeSparkleParticle(
                     level,
                     x, y, z, dx, dy, dz,
-                    this.spriteSet, levititeSparklePartcleData.color
+                    this.spriteSet, levititeSparkleParticleData.color
             );
         }
     }

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.ponder.new_ponder_tooltip.NewPonderTooltipManager;
+import dev.simulated_team.simulated.service.SimConfigService;
 import net.createmod.catnip.lang.LangBuilder;
 import net.createmod.ponder.foundation.PonderTooltipHandler;
 import net.minecraft.ChatFormatting;
@@ -18,7 +19,7 @@ public class PonderTooltipHandlerMixin {
 	private static MutableComponent simulated$addToTooltip(final LangBuilder instance, final Operation<MutableComponent> original) {
 		final MutableComponent component = original.call(instance);
 		final ItemStack stack = PonderTooltipHandlerAccessor.getTrackingStack();
-		if(stack != null) {
+		if(SimConfigService.INSTANCE.client().itemConfig.showNewPonderTag.get() && stack != null) {
 			if(!NewPonderTooltipManager.hasWatchedAllScenes(stack.getItem())) {
 				component.append(" ").append(SimLang.translate("tooltip.new_ponder").style(ChatFormatting.GOLD).component());
 			}

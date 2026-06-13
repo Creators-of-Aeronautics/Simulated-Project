@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
 import dev.ryanhcode.sable.api.physics.constraint.PhysicsConstraintHandle;
-import dev.ryanhcode.sable.api.physics.constraint.free.FreeConstraintConfiguration;
+import dev.ryanhcode.sable.api.physics.constraint.FreeConstraintConfiguration;
 import dev.ryanhcode.sable.api.physics.object.rope.RopeHandle;
 import dev.ryanhcode.sable.api.physics.object.rope.RopePhysicsObject;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;

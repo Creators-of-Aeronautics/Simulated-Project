@@ -11,7 +11,9 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -19,6 +21,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,18 +44,18 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
     private float meanVolume = 0;
 
     public BalloonBurnerSoundInstance(SoundEvent sound) {
-        super(sound, SoundSource.AMBIENT, RandomSource.create());
+        super(sound, SoundSource.AMBIENT, SoundInstance.createUnseededRandom());
         this.looping = true;
         this.delay = 0;
-        this.volume = 0.001f;
-        this.pitch = 0.001f;
+        this.volume = 0.0F;
+        this.pitch = 0.0F;
     }
 
     public void addPos(final BlockPos pos) {
         final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
         if (distSquared(camera, pos) < MAX_DISTANCE * MAX_DISTANCE) {
-            if (NEARBY_BLOCKS.add(pos)) {
+            if (NEARBY_BLOCKS.add(pos.immutable())) {
                 updateMeanPos();
             }
         }
@@ -64,7 +67,7 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
     }
 
     private void updateMeanPos() {
-        meanPos.zero();
+        this.meanPos.zero();
 
         final Vector3d v = new Vector3d();
 
@@ -77,18 +80,22 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
                 if (subLevel != null)
                     subLevel.logicalPose().transformPosition(v);
 
-                meanPos.add(v);
+                this.meanPos.add(v);
             }
 
-            meanPos.div(NEARBY_BLOCKS.size());
+            this.meanPos.div(NEARBY_BLOCKS.size());
         }
     }
 
     private void updateInformation() {
+        if (NEARBY_BLOCKS.isEmpty()) {
+            return;
+        }
+
         final ClientLevel level = Minecraft.getInstance().level;
         final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
-        meanVolume = 0.001f;
+        this.meanVolume = 0.001f;
         int volumeChangers = 0;
         final Iterator<BlockPos> iter = NEARBY_BLOCKS.iterator();
         while (iter.hasNext()) {
@@ -101,7 +108,7 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
                 }
 
                 final BlockEntity be = level.getBlockEntity(next);
-                float intensityScaling = 0.0f;
+                float intensityScaling;
                 if (be instanceof HotAirBurnerBlockEntity hbe) {
                     intensityScaling = Mth.clamp(hbe.getClientIntensity().getValue(), 0.0f, 1.0f);
                 } else if (be instanceof final SteamVentBlockEntity sbe) {
@@ -113,25 +120,26 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
                 }
 
 
-                meanVolume += Math.max(Math.min(2.0f, intensityScaling * 4.0f), 0.0f);
+                this.meanVolume += Math.clamp(intensityScaling * 4.0f, 0.0f, 2.0f);
                 volumeChangers++;
             }
         }
 
         if (!NEARBY_BLOCKS.isEmpty()) {
-            meanPitch = 1.0f;
-            meanVolume /= volumeChangers;
-            meanVolume *= (float) (1 - (Math.sqrt(distSquared(camera, JOMLConversion.toMojang(meanPos))) / MAX_DISTANCE));
+            this.meanPitch = 1.0f;
+            this.meanVolume /= volumeChangers;
+            this.meanVolume *= (float) (1 - (Math.sqrt(distSquared(camera, this.meanPos)) / MAX_DISTANCE));
         }
     }
 
-    private static double distSquared(final Camera camera, final Vec3 pos) {
+    private static double distSquared(final Camera camera, final Vector3dc pos) {
         final ClientLevel level = Minecraft.getInstance().level;
-        return Sable.HELPER.distanceSquaredWithSubLevels(level, camera.getPosition(), pos);
+        return Sable.HELPER.distanceSquaredWithSubLevels(level, camera.getPosition(), pos.x(), pos.y(), pos.z());
     }
 
-    private static double distSquared(final Camera camera, final BlockPos pos) {
-        return distSquared(camera, pos.getCenter());
+    private static double distSquared(final Camera camera, final Vec3i pos) {
+        final ClientLevel level = Minecraft.getInstance().level;
+        return Sable.HELPER.distanceSquaredWithSubLevels(level, camera.getPosition(), pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5);
     }
 
     @Override
@@ -144,19 +152,15 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
         updateInformation();
 
         if (NEARBY_BLOCKS.isEmpty()) {
-            this.volume = 0.001f;
-            this.pitch = 0.001f;
-
-            meanPos.zero();
             return;
         }
 
-        this.x = meanPos.x;
-        this.y = meanPos.y;
-        this.z = meanPos.z;
+        this.x = this.meanPos.x;
+        this.y = this.meanPos.y;
+        this.z = this.meanPos.z;
 
-        this.volume = meanVolume * VOLUME_SCALE;
-        this.pitch = meanPitch;
+        this.volume = this.meanVolume * VOLUME_SCALE;
+        this.pitch = this.meanPitch;
     }
 
     @Override
@@ -167,12 +171,12 @@ public class BalloonBurnerSoundInstance extends AbstractTickableSoundInstance {
     @Override
     public boolean canPlaySound() {
         final ClientLevel level = Minecraft.getInstance().level;
-        return level != null;
+        return level != null && !NEARBY_BLOCKS.isEmpty();
     }
 
     @Override
     public boolean isStopped() {
         final ClientLevel level = Minecraft.getInstance().level;
-        return level == null;
+        return level == null || NEARBY_BLOCKS.isEmpty();
     }
 }

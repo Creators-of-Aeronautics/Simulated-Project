@@ -12,42 +12,42 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public class LevititeSparklePartcleData implements ParticleOptions, ICustomParticleDataWithSprite<LevititeSparklePartcleData> {
+public class LevititeSparkleParticleData implements ParticleOptions, ICustomParticleDataWithSprite<LevititeSparkleParticleData> {
     public static final int LEVITITE_GREEN = 9424022;
     public static final int LEVITITE_PINK = 15521489;
 
-    public static final MapCodec<LevititeSparklePartcleData> CODEC = RecordCodecBuilder.mapCodec(instance ->
+    public static final MapCodec<LevititeSparkleParticleData> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Codec.INT.fieldOf("color").forGetter(p -> p.color)
-            ).apply(instance, LevititeSparklePartcleData::new));
+            ).apply(instance, LevititeSparkleParticleData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, LevititeSparklePartcleData> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, LevititeSparkleParticleData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, p -> p.color,
-            LevititeSparklePartcleData::new
+            LevititeSparkleParticleData::new
     );
 
     public final int color;
 
-    public LevititeSparklePartcleData(final int color) {
+    public LevititeSparkleParticleData(final int color) {
         this.color = color;
     }
 
-    public LevititeSparklePartcleData() {
+    public LevititeSparkleParticleData() {
         this(LEVITITE_GREEN);
     }
 
     @Override
-    public ParticleEngine.SpriteParticleRegistration<LevititeSparklePartcleData> getMetaFactory() {
-        return LevititeSparklePartcle.Factory::new;
+    public ParticleEngine.SpriteParticleRegistration<LevititeSparkleParticleData> getMetaFactory() {
+        return LevititeSparkleParticle.Factory::new;
     }
 
     @Override
-    public MapCodec<LevititeSparklePartcleData> getCodec(final ParticleType<LevititeSparklePartcleData> type) {
+    public MapCodec<LevititeSparkleParticleData> getCodec(final ParticleType<LevititeSparkleParticleData> type) {
         return CODEC;
     }
 
     @Override
-    public StreamCodec<? super RegistryFriendlyByteBuf, LevititeSparklePartcleData> getStreamCodec() {
+    public StreamCodec<? super RegistryFriendlyByteBuf, LevititeSparkleParticleData> getStreamCodec() {
         return STREAM_CODEC;
     }
 

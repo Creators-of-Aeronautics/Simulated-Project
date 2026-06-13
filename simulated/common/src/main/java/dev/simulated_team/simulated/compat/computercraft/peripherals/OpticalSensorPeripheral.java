@@ -32,7 +32,7 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
 
     @LuaFunction
     public float getRange() {
-        return this.blockEntity.getLaserRange();
+        return this.blockEntity.getRange();
     }
 
     @LuaFunction(mainThread = true)

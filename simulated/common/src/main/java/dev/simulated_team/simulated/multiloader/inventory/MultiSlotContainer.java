@@ -405,7 +405,9 @@ public abstract class MultiSlotContainer implements AbstractContainer {
         final ListTag inv = nbt.getList("Items", Tag.TAG_COMPOUND);
         for (final Tag tag : inv) {
             final CompoundTag itemTag = (CompoundTag) tag;
-            this.inventory.get(itemTag.getInt("index")).read(provider, itemTag);
+            final ContainerSlot slot = this.inventory.get(itemTag.getInt("index"));
+            slot.read(provider, itemTag);
+            this.populatedSlots.add(slot);
         }
     }
 

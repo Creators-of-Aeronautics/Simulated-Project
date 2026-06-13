@@ -113,6 +113,7 @@ public class SimBlockEntityTypes {
             .blockEntity("docking_connector", DockingConnectorBlockEntity::new)
             .onRegister(SimInventoryService.INSTANCE.registerInventory((be, dir) -> be.getInventory()))
             .onRegister(SimInventoryService.INSTANCE.registerTank((be, dir) -> be.tank))
+            .onRegister(SimInventoryService.INSTANCE.registerBattery((be, dir) -> be.battery))
             .validBlocks(SimBlocks.DOCKING_CONNECTOR)
             .renderer(() -> DockingConnectorRenderer::new)
             .register();

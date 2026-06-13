@@ -24,7 +24,7 @@ public interface SimModCompatibilityService {
 
     @ApiStatus.Internal
     static void initLoaded() {
-        final ServiceLoader<SimModCompatibilityService> loader = ServiceLoader.load(SimModCompatibilityService.class);
+        final ServiceLoader<SimModCompatibilityService> loader = ServiceLoader.load(SimModCompatibilityService.class, SimModCompatibilityService.class.getClassLoader());
         final Iterator<SimModCompatibilityService> iterator = loader.iterator();
 
         while (iterator.hasNext()) {

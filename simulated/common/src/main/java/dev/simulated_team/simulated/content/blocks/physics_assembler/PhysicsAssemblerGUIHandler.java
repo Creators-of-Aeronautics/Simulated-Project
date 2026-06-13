@@ -95,9 +95,7 @@ public class PhysicsAssemblerGUIHandler extends BlockHoldInteraction {
     public boolean activeOnMouseMove(final double yaw, final double pitch) {
         final double scalar = 0.5 - Math.abs(0.5 - animatedValue) + 0.05;
 
-        final PhysicsAssemblerBlockEntity be = (PhysicsAssemblerBlockEntity) SableDistUtil.getClientLevel().getBlockEntity(this.getInteractionPos());
-
-        if (be == null) {
+        if (!(SableDistUtil.getClientLevel().getBlockEntity(this.getInteractionPos()) instanceof PhysicsAssemblerBlockEntity)) {
             return false;
         }
 

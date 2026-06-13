@@ -4,6 +4,7 @@ import dev.eriksonn.aeronautics.content.blocks.hot_air.sound.BalloonBurnerSoundI
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.sound.PropellerBearingSoundHolder;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.sound.PropellerBearingSoundInstance;
+import dev.simulated_team.simulated.mixin_interface.sounds.SoundExtension;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.sounds.SoundManager;
@@ -44,11 +45,12 @@ public class AeroSoundDistUtil {
         final SoundManager soundManager = minecraft.getSoundManager();
 
         if (level != null && !minecraft.isPaused()) {
-            if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND)) {
+            if (BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND.canPlaySound() && !SoundExtension.isSoundPlaying(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND)) {
                 soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND);
+                System.out.println("Start burner");
             }
 
-            if (!soundManager.isActive(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND)) {
+            if (BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND.canPlaySound() && !SoundExtension.isSoundPlaying(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND)) {
                 soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND);
             }
         }

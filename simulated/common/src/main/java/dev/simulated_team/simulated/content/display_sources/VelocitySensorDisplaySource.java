@@ -38,7 +38,7 @@ public class VelocitySensorDisplaySource extends AbstractNumericDisplaysource {
         }
 
         if (displayLinkContext.sourceConfig().getInt(this.getSelectionKey()) == 0) {
-            return SimLang.number(vbe.getAdjustedVelocity()).text(" m/s").component();
+            return SimLang.number(Math.abs(vbe.getAdjustedVelocity())).text(" m/s").component();
         }
 
         return ZERO.copy();

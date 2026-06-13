@@ -7,13 +7,12 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
 import dev.ryanhcode.sable.sublevel.system.SubLevelTrackingSystem;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.config.server.blocks.SimBlockConfigs;
 import dev.simulated_team.simulated.content.blocks.rope.strand.client.ClientLevelRopeManager;
 import dev.simulated_team.simulated.content.blocks.rope.strand.client.ClientRopePoint;
@@ -43,6 +42,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -195,8 +195,11 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
         final RopeAttachment endAttachment = strand.getAttachment(RopeAttachmentPoint.END);
 
+        // todo: no nice way to grab a potentially causing player to check for infinite materials :p
+        final boolean tileDrops = level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
+
         if (endAttachment == null) {
-            this.destroyRope(null, this.getAttachmentPoint());
+            this.destroyRope(null, this.getAttachmentPoint(), tileDrops);
             return;
         }
 
@@ -204,19 +207,19 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         final BlockEntity blockEntity = level.getBlockEntity(blockAttachment);
 
         if (blockEntity == null) {
-            this.destroyRope(null, blockAttachment.getCenter());
+            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
             return;
         }
 
         if (!(blockEntity instanceof final SmartBlockEntity smartBlockEntity)) {
-            this.destroyRope(null, blockAttachment.getCenter());
+            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
             return;
         }
 
         final RopeStrandHolderBehavior holderBehavior = smartBlockEntity.getBehaviour(RopeStrandHolderBehavior.TYPE);
 
         if (holderBehavior == null) {
-            this.destroyRope(null, blockAttachment.getCenter());
+            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
         }
     }
 
@@ -227,7 +230,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
      * @param target the target holder to attach the rope to
      * @return true if the rope was successfully created, false if it already exists or the target is invalid
      */
-    public boolean createRope(final RopeStrandHolderBehavior target) {
+    public boolean createRope(final RopeStrandHolderBehavior target, final boolean dropItem) {
         if (target == this)
             return false;
 
@@ -253,7 +256,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
             return false;
         }
 
-        this.destroyRope(null, null);
+        this.destroyRope(null, null, dropItem && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS));
 
         final double distance = ropeTarget.distanceTo(ropeStart);
         final int oneLongSegments = Mth.floor(distance);
@@ -332,7 +335,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     /**
      * Destroys the current rope.
      */
-    public void destroyRope(@Nullable final ServerPlayer player, @Nullable final Vec3 ropeDropPos) {
+    public void destroyRope(@Nullable final ServerPlayer player, @Nullable final Vec3 ropeDropPos, final boolean returnItem) {
         if (!this.strandOwner || this.ownedServerStrand == null) {
             return;
         }
@@ -362,15 +365,19 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
             final List<Vector3d> points = strand.getPoints();
             final Vector3d middlePointPos = new Vector3d(points.get(points.size() / 2));
 
-            final ItemStack stack = new ItemStack(SimItems.ROPE_COUPLING.get());
+            if (returnItem) {
+                final ItemStack stack = new ItemStack(SimItems.ROPE_COUPLING.get());
 
-            if (player != null) {
-                player.getInventory().placeItemBackInInventory(stack);
-            } else {
-                if (ropeDropPos != null)
-                    middlePointPos.set(ropeDropPos.x, ropeDropPos.y, ropeDropPos.z);
+                if (player != null) {
+                    if (!player.hasInfiniteMaterials() || !player.getInventory().contains(stack)) {
+                        player.getInventory().placeItemBackInInventory(stack);
+                    }
+                } else {
+                    if (ropeDropPos != null)
+                        middlePointPos.set(ropeDropPos.x, ropeDropPos.y, ropeDropPos.z);
 
-                level.addFreshEntity(new ItemEntity(level, middlePointPos.x, middlePointPos.y, middlePointPos.z, stack));
+                    level.addFreshEntity(new ItemEntity(level, middlePointPos.x, middlePointPos.y, middlePointPos.z, stack));
+                }
             }
 
             for (final Vector3d position : points) {
@@ -564,6 +571,8 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
             this.removeClientStrand();
         }
 
+        final boolean tileDrops = level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
+
         if (!this.strandOwner && attachedStrand != null) {
             final RopeAttachment startAttachment = attachedStrand.getAttachment(RopeAttachmentPoint.START);
             final BlockPos blockAttachment = startAttachment.blockAttachment();
@@ -573,13 +582,13 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
                 final RopeStrandHolderBehavior holder = smartBlockEntity.getBehaviour(TYPE);
 
                 if (holder != null) {
-                    holder.destroyRope(null, this.getAttachmentPoint());
+                    holder.destroyRope(null, this.getAttachmentPoint(), tileDrops);
                     return;
                 }
             }
         }
 
-        this.destroyRope(null, this.getAttachmentPoint());
+        this.destroyRope(null, this.getAttachmentPoint(), tileDrops);
     }
 
     public boolean isAttached() {

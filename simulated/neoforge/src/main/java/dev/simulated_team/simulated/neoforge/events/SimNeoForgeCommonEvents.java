@@ -13,6 +13,8 @@ import dev.simulated_team.simulated.index.SimArmInteractions;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.index.neoforge.NeoForgeSimStats;
+import dev.simulated_team.simulated.multiloader.energy.SingleBattery;
+import dev.simulated_team.simulated.multiloader.energy.SingleBatteryWrapper;
 import dev.simulated_team.simulated.multiloader.inventory.AbstractContainer;
 import dev.simulated_team.simulated.multiloader.inventory.neoforge.ContainerWrapper;
 import dev.simulated_team.simulated.multiloader.tanks.SingleTank;
@@ -204,6 +206,17 @@ public class SimNeoForgeCommonEvents {
 					}
 
 					return new SingleTankWrapper(container);
+				});
+			}
+
+			for (final NeoForgeSimInventoryService.EnergyGetterHolder<? extends BlockEntity> getter : NeoForgeSimInventoryService.energyGetters) {
+				event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, getter.type(), (be, dir) -> {
+					final SingleBattery battery = getter.castBlockEntityAndGetInv(be, dir);
+					if (battery == null) {
+						return null;
+					}
+
+					return new SingleBatteryWrapper(battery);
 				});
 			}
 		}

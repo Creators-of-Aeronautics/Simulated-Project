@@ -35,6 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -360,7 +361,9 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
         @Override
         public Sided fromSide(final Direction direction) {
             this.direction = direction;
-            if (direction == Direction.UP) {
+
+            Level level = this.be.getLevel();
+            if (level != null && level.isClientSide && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {
@@ -406,7 +409,8 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
 
         @Override
         protected boolean isSideActive(final BlockState state, final Direction direction) {
-            if (direction == Direction.UP) {
+            Level level = this.be.getLevel();
+            if (level != null && level.isClientSide && direction == Direction.UP) {
                 final Minecraft mc = Minecraft.getInstance();
                 final HitResult target = mc.hitResult;
                 if (target instanceof BlockHitResult) {

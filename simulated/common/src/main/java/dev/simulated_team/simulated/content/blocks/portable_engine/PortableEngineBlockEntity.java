@@ -214,6 +214,9 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
         // Update burn timestamp
         if (this.burnTime > 0 && !this.isCurrentFuelInfinite()) {
             this.burnTime--;
+            if (PortableEngineBlock.analogPower(this.burnTime) != PortableEngineBlock.analogPower(this.burnTime + 1)) {
+                this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
+            }
         }
         if (this.burnTime <= 0 && !this.inventory.isEmpty()) {
             this.burnTime = SimItemService.INSTANCE.getBurnTime(stack);

@@ -9,10 +9,10 @@ import com.simibubi.create.foundation.block.IBE;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
-import dev.simulated_team.simulated.mixin_interface.PlayerTypewriterExtension;
 import dev.simulated_team.simulated.service.SimMenuService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -47,7 +47,6 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements IBE<LinkedTypewriterBlockEntity>, IWrenchable {
@@ -105,9 +104,9 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
                         player.getMainHandItem() : player.getOffhandItem();
                 player.displayClientMessage(SimLang.translate("linked_typewriter.linked_controller_copy").component(), true);
                 LinkedTypewriterInteractionHandler.sendLinkedControllerData(level, blockPos, item);
+                LinkedControllerClientHandler.MODE = LinkedControllerClientHandler.Mode.IDLE;
             }
 
-            LinkedControllerClientHandler.MODE = LinkedControllerClientHandler.Mode.IDLE;
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
@@ -136,7 +135,6 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
 
                 // disconnect if the user is interacting with this typewriter again
                 if (be.checkUser(uuid)) {
-                    ((PlayerTypewriterExtension) player).simulated$setCurrentTypewriter(null);
                     be.disconnectUser();
                     success.setTrue();
                 }
@@ -155,15 +153,14 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         return true;
     }
 
-/*    @Override
-    public int getAnalogOutputSignal(final BlockState blockState, @NotNull final Level worldIn, final BlockPos pos) {
-        final BlockEntity be = worldIn.getBlockEntity(pos);
-        if (be instanceof final LinkedTypewriterBlockEntity linkedTypewriterBlockEntity) {
-            return Mth.ceil(Mth.clamp(((float) linkedTypewriterBlockEntity.activeKeys / linkedTypewriterBlockEntity.keybinds.size()) * 15, 0.0F, 15.0F));
-        } else {
-            return 0;
+    @Override
+    protected int getAnalogOutputSignal(final BlockState state, final Level level, final BlockPos pos) {
+        final BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof final LinkedTypewriterBlockEntity typewriter) {
+            return typewriter.isInUse() ? 15 : 0;
         }
-    }*/
+        return 0;
+    }
 
     @Override
     public InteractionResult onSneakWrenched(final BlockState state, final UseOnContext context) {
@@ -186,16 +183,23 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         final BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
             BlockItem.setBlockEntityData(itemStack, blockEntity.getType(), blockEntity.saveWithoutMetadata(level.registryAccess()));
+            if (blockEntity.components().has(DataComponents.CUSTOM_NAME)) {
+                itemStack.set(DataComponents.CUSTOM_NAME, blockEntity.components().get(DataComponents.CUSTOM_NAME));
+            }
         }
+
         return itemStack;
     }
 
     @Override
     public BlockState playerWillDestroy(final Level level, final BlockPos pos, final BlockState state, final Player player) {
+        assert level != null;
+
         final BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity != null && !level.isClientSide && player.isCreative() && blockEntity instanceof final LinkedTypewriterBlockEntity linkedTypewriterBlockEntity && !linkedTypewriterBlockEntity.getTypewriterEntries().getKeyMap().isEmpty()) {
-            final ItemStack itemStack = this.getCloneItemStack(Objects.requireNonNull(level), pos, state);
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+        if (blockEntity != null && !level.isClientSide && player.isCreative() &&
+                blockEntity instanceof final LinkedTypewriterBlockEntity linkedTypewriterBlockEntity && (!linkedTypewriterBlockEntity.getTypewriterEntries().getKeyMap().isEmpty() || linkedTypewriterBlockEntity.components().has(DataComponents.CUSTOM_NAME))) {
+
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), this.getCloneItemStack(level, pos, state));
         }
         return super.playerWillDestroy(level, pos, state, player);
     }

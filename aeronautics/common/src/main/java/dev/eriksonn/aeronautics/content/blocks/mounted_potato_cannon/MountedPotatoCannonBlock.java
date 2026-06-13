@@ -2,11 +2,11 @@ package dev.eriksonn.aeronautics.content.blocks.mounted_potato_cannon;
 
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
+import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
+import dev.eriksonn.aeronautics.index.AeroBlockShapes;
 import dev.simulated_team.simulated.multiloader.inventory.ContainerSlot;
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
 import dev.simulated_team.simulated.util.DirectionalAxisShaper;
-import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
-import dev.eriksonn.aeronautics.index.AeroBlockShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -61,7 +61,7 @@ public class MountedPotatoCannonBlock extends DirectionalAxisKineticBlock implem
 						slot.insertStack(info, Math.min(heldItem.getCount(), 16), false);
 					}
 
-					if (!player.isCreative()) {
+					if (!player.hasInfiniteMaterials()) {
 						heldItem.shrink((int) inserted);
 					}
 					return ItemInteractionResult.sidedSuccess(level.isClientSide());
