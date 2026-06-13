@@ -19,7 +19,7 @@
   "item.offroad.small_tire": "소형 타이어",
   "item.offroad.small_tire.tooltip.behaviour1": "현가 장치에 타이어를 _설치_합니다.",
   "item.offroad.small_tire.tooltip.condition1": "현가 장치에 우클릭",
-  "item.offroad.small_tire.tooltip.summary": "소형 _미지형 바퀴._",
+  "item.offroad.small_tire.tooltip.summary": "소형 _전지형 바퀴._",
   "item.offroad.tire": "타이어",
   "item.offroad.tire.placement_error": "현가 장치 앞에만 설치할 수 있습니다!",
   "item.offroad.tire.tooltip.behaviour1": "현가 장치에 타이어를 _설치_합니다.",
