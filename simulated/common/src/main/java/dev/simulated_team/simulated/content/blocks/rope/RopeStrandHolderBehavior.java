@@ -78,7 +78,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     public void tick() {
         super.tick();
 
-        if (this.ownedServerStrand != null) {
+        if (!this.getLevel().isClientSide() && this.ownedServerStrand != null) {
             if (this.queuedLevelAddition) {
                 this.addServerStrand(this.ownedServerStrand);
                 this.queuedLevelAddition = false;
@@ -328,7 +328,11 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
     private void addServerStrand(final ServerRopeStrand strand) {
         this.ownedServerStrand = strand;
-        ServerLevelRopeManager.getOrCreate(this.getLevel())
+        final Level level = this.getLevel();
+        if (level.isClientSide()) {
+            return;
+        }
+        ServerLevelRopeManager.getOrCreate(level)
                 .addStrand(this.ownedServerStrand);
     }
 
