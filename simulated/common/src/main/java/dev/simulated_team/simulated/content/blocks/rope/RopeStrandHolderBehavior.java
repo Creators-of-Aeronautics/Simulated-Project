@@ -307,7 +307,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     public void unload() {
         final Level level = this.getLevel();
 
-        if (this.ownedServerStrand != null) {
+        if (!level.isClientSide() && this.ownedServerStrand != null) {
             this.removeServerStrand(level);
         }
 
