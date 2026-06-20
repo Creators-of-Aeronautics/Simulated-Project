@@ -73,7 +73,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
     /**
      * The next index available for rock cutter actors
      */
-    private final AtomicInteger nextAvailableIndex = new AtomicInteger();
+    private int nextAvailableIndex;
 
     private boolean disassemblySlowdown = false;
     private float rotationSpeed;
@@ -502,7 +502,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
 
     private void resetCenterMiningInfo() {
         this.centerMiningPositions.clear();
-        this.nextAvailableIndex.set(0);
+        this.nextAvailableIndex = 0;
 
         this.visitedPositions.clear();
     }
@@ -537,8 +537,8 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
     public int requestNewIndexAndIncrement(final MovementContext context) {
         if (context.state.getBlock() instanceof RockCuttingWheelBlock) {
             // make sure we can't exceed the total number of rock cutters, even if this shouldn't be possible
-            if (this.nextAvailableIndex.get() < this.centerMiningPositions.size()) {
-                return this.nextAvailableIndex.getAndIncrement();
+            if (this.nextAvailableIndex < this.centerMiningPositions.size()) {
+                return this.nextAvailableIndex++;
             }
         }
 
@@ -585,7 +585,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
                 }
 
                 compound.put("OriginPositions", originListTag);
-                compound.putInt("NextAvailableIndex", this.nextAvailableIndex.get());
+                compound.putInt("NextAvailableIndex", this.nextAvailableIndex);
             }
         }
     }
@@ -623,7 +623,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
                     );
                 }
 
-                this.nextAvailableIndex.set(compound.getInt("NextAvailableIndex"));
+                this.nextAvailableIndex = compound.getInt("NextAvailableIndex");
             }
         }
     }
