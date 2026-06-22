@@ -2,7 +2,6 @@ package dev.simulated_team.simulated.content.items.merging_glue;
 
 import com.simibubi.create.AllSpecialTextures;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimTags;
@@ -75,9 +74,19 @@ public class MergingGlueItemHandler {
                 return false;
             }
 
-            if (this.firstDirection != null && (this.firstDirection.getAxis().isHorizontal() != normal.getAxis().isHorizontal() || (normal.getAxis().isVertical() && normal == this.firstDirection))) {
-                sendMessage("invalid_directions", SimColors.NUH_UH_RED);
-                return false;
+            if (this.firstDirection != null) {
+                if (this.firstDirection.getAxis().isHorizontal() != normal.getAxis().isHorizontal()) {
+                    sendMessage("invalid_directions.horizontal_vertical", SimColors.NUH_UH_RED);
+                    return false;
+                }
+                if ((normal.getAxis().isVertical() && normal == this.firstDirection)) {
+                    if (this.firstDirection == Direction.UP) {
+                        sendMessage("invalid_directions.up_up", SimColors.NUH_UH_RED);
+                    } else {
+                        sendMessage("invalid_directions.down_down", SimColors.NUH_UH_RED);
+                    }
+                    return false;
+                }
             }
 
             if (this.firstPos != null && subLevel == Sable.HELPER.getContaining(level, this.firstPos)) {

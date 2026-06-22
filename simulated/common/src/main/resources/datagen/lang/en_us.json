@@ -178,7 +178,11 @@
       "out_of_range": "Out of range!",
       "same_block": "Same block position!",
       "block_exists": "A block exists here!",
-      "invalid_directions": "Invalid directions!",
+      "invalid_directions": {
+        "horizontal_vertical": "Cannot glue horizontal and vertical faces together!",
+        "up_up": "Cannot glue two upwards faces together!",
+        "down_down": "Cannot glue two downwards faces together!"
+      },
       "only_between_sub_levels": "Can only glue between Simulated Contraptions!",
       "same_sub_level": "Cannot glue on the same Simulated Contraption!",
       "not_enough_support": "This face does not have enough support!",
