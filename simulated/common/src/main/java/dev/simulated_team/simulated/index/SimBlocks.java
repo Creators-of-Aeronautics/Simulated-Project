@@ -189,7 +189,7 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::stone)
                     .addLayer(() -> RenderType::cutoutMipped)
                     .blockstate(SimBlockStateGen::directionalAxisBlock)
-                    .properties(Block.Properties::noOcclusion)
+                    .properties(p -> p.noOcclusion().forceSolidOn())
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT)
                     .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("I")
@@ -228,8 +228,8 @@ public class SimBlocks {
             .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
             .register();
 
-    public static final DyedBlockList<HandleBlock> DYED_HANDLES = new DyedBlockList<>(color -> {
-        return createHandle(color, HandleBlock.Variant.DYED)
+    public static final DyedBlockList<HandleBlock> DYED_HANDLES = new DyedBlockList<>(color ->
+            createHandle(color, HandleBlock.Variant.DYED)
                 .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                         .requires(IRON_HANDLE)
                         .requires(DyeItem.byColor(color))
@@ -237,8 +237,8 @@ public class SimBlocks {
                         .group("handle_variants")
                         .save(p))
                 .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
-                .register();
-    });
+                .register()
+    );
 
     public static final BlockEntry<DirectionalGearshiftBlock> DIRECTIONAL_GEARSHIFT = REGISTRATE
             .block("directional_gearshift", DirectionalGearshiftBlock::new)
@@ -656,7 +656,7 @@ public class SimBlocks {
     public static final BlockEntry<DirectionalLinkedReceiverBlock> DIRECTIONAL_LINKED_RECEIVER =
             REGISTRATE.block("directional_linked_receiver", DirectionalLinkedReceiverBlock::new)
                     .initialProperties(SharedProperties::stone)
-                    .properties(BlockBehaviour.Properties::noOcclusion)
+                    .properties(p -> p.noOcclusion().forceSolidOn())
                     .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
@@ -676,7 +676,7 @@ public class SimBlocks {
     public static final BlockEntry<ModulatingLinkedReceiverBlock> MODULATING_LINKED_RECEIVER =
             REGISTRATE.block("modulating_linked_receiver", ModulatingLinkedReceiverBlock::new)
                     .initialProperties(SharedProperties::stone)
-                    .properties(BlockBehaviour.Properties::noOcclusion)
+                    .properties(p -> p.noOcclusion().forceSolidOn())
                     .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
@@ -825,6 +825,7 @@ public class SimBlocks {
         String colorName = color.getSerializedName();
         return REGISTRATE.block(colorName + "_nameplate", p -> new NameplateBlock(p, color))
                 .initialProperties(SharedProperties::wooden)
+                .properties(p -> p.forceSolidOn())
                 .transform(axeOnly())
                 .tag(SimTags.Blocks.NAMEPLATE_BLOCKS)
                 .addLayer(() -> RenderType::cutoutMipped)
@@ -866,6 +867,7 @@ public class SimBlocks {
             REGISTRATE.block("spring", SpringBlock::new)
                     .transform(pickaxeOnly())
                     .initialProperties(SharedProperties::softMetal)
+                    .properties(p -> p.forceSolidOn())
                     .blockstate((ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
                             blockState -> prov.models().getExistingFile(
                                     prov.modLoc("block/spring/" + (blockState.getValue(SpringBlock.SIZE) == SpringBlock.Size.MEDIUM ? "" : (blockState.getValue(SpringBlock.SIZE).getSerializedName() + "_")) + "block"))))
@@ -887,9 +889,8 @@ public class SimBlocks {
 
         final BlockBuilder<HandleBlock, CreateRegistrate> builder = REGISTRATE.block(name, p -> new HandleBlock(p, color, variant))
                 .initialProperties(SharedProperties::stone)
-                .properties(p -> p.sound(SoundType.COPPER))
+                .properties(p -> p.sound(SoundType.COPPER).noOcclusion().forceSolidOn())
                 .tag(SimTags.Blocks.HANDLES)
-                .properties(BlockBehaviour.Properties::noOcclusion)
                 .onRegister(ItemUseOverrides::addBlock);
 
         builder.blockstate((ctx, prov) -> {
