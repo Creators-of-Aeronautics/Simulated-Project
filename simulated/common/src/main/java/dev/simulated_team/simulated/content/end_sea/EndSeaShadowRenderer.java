@@ -16,8 +16,10 @@ import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.post.PostProcessingManager;
+import foundry.veil.api.compat.IrisCompat;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -49,6 +51,9 @@ public class EndSeaShadowRenderer {
     public static void renderShadowMap(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final MultiBufferSource.BufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc frustumMatrix, final Matrix4fc projectionMatrix, final int renderTick, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
         if (!EndSeaShadowRenderer.isEnabled() ||
                 stage != VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
+            return;
+        }
+        if (IrisCompat.isLoaded() && IrisApi.getInstance().isRenderingShadowPass()) {
             return;
         }
 

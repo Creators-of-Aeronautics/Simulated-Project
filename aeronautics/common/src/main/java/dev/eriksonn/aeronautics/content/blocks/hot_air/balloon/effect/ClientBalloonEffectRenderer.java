@@ -13,7 +13,9 @@ import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniformAccess;
+import foundry.veil.api.compat.IrisCompat;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
@@ -42,6 +44,9 @@ public class ClientBalloonEffectRenderer {
                                           final Matrix4fc projectionMatrix,
                                           final int renderTick) {
         if (stage != VeilRenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) {
+            return;
+        }
+        if (IrisCompat.isLoaded() && IrisApi.getInstance().isRenderingShadowPass()) {
             return;
         }
 
