@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.simulated_team.simulated.Simulated;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -13,6 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * A loader-independent representation of a fluid
@@ -24,12 +27,17 @@ public class CFluidType {
 
     public CFluidType(final ResourceLocation type, @Nullable final DataComponentMap data) {
         this.fluid = BuiltInRegistries.FLUID.get(type);
-        this.data = data;
+        this.data = normalize(data);
     }
 
     public CFluidType(final Fluid type, @Nullable final DataComponentMap data) {
         this.fluid = type;
-        this.data = data;
+        this.data = normalize(data);
+    }
+
+    @Nullable
+    private static DataComponentMap normalize(@Nullable final DataComponentMap data) {
+        return data == null || data.isEmpty() ? null : data;
     }
 
     public boolean isBlank() {
@@ -75,11 +83,38 @@ public class CFluidType {
         }
 
         if (obj instanceof final CFluidType other) {
-            // both haves tag, or both no haves tag
-            if ((this.data == null) == (other.data == null)) {
-                return this.fluid.isSame(other.fluid) && (this.data == null || this.data.equals(other.data));
-            }
+            return this.fluid.isSame(other.fluid) && componentsMatch(this.data, other.data);
         }
         return false;
+    }
+
+    private static boolean componentsMatch(@Nullable final DataComponentMap first, @Nullable final DataComponentMap second) {
+        if (first == second) {
+            return true;
+        }
+        if (first == null || second == null || first.size() != second.size()) {
+            return false;
+        }
+        for (final TypedDataComponent<?> component : first) {
+            if (!componentMatches(component, second)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static <T> boolean componentMatches(final TypedDataComponent<T> component, final DataComponentMap other) {
+        return Objects.equals(component.value(), other.get(component.type()));
+    }
+
+    @Override
+    public int hashCode() {
+        int componentHash = 0;
+        if (this.data != null) {
+            for (final TypedDataComponent<?> component : this.data) {
+                componentHash += Objects.hash(component.type(), component.value());
+            }
+        }
+        return 31 * this.fluid.hashCode() + componentHash;
     }
 }

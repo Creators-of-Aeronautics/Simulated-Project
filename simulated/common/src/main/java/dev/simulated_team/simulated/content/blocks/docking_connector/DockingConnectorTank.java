@@ -20,13 +20,21 @@ public class DockingConnectorTank extends SingleTank {
     }
 
     public void connect(final BlockPos pos, final DockingConnectorTank other) {
+        if (pos.equals(this.connectedPos) && this.connectedTank == other) {
+            return;
+        }
         this.connectedPos = pos;
         this.connectedTank = other;
+        this.blockEntity.onFluidConnectionChanged();
     }
 
     public void disconnect() {
+        if (this.connectedPos == null && this.connectedTank == null) {
+            return;
+        }
         this.connectedPos = null;
         this.connectedTank = null;
+        this.blockEntity.onFluidConnectionChanged();
     }
 
     private boolean canInteract() {
@@ -40,6 +48,10 @@ public class DockingConnectorTank extends SingleTank {
         }
 
         return this.connectedTank == other.tank;
+    }
+
+    boolean isConnectedTo(final DockingConnectorTank other) {
+        return this.connectedTank == other && this.canInteract();
     }
 
     @Override

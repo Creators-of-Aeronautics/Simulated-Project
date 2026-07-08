@@ -54,6 +54,7 @@
     "accessor.ControlledContraptionEntityAccessor",
     "accessor.CreateBlockEntityBuilderAccessor",
     "accessor.ParrotElementAccessor",
+    "accessor.PipeConnectionAccessor",
     "accessor.RedstoneLinkBlockEntityAccessor",
     "accessor.WorldSectionElementAccessor",
     "assembly_preventer.ServerSubLevelMixin",
