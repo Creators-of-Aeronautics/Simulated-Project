@@ -14,7 +14,7 @@ public enum AeroParticleTypes {
     HOT_AIR_EMBER(HotAirEmberParticleData::new),
     LEVITITE_SPARKLE(LevititeSparkleParticleData::new),
     GUST(GustParticleData::new),
-    AIR_POOF(AirPoofParticleData::new);
+    AIR_POOF(() -> AirPoofParticleData.INSTANCE);
 
     public final ParticleEntry<?> entry;
 

@@ -11,8 +11,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
 public class AirPoofParticleData implements ParticleOptions, ICustomParticleDataWithSprite<AirPoofParticleData> {
-    private static final MapCodec<AirPoofParticleData> CODEC = MapCodec.unit(AirPoofParticleData::new);
-    private final StreamCodec<FriendlyByteBuf, AirPoofParticleData> streamCodec = StreamCodec.unit(this);
+    public static final AirPoofParticleData INSTANCE = new AirPoofParticleData();
+    private static final MapCodec<AirPoofParticleData> CODEC = MapCodec.unit(INSTANCE);
+    private static final StreamCodec<FriendlyByteBuf, AirPoofParticleData> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+    private AirPoofParticleData() {}
 
     @Override
     public ParticleEngine.SpriteParticleRegistration<AirPoofParticleData> getMetaFactory() {
@@ -26,7 +29,7 @@ public class AirPoofParticleData implements ParticleOptions, ICustomParticleData
 
     @Override
     public StreamCodec<? super RegistryFriendlyByteBuf, AirPoofParticleData> getStreamCodec() {
-        return this.streamCodec;
+        return STREAM_CODEC;
     }
 
     @Override
