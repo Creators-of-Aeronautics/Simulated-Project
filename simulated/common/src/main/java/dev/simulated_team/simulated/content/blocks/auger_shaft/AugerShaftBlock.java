@@ -118,7 +118,7 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
 
         if (!(blockState.getBlock() instanceof AugerCogBlock)) {
             final Boolean encased = blockState.getValue(ENCASED);
-            if (encased && player.getItemInHand(interactionHand).is(AllItems.WRENCH.get())) {
+            if (encased && AllItems.WRENCH.isIn(player.getItemInHand(interactionHand))) {
                 if (level.isClientSide)
                     return ItemInteractionResult.SUCCESS;
 

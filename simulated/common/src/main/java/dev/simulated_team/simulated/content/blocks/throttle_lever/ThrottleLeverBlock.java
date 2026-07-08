@@ -67,7 +67,7 @@ public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock i
 
     @Override
     protected InteractionResult useWithoutItem(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult) {
-        if (player.getMainHandItem().is(AllItems.WRENCH)) {
+        if (AllItems.WRENCH.isIn(player.getMainHandItem())) {
             return InteractionResult.PASS;
         }
 
