@@ -130,10 +130,6 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
                     be.setCurrentBurnTime(PortableEngineBlockEntity.INFINITE_THRESHOLD);
                 }
             }
-            if (!player.hasInfiniteMaterials()) {
-                heldItem.shrink(1);
-                player.setItemInHand(interactionHand, heldItem);
-            }
         } else {
             if ((!heldItem.isEmpty() && !inventory.canInsertItem(ItemInfoWrapper.generateFromStack(heldItem)))) {
                 return ItemInteractionResult.FAIL;
