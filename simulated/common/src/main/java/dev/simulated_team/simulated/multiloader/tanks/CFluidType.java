@@ -1,10 +1,9 @@
 package dev.simulated_team.simulated.multiloader.tanks;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.simulated_team.simulated.Simulated;
-import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -12,60 +11,44 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A loader-independent representation of a fluid
  */
-public class CFluidType {
-
-    public final Fluid fluid;
-    DataComponentMap data;
-
-    public CFluidType(final ResourceLocation type, @Nullable final DataComponentMap data) {
-        this.fluid = BuiltInRegistries.FLUID.get(type);
-        this.data = data;
-    }
-
-    public CFluidType(final Fluid type, @Nullable final DataComponentMap data) {
-        this.fluid = type;
-        this.data = data;
-    }
-
+public record CFluidType(Fluid fluid, DataComponentPatch data) {
     public boolean isBlank() {
         return this.equals(BLANK);
     }
 
-    public static final CFluidType BLANK = new CFluidType(Fluids.EMPTY, null);
+    public static final CFluidType BLANK = new CFluidType(Fluids.EMPTY, DataComponentPatch.EMPTY);
 
     public CompoundTag write() {
         final CompoundTag tag = new CompoundTag();
         tag.putString("Fluid", BuiltInRegistries.FLUID.getKey(this.fluid).toString());
-        if (this.data != null) {
-            final Codec<DataComponentMap> codec = DataComponentMap.CODEC;
-            final DataResult<Tag> result = codec.encodeStart(NbtOps.INSTANCE, this.data);
 
-            if (result.isError()) {
-                Simulated.LOGGER.warn(result.error().get().message());
-            } else {
-                tag.put("data", result.result().get());
-            }
+        final DataResult<Tag> result = DataComponentPatch.CODEC.encodeStart(NbtOps.INSTANCE, this.data);
+        if (result.isError()) {
+            Simulated.LOGGER.warn(result.error().get().message());
+        } else {
+            tag.put("data", result.result().get());
         }
+
         return tag;
     }
 
     public static CFluidType read(final CompoundTag tag) {
-        DataComponentMap map = null;
+        final Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(tag.getString("Fluid")));
+        DataComponentPatch data = DataComponentPatch.EMPTY;
         if (tag.contains("data")) {
-            final DataResult<Pair<DataComponentMap, Tag>> result = DataComponentMap.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));
+            final DataResult<Pair<DataComponentPatch, Tag>> result = DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));
             if (result.isError()) {
                 Simulated.LOGGER.warn(result.error().get().message());
             } else {
-                map = result.result().get().getFirst();
+                data = result.result().get().getFirst();
             }
         }
 
-        return new CFluidType(ResourceLocation.parse(tag.getString("Fluid")), map);
+        return new CFluidType(fluid, data);
     }
 
     @Override
@@ -74,11 +57,9 @@ public class CFluidType {
             return true;
         }
 
-        if (obj instanceof final CFluidType other) {
+        if (obj instanceof CFluidType(Fluid fluid1, DataComponentPatch data1)) {
             // both haves tag, or both no haves tag
-            if ((this.data == null) == (other.data == null)) {
-                return this.fluid.isSame(other.fluid) && (this.data == null || this.data.equals(other.data));
-            }
+            return this.fluid.isSame(fluid1) && this.data.equals(data1);
         }
         return false;
     }
