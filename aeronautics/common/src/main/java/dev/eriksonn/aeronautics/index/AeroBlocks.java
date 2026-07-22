@@ -4,6 +4,7 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
+import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.foundation.block.DyedBlockList;
 import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import com.simibubi.create.foundation.data.AssetLookup;
@@ -11,6 +12,8 @@ import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.utility.DyeHelper;
 import com.tterrag.registrate.builders.BlockBuilder;
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -18,6 +21,7 @@ import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.config.server.AeroStress;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.envelope.EnvelopeBlock;
+import dev.eriksonn.aeronautics.content.blocks.hot_air.envelope.EnvelopeEncasedPipeBlock;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.envelope.EnvelopeEncasedShaftBlock;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.hot_air_burner.HotAirBurnerBlock;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.steam_vent.SteamVentBlock;
@@ -35,6 +39,7 @@ import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.sounds.SimLazySoundType;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import dev.simulated_team.simulated.registrate.simulated_tab.CreativeTabItemTransforms;
+import net.createmod.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -59,6 +64,8 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
@@ -170,6 +177,37 @@ public class AeroBlocks {
                 .item()
                 .tag(AeroTags.ItemTags.ENVELOPE)
                 .transform(b -> b.model(SimBlockStateGen.coloredBlockItemModel("envelope_block/envelope_" + colorName, "envelope_encased_shaft/item")).build())
+                .register();
+    });
+
+    public static final DyedBlockList<EnvelopeEncasedPipeBlock> ENVELOPE_ENCASED_FLUID_PIPES = new DyedBlockList<>(color -> {
+        String colorName = color.getSerializedName();
+
+        return REGISTRATE.block(colorName + "_envelope_encased_fluid_pipe", p -> EnvelopeEncasedPipeBlock.withCanvas(p, color))
+                .initialProperties(SharedProperties::wooden)
+                .properties(p -> p.sound(SoundType.SCAFFOLDING))
+                .properties(BlockBehaviour.Properties::noOcclusion)
+                .properties(p -> p.sound(
+                        new SimLazySoundType(1.0f, 1.0f,
+                                AeroSoundEvents.ENVELOPE_BREAK::event,
+                                () -> SoundEvents.WOOL_STEP,
+                                AeroSoundEvents.ENVELOPE_PLACE::event,
+                                AeroSoundEvents.ENVELOPE_HIT::event,
+                                () -> SoundEvents.WOOL_FALL)))
+                .properties(p -> p.mapColor(color))
+                .transform(b -> b.transform(EncasingRegistry.addVariantTo(AllBlocks.FLUID_PIPE)))
+                .blockstate((c, p) -> AeroBlocks.encasedFluidPipesBlockstates(colorName, c, p))
+                .loot((p, b) -> p.add(b, p.createSingleItemTable(DYED_ENVELOPE_BLOCKS.get(color))
+                        .withPool(p.applyExplosionCondition(AllBlocks.FLUID_PIPE.get(), LootPool.lootPool()
+                                .setRolls(ConstantValue.exactly(1.0F))
+                                .add(LootItem.lootTableItem(AllBlocks.FLUID_PIPE.get()))))))
+                .tag(AeroTags.BlockTags.ENVELOPE)
+                .transform(axeOrPickaxe())
+                .transform(EncasingRegistry.addVariantTo(AllBlocks.FLUID_PIPE))
+                .transform(CreativeTabItemTransforms.VisibilityType.INVISIBLE.applyBlock())
+                .item()
+                .tag(AeroTags.ItemTags.ENVELOPE)
+                .transform(b -> b.model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/envelope_encased_fluid_pipe/item")).texture("0", p.modLoc("block/" + "envelope_block/envelope_" + colorName)).texture("1", p.modLoc("block/" + "envelope_block/pipe_" + colorName))).build())
                 .register();
     });
 
@@ -389,6 +427,24 @@ public class AeroBlocks {
     private static <B extends Block, R> NonNullUnaryOperator<BlockBuilder<B, R>> flammable(final int encouragement, final int flamability) {
         return builder -> builder.onRegisterAfter(Registries.BLOCK, block -> ((FireBlock) Blocks.FIRE)
                 .setFlammable(block, encouragement, flamability));
+    }
+
+    private static void encasedFluidPipesBlockstates(String colorName, DataGenContext<Block, EnvelopeEncasedPipeBlock> c, RegistrateBlockstateProvider p) {
+        ModelFile flat = p.models().withExistingParent("envelope_encased_fluid_pipe/" + colorName + "/block_flat", p.modLoc("block/envelope_encased_fluid_pipe/block")).texture("0", p.modLoc("block/envelope_block/envelope_" + colorName));
+        ModelFile open = p.models().withExistingParent("envelope_encased_fluid_pipe/" + colorName + "/block_open", p.modLoc("block/envelope_encased_fluid_pipe/block")).texture("0", p.modLoc("block/envelope_block/pipe_" + colorName));
+        MultiPartBlockStateBuilder builder = p.getMultipartBuilder(c.get());
+        for (boolean flatPass : Iterate.trueAndFalse)
+            for (Direction d : Iterate.directions) {
+                int verticalAngle = d == Direction.UP ? 90 : d == Direction.DOWN ? -90 : 0;
+                builder.part()
+                        .modelFile(flatPass ? flat : open)
+                        .rotationX(verticalAngle)
+                        .rotationY((int) (d.toYRot() + (d.getAxis()
+                                .isVertical() ? 90 : 0)) % 360)
+                        .addModel()
+                        .condition(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(d), !flatPass)
+                        .end();
+            }
     }
 
     public static void init() {

@@ -1,20 +1,16 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.envelope;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.simibubi.create.content.decoration.encasing.CasingBlock;
 import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.foundation.utility.BlockHelper;
-import dev.simulated_team.simulated.service.SimItemService;
 import dev.eriksonn.aeronautics.index.AeroBlocks;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -136,17 +132,7 @@ public class EnvelopeBlock extends CasingBlock implements Envelope, SpecialBlock
 
     @Override
     protected ItemInteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
-        final DyeColor color = SimItemService.getDyeColor(itemStack);
-
-        if (color != null) {
-            if (!level.isClientSide())
-                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.random.nextFloat() * .2f);
-
-            EnvelopeBlock.applyDye(blockState, level, blockPos, color);
-            return ItemInteractionResult.SUCCESS;
-        }
-
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return EnvelopeBlockHelper.useItemOnHelper(itemStack, blockState, level, blockPos);
     }
 
     @Override
