@@ -25,6 +25,10 @@ public record TireLike(float radius, Vec3 rotation, Vec3 offset, Optional<Resour
         this(radius, rotation, offset, Optional.ofNullable(model), minimumFriction);
     }
 
+    public TireLike(float radius, Vec3 rotation, Vec3 offset, @Nullable ResourceLocation model) {
+        this(radius, rotation, offset, Optional.ofNullable(model), 0.0f);
+    }
+
     public TireLike(final float radius) {
         this(radius, new Vec3(90, 0, 0), new Vec3(0, 0, 0), Optional.empty(), 0.0f);
     }
