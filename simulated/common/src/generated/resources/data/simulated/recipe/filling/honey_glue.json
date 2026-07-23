@@ -2,7 +2,7 @@
   "type": "create:filling",
   "ingredients": [
     {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     },
     {
       "type": "neoforge:tag",

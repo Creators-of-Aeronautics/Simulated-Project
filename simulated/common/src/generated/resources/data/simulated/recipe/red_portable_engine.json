@@ -9,7 +9,7 @@
       "item": "simulated:engine_assembly"
     },
     "G": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     }
   },
   "pattern": [

@@ -7,7 +7,7 @@
       "item": "create:andesite_alloy"
     },
     "C": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "F": {
       "item": "create:fluid_pipe"
@@ -16,7 +16,7 @@
       "item": "create:precision_mechanism"
     },
     "P": {
-      "item": "minecraft:slime_ball"
+      "tag": "c:slime_balls"
     },
     "R": {
       "item": "simulated:rope_coupling"

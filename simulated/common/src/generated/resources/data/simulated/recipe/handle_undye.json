@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "group": "simulated:handle_variants",
   "ingredients": [
     {
       "tag": "simulated:handle_variants"

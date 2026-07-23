@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "create:brass_sheet"
+      "tag": "c:plates/brass"
     },
     "Q": {
       "item": "create:polished_rose_quartz"

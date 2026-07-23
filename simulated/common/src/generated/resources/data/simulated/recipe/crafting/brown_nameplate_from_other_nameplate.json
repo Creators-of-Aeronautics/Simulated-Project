@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "building",
+  "group": "simualted:nameplate_dyeing",
   "ingredients": [
     {
       "tag": "c:dyes/brown"

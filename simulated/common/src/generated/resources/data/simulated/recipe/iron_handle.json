@@ -6,7 +6,7 @@
       "item": "create:andesite_alloy"
     },
     "N": {
-      "item": "minecraft:iron_nugget"
+      "tag": "c:nuggets/iron"
     }
   },
   "pattern": [

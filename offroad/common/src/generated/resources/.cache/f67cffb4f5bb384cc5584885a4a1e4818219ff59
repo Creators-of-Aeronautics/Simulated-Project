@@ -1,4 +1,4 @@
-// 1.21.1	2026-02-21T18:10:28.1946938	Registrate Provider for offroad [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-07-23T16:50:07.2439536	Registrate Provider for offroad [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 391999b98b747618f6d0747ff37dba343f55f808 assets/offroad/blockstates/borehead_bearing.json
 fdd42023819a798396a345b899de18fb46e8c75d assets/offroad/blockstates/rockcutting_wheel.json
 ed2affc71ca4425cd5bc760b760917bcdc836e0c assets/offroad/blockstates/wheel_mount.json
@@ -27,9 +27,9 @@ dfb700a88f1e8cdab15de155ea8885779b1e5a8a data/offroad/loot_table/blocks/rockcutt
 3ab7d13192eb08f1546aae7b2568c32f17d11b11 data/offroad/recipe/borehead_bearing.json
 007d201e43287fb84446519fa75fa9bb20961401 data/offroad/recipe/large_tire.json
 5ddb34872d48c57511fa2d23bc72acc39b30984f data/offroad/recipe/monstrous_tire.json
-5d2e1e9309350a0880316f917678ce85eedb6777 data/offroad/recipe/rockcutting_wheel.json
+8cdafdb451df9d127b3a232eb83c32dc05c547bd data/offroad/recipe/rockcutting_wheel.json
 24fd66ff0c712f89b0dd515c8140419009b652be data/offroad/recipe/small_tire.json
 0beb6d3588134479295bf22494a65a5a332c35d5 data/offroad/recipe/tire.json
-38ae80e0e057c294aa937c5c0dfdf5b3803f80a1 data/offroad/recipe/wheel_mount.json
+509e20632f1c45a07d0dd989be3e6225448500c6 data/offroad/recipe/wheel_mount.json
 517625696f89da7636e3126a405201cc977453f0 data/offroad/tags/block/borehead_effective.json
 19b073a7559571c409a9e82de27bfabac67ee6ac data/offroad/tags/block/borehead_super_effective.json

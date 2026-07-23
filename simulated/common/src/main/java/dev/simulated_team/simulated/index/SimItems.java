@@ -1,9 +1,9 @@
 package dev.simulated_team.simulated.index;
 
-import com.simibubi.create.AllItems;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -33,8 +33,8 @@ public class SimItems {
             REGISTRATE.item("contraption_diagram", DiagramItem::new)
                     .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(Items.PAPER)
-                            .requires(SimBlocks.PHYSICS_ASSEMBLER.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimBlocks.PHYSICS_ASSEMBLER.get()))
+                            .requires(SimBlocks.PHYSICS_ASSEMBLER)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimBlocks.PHYSICS_ASSEMBLER))
                             .save(p))
                     .register();
 
@@ -45,9 +45,9 @@ public class SimItems {
                                     .pattern("S")
                                     .pattern("N")
                                     .pattern("S")
-                                    .define('S', AllItems.IRON_SHEET)
-                                    .define('N', Items.IRON_NUGGET)
-                                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                                    .define('S', CommonMetal.IRON.plates)
+                                    .define('N', CommonMetal.IRON.nuggets)
+                                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
                                     .save(prov)
                     )
                     .register();

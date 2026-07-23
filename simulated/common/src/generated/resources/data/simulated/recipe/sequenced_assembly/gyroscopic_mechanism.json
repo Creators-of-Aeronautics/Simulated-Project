@@ -1,7 +1,7 @@
 {
   "type": "create:sequenced_assembly",
   "ingredient": {
-    "item": "create:iron_sheet"
+    "tag": "c:plates/iron"
   },
   "loops": 5,
   "results": [
@@ -69,7 +69,7 @@
           "item": "simulated:incomplete_gyroscopic_mechanism"
         },
         {
-          "item": "create:brass_nugget"
+          "tag": "c:nuggets/brass"
         }
       ],
       "results": [

@@ -13,6 +13,7 @@ import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.SharedProperties;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
@@ -87,6 +88,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.Nullable;
 
 import static com.simibubi.create.api.behaviour.movement.MovementBehaviour.movementBehaviour;
@@ -108,10 +110,10 @@ public class SimBlocks {
                             .pattern("   ")
                             .pattern(" N ")
                             .pattern("ARA")
-                            .define('A', AllItems.ANDESITE_ALLOY.get())
+                            .define('A', AllItems.ANDESITE_ALLOY)
                             .define('N', Items.LEVER)
-                            .define('R', AllBlocks.ANDESITE_CASING.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING.get()))
+                            .define('R', AllBlocks.ANDESITE_CASING)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .register();
 
@@ -134,9 +136,9 @@ public class SimBlocks {
                             .pattern(" B ")
                             .pattern(" C ")
                             .define('A', ItemTags.WOODEN_SLABS)
-                            .define('B', AllBlocks.INDUSTRIAL_IRON_BLOCK.get())
-                            .define('C', AllBlocks.COGWHEEL.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING.get()))
+                            .define('B', AllBlocks.INDUSTRIAL_IRON_BLOCK)
+                            .define('C', AllBlocks.COGWHEEL)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .register();
 
@@ -174,10 +176,10 @@ public class SimBlocks {
                             .pattern("I")
                             .pattern("H")
                             .pattern("S")
-                            .define('I', AllItems.IRON_SHEET)
+                            .define('I', CommonMetal.IRON.plates)
                             .define('H', AllBlocks.SHAFT)
-                            .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                            .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.ROPE_COUPLING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -194,9 +196,9 @@ public class SimBlocks {
                     .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("I")
                             .pattern("S")
-                            .define('I', AllItems.IRON_SHEET)
-                            .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                            .define('I', CommonMetal.IRON.plates)
+                            .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.ROPE_COUPLING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -207,12 +209,13 @@ public class SimBlocks {
                 ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
                     .pattern("N")
                     .pattern("A")
-                    .define('N', Items.IRON_NUGGET)
-                    .define('A', AllItems.ANDESITE_ALLOY.get())
+                    .define('N', CommonMetal.IRON.nuggets)
+                    .define('A', AllItems.ANDESITE_ALLOY)
                     .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.ANDESITE_ALLOY))
                     .save(p);
                 ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                     .requires(SimTags.Items.HANDLE_VARIANTS)
+                    .group("simulated:handle_variants")
                     .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.HANDLE_VARIANTS))
                     .save(p, Simulated.path("handle_undye"));
             })
@@ -221,9 +224,9 @@ public class SimBlocks {
     public static final BlockEntry<HandleBlock> COPPER_HANDLE = createHandle(null, HandleBlock.Variant.COPPER)
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                     .requires(IRON_HANDLE)
-                    .requires(AllItems.COPPER_NUGGET)
+                    .requires(CommonMetal.COPPER.nuggets)
                     .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(IRON_HANDLE))
-                    .group("handle_variants")
+                    .group("simulated:handle_variants")
                     .save(p))
             .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
             .register();
@@ -234,7 +237,7 @@ public class SimBlocks {
                         .requires(IRON_HANDLE)
                         .requires(DyeItem.byColor(color))
                         .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(IRON_HANDLE))
-                        .group("handle_variants")
+                        .group("simulated:handle_variants")
                         .save(p))
                 .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
                 .register()
@@ -293,13 +296,14 @@ public class SimBlocks {
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 2)
                                 .requires(AllBlocks.CHUTE)
                                 .requires(AllBlocks.SHAFT)
-                                .requires(AllItems.IRON_SHEET)
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                                .requires(CommonMetal.IRON.plates)
+                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
                                 .save(p);
 
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
-                                .requires(SimBlocks.AUGER_COG.get())
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                                .requires(SimBlocks.AUGER_COG)
+                                .group("simulated:auger_swap")
+                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
                                 .save(p, Simulated.path(c.getName() + "_from_auger_cogwheel"));
                     })
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
@@ -317,7 +321,8 @@ public class SimBlocks {
                     .transform(SimStress.setImpact(0.5))
                     .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(SimBlocks.AUGER_SHAFT.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.IRON_SHEET))
+                            .group("simulated:auger_swap")
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
                             .save(p, Simulated.path(c.getName() + "_from_auger_shaft")))
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
@@ -336,10 +341,10 @@ public class SimBlocks {
                             .pattern("G")
                             .pattern("E")
                             .pattern("B")
-                            .define('G', AllItems.IRON_SHEET.get())
+                            .define('G', CommonMetal.IRON.plates)
                             .define('E', SimItems.ENGINE_ASSEMBLY)
                             .define('B', Blocks.BLAST_FURNACE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
                             .save(p))
                     .item()
                     .model((c, p) -> p
@@ -395,7 +400,7 @@ public class SimBlocks {
                             .pattern("C")
                             .define('A', SimTags.Items.LASER_POINTER_LENS)
                             .define('T', Items.REDSTONE_TORCH)
-                            .define('C', AllBlocks.ANDESITE_CASING.get())
+                            .define('C', AllBlocks.ANDESITE_CASING)
                             .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -417,7 +422,7 @@ public class SimBlocks {
                             .pattern("C")
                             .define('G', Blocks.TINTED_GLASS)
                             .define('A', SimTags.Items.LASER_POINTER_LENS)
-                            .define('C', AllBlocks.ANDESITE_CASING.get())
+                            .define('C', AllBlocks.ANDESITE_CASING)
                             .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
@@ -438,8 +443,8 @@ public class SimBlocks {
                             .pattern("A")
                             .define('P', AllItems.PROPELLER)
                             .define('B', Blocks.BARREL)
-                            .define('A', AllBlocks.ANDESITE_CASING.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING.get()))
+                            .define('A', AllBlocks.ANDESITE_CASING)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item().transform(customItemModel())
                     .addLayer(() -> RenderType::cutoutMipped)
@@ -462,9 +467,9 @@ public class SimBlocks {
                             .pattern("S")
                             .pattern("A")
                             .define('P', Items.PAPER)
-                            .define('S', AllItems.IRON_SHEET)
-                            .define('A', AllBlocks.ANDESITE_CASING.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING.get()))
+                            .define('S', CommonMetal.IRON.plates)
+                            .define('A', AllBlocks.ANDESITE_CASING)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -487,7 +492,7 @@ public class SimBlocks {
                             .define('C', Items.COMPASS)
                             .define('G', SimItems.GYRO_MECHANISM)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.GYRO_MECHANISM.get()))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.GYRO_MECHANISM))
                             .save(p)
                     )
                     .blockstate(BlockStateGen.horizontalAxisBlockProvider(true))
@@ -531,10 +536,10 @@ public class SimBlocks {
                             .pattern(" A ")
                             .pattern(" C ")
                             .pattern(" B ")
-                            .define('A', Items.AMETHYST_SHARD)
-                            .define('B', AllBlocks.BRASS_CASING.get())
-                            .define('C', AllItems.ELECTRON_TUBE.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .define('A', Tags.Items.GEMS_AMETHYST)
+                            .define('B', AllBlocks.BRASS_CASING)
+                            .define('C', AllItems.ELECTRON_TUBE)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -587,11 +592,11 @@ public class SimBlocks {
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .item().transform(customItemModel())
                     .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
-                            .requires(AllBlocks.BRASS_CASING.get())
-                            .requires(AllBlocks.SHAFT.get())
-                            .requires(AllBlocks.COGWHEEL.get())
-                            .requires(AllItems.ELECTRON_TUBE.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .requires(AllBlocks.BRASS_CASING)
+                            .requires(AllBlocks.SHAFT)
+                            .requires(AllBlocks.COGWHEEL)
+                            .requires(AllItems.ELECTRON_TUBE)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -613,8 +618,8 @@ public class SimBlocks {
                             .pattern("S")
                             .define('C', AllBlocks.LARGE_COGWHEEL)
                             .define('A', AllBlocks.ANDESITE_CASING)
-                            .define('S', AllBlocks.SHAFT.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.SHAFT.get()))
+                            .define('S', AllBlocks.SHAFT)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -632,7 +637,7 @@ public class SimBlocks {
                             .pattern("B")
                             .define('S', Items.STICK)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -666,10 +671,10 @@ public class SimBlocks {
                             .pattern("A")
                             .pattern("B")
                             .pattern("C")
-                            .define('A', AllItems.TRANSMITTER.get())
-                            .define('B', AllItems.IRON_SHEET.get())
-                            .define('C', AllBlocks.BRASS_CASING.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .define('A', AllItems.TRANSMITTER)
+                            .define('B', CommonMetal.IRON.plates)
+                            .define('C', AllBlocks.BRASS_CASING)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -686,10 +691,10 @@ public class SimBlocks {
                             .pattern("A")
                             .pattern("B")
                             .pattern("C")
-                            .define('A', AllItems.TRANSMITTER.get())
-                            .define('B', AllItems.GOLDEN_SHEET.get())
-                            .define('C', AllBlocks.BRASS_CASING.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .define('A', AllItems.TRANSMITTER)
+                            .define('B', CommonMetal.GOLD.plates)
+                            .define('C', AllBlocks.BRASS_CASING)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -703,7 +708,7 @@ public class SimBlocks {
                             .pattern("RBT")
                             .pattern("SSS")
                             .define('T', Blocks.REDSTONE_TORCH)
-                            .define('B', AllItems.BRASS_SHEET.get())
+                            .define('B', CommonMetal.BRASS.plates)
                             .define('R', SimTags.Items.REDSTONE_DUST)
                             .define('Q', AllItems.POLISHED_ROSE_QUARTZ)
                             .define('S', SimTags.Items.STONE)
@@ -725,8 +730,8 @@ public class SimBlocks {
                             .pattern("SSS")
                             .define('T', Blocks.REDSTONE_TORCH)
                             .define('R', SimTags.Items.REDSTONE_DUST)
-                            .define('B', AllItems.BRASS_SHEET.get())
-                            .define('C', AllItems.COPPER_SHEET.get())
+                            .define('B', CommonMetal.BRASS.plates)
+                            .define('C', CommonMetal.COPPER.plates)
                             .define('S', SimTags.Items.STONE)
                             .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.REDSTONE_DUST))
                             .save(p))
@@ -768,10 +773,10 @@ public class SimBlocks {
                     .tag(SimTags.Items.ROTATE_WITH_NAV_ARROW)
                     .transform(customItemModel())
                     .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
-                            .requires(Items.REDSTONE)
-                            .requires(AllItems.COPPER_SHEET.get())
-                            .requires(AllBlocks.INDUSTRIAL_IRON_BLOCK.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(Items.COPPER_INGOT))
+                            .requires(SimTags.Items.REDSTONE_DUST)
+                            .requires(CommonMetal.COPPER.plates)
+                            .requires(AllBlocks.INDUSTRIAL_IRON_BLOCK)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.COPPER.ingots))
                             .save(p))
                     .register();
 
@@ -786,12 +791,13 @@ public class SimBlocks {
                                     (state) -> p.models().getExistingFile(Simulated.path("block/symmetric_sail/block"))))
                     .recipe((c, p) -> {
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 2)
-                                .requires(AllBlocks.SAIL.get())
-                                .requires(AllBlocks.SAIL.get())
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.SAIL.get()))
+                                .requires(AllBlocks.SAIL)
+                                .requires(AllBlocks.SAIL)
+                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.SAIL))
                                 .save(p);
 
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AllBlocks.SAIL.get(), 1)
+                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AllBlocks.SAIL, 1)
+                                .group("simulated:sail_asymmetry")
                                 .requires(c.get())
                                 .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(c.get()))
                                 .save(p);
@@ -845,12 +851,13 @@ public class SimBlocks {
                                     .requires(Items.PAPER)
                                     .requires(Items.STICK)
                                     .requires(AllItems.ANDESITE_ALLOY)
-                                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.ANDESITE_ALLOY.get()))
+                                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.ANDESITE_ALLOY))
                                     .save(p);
                         }
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                                 .requires(SimTags.DYE_MAP.get(colorName))
                                 .requires(SimTags.Items.NAMEPLATE_ITEMS)
+                                .group("simualted:nameplate_dyeing")
                                 .unlockedBy("has_nameplate", RegistrateRecipeProvider.has(SimTags.Items.NAMEPLATE_ITEMS))
                                 .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_nameplate"));
                     });

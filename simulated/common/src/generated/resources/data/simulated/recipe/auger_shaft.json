@@ -9,7 +9,7 @@
       "item": "create:shaft"
     },
     {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     }
   ],
   "result": {

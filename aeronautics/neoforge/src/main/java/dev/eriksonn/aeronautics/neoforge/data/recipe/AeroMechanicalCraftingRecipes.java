@@ -1,14 +1,14 @@
 package dev.eriksonn.aeronautics.neoforge.data.recipe;
 
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.index.AeroBlocks;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,8 +23,8 @@ public class AeroMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
 					.patternLine("SR  ")
 					.patternLine("KCPP")
 					.patternLine("SR  ")
-					.key('S', AllItems.COPPER_SHEET)
-					.key('R', Items.REDSTONE)
+					.key('S', CommonMetal.COPPER.plates)
+					.key('R', Tags.Items.DUSTS_REDSTONE)
 					.key('K', Blocks.DRIED_KELP_BLOCK)
 					.key('C', AllBlocks.COGWHEEL)
 					.key('P', AllBlocks.FLUID_PIPE)

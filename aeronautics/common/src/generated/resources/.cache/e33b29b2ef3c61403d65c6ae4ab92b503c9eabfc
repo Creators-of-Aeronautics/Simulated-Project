@@ -1,4 +1,4 @@
-// 1.21.1	2025-12-13T11:33:32.8096344	Aero's Perfect Processing Recipes
+// 1.21.1	2026-07-23T16:49:42.7412551	Aero's Perfect Processing Recipes
 818c78f964a2cc60de745bd7957702a3388be60f data/aeronautics/recipe/crushing/end_stone_powder.json
 e86499d559ca8944c54ff9e2a65ec33420e4324c data/aeronautics/recipe/deploying/deploying_envelope_black.json
 a388cbd16617d5f3e07893e70989781a2db0a828 data/aeronautics/recipe/deploying/deploying_envelope_blue.json
@@ -16,6 +16,6 @@ e260bc183a00f4dd876cf5ef402bac2a8203b506 data/aeronautics/recipe/deploying/deplo
 6f98d337dbfa2486b1fdf2c3b64db75e1402c766 data/aeronautics/recipe/deploying/deploying_envelope_red.json
 2d3894a14db326f12d613927acf78316138024ad data/aeronautics/recipe/deploying/deploying_envelope_white.json
 3488b11a1a3d27982a038b6668d183ef2ab2fa9d data/aeronautics/recipe/deploying/deploying_envelope_yellow.json
-96fc6589cba56ac6f5b98e7c3cf26e17bad44850 data/aeronautics/recipe/mechanical_crafting/mounted_potato_cannon.json
+937032d10db9c75ab6e38e2f27171011b65041b0 data/aeronautics/recipe/mechanical_crafting/mounted_potato_cannon.json
 c0e82ee88e3bdfa7276cfd8c54d6a6f911534923 data/aeronautics/recipe/mixing/levitite_blend.json
 81f5810d10a258a0de471860c50db521348062a8 data/aeronautics/recipe/splashing/envelope_washing.json

@@ -1,14 +1,11 @@
 package dev.ryanhcode.offroad.index;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.content.contraptions.actors.roller.RollerBlockItem;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.SharedProperties;
-import dev.simulated_team.simulated.data.SimBlockStateGen;
-import dev.simulated_team.simulated.index.SimItems;
-import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.ryanhcode.offroad.Offroad;
@@ -18,6 +15,9 @@ import dev.ryanhcode.offroad.content.blocks.rock_cutting_wheel.RockCuttingWheelA
 import dev.ryanhcode.offroad.content.blocks.rock_cutting_wheel.RockCuttingWheelBlock;
 import dev.ryanhcode.offroad.content.blocks.wheel_mount.WheelMountBlock;
 import dev.ryanhcode.offroad.content.components.TireLike;
+import dev.simulated_team.simulated.data.SimBlockStateGen;
+import dev.simulated_team.simulated.index.SimItems;
+import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -56,7 +56,7 @@ public class OffroadBlocks {
                             .define('S', ItemTags.WOODEN_SLABS)
                             .define('G', AllBlocks.GEARBOX)
                             .define('I', AllBlocks.INDUSTRIAL_IRON_BLOCK)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.INDUSTRIAL_IRON_BLOCK.get()))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.INDUSTRIAL_IRON_BLOCK))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -80,8 +80,8 @@ public class OffroadBlocks {
                             .pattern("S")
                             .define('C', AllBlocks.CRUSHING_WHEEL)
                             .define('G', AllBlocks.INDUSTRIAL_IRON_BLOCK)
-                            .define('S', AllItems.IRON_SHEET)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.INDUSTRIAL_IRON_BLOCK.get()))
+                            .define('S', CommonMetal.IRON.plates)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.INDUSTRIAL_IRON_BLOCK))
                             .save(p))
                     .item()
                     .properties(x -> x.component(OffroadDataComponents.TIRE, TireLike.ROCKCUTTING_WHEEL))
@@ -106,10 +106,10 @@ public class OffroadBlocks {
                             .pattern("C")
                             .pattern("S")
                             .pattern("P")
-                            .define('C', AllBlocks.ANDESITE_CASING.get())
-                            .define('S', SimItems.SPRING.asItem())
-                            .define('P', AllItems.IRON_SHEET.asItem())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING.get()))
+                            .define('C', AllBlocks.ANDESITE_CASING)
+                            .define('S', SimItems.SPRING)
+                            .define('P', CommonMetal.IRON.plates)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .register();
 

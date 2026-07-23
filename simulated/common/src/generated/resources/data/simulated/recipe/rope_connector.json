@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "I": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     },
     "S": {
       "item": "create:industrial_iron_block"
