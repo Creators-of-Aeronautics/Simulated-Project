@@ -148,11 +148,14 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
                 return;
             }
 
+            final ServerSubLevel standingSubLevel = (ServerSubLevel) Sable.HELPER.getTrackingSubLevel(player);
+
+            boolean handleNewtonThirdLaw = SimConfigService.INSTANCE.server().physics.handleNewtonThirdLaw.get();
+
             if (!player.onGround() && !player.isInWater() && !player.getAbilities().flying &&!player.onClimbable()) {
                 return;
             } else {
-                final SubLevel standingSubLevel = Sable.HELPER.getTrackingSubLevel(player);
-                if (standingSubLevel == subLevel) {
+                if (standingSubLevel == subLevel && handleNewtonThirdLaw) {
                     return;
                 }
             }
@@ -172,10 +175,23 @@ public class HandleBlockEntity extends SmartBlockEntity implements BlockEntitySu
 
             final SubLevelPhysicsSystem physicsSystem = container.physicsSystem();
 
-            this.constraintHandle = physicsSystem.getPipeline().addConstraint(
-                    null, subLevel,
-                    new FreeConstraintConfiguration(constraintGoal, constraintPosition, new Quaterniond())
-            );
+            if (handleNewtonThirdLaw){
+                if (standingSubLevel != null) {
+                    standingSubLevel.logicalPose().transformPositionInverse(constraintGoal);
+                }
+
+                this.constraintHandle = physicsSystem.getPipeline().addConstraint(
+                        standingSubLevel, subLevel,
+                        new FreeConstraintConfiguration(constraintGoal, constraintPosition, new Quaterniond())
+                );
+            } else {
+                this.constraintHandle = physicsSystem.getPipeline().addConstraint(
+                        null, subLevel,
+                        new FreeConstraintConfiguration(constraintGoal, constraintPosition, new Quaterniond())
+                );
+            }
+
+
 
             final double maxForce = SimConfigService.INSTANCE.server().physics.handleMaxForce.getF();
 

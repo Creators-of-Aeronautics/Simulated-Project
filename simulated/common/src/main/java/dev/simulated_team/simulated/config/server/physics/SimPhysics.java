@@ -18,6 +18,7 @@ public class SimPhysics extends ConfigBase {
     public final ConfigFloat dockingConnectorAngleTolerance = this.f(20.0f, 0, 365.0F, "docking_connector_angle", Comments.dockingConnectorAngleTolerance);
     public final ConfigFloat dockingConnectorDistanceTolerance = this.f(0.5F, 0, 4, "docking_connector_distance", Comments.dockingConnectorDistanceTolerance);
     public final ConfigFloat handleMaxForce = this.f(120.0f, 0, Float.MAX_VALUE,"handleMaxForce", Comments.handleMaxForce);
+    public final ConfigBool handleNewtonThirdLaw = this.b(true, "handleNewtonThirdLaw", Comments.handleNewtonThirdLaw);
 
     public final ConfigFloat physicsStaffLinearStiffness = this.f(2650.0f, 0, Float.MAX_VALUE, "physics_staff_linear_stiffness", SimPhysics.Comments.physicsStaffLinearStiffness);
     public final ConfigFloat physicsStaffLinearDamping = this.f(125.0f, 0, Float.MAX_VALUE, "physics_staff_linear_damping", SimPhysics.Comments.physicsStaffLinearDamping);
@@ -44,6 +45,7 @@ public class SimPhysics extends ConfigBase {
         private static final String dockingConnectorAngleTolerance = "The angle tolerance in degrees for docking connectors to link";
         private static final String dockingConnectorDistanceTolerance = "The distance tolerance in blocks for docking connectors to link";
         private static final String handleMaxForce = "The maximum force handles are allowed to apply to the contraption they are attached to";
+        private static final String handleNewtonThirdLaw = "Whether handles obey Newton's Third Law (equal and opposite reaction force on the contraption)";
 
         public static String physicsStaffLinearStiffness = "The linear stiffness of the joint motors used to hold sub-levels by the Creative Physics Staff";
         public static String physicsStaffLinearDamping = "The linear damping of the joint motors used to hold sub-levels by the Creative Physics Staff";
