@@ -331,7 +331,6 @@
   "simulated.linked_typewriter.title": "タイプライターリンク",
   "simulated.merging_glue.block_exists": "ここにブロックが存在します！",
   "simulated.merging_glue.connection_terminated": "選択が破棄されました",
-  "simulated.merging_glue.invalid_directions": "無効な方向です！",
   "simulated.merging_glue.not_enough_support": "この面は十分なサポートがありません！",
   "simulated.merging_glue.only_between_sub_levels": "疑似からくりの間のみ接着できます！",
   "simulated.merging_glue.out_of_range": "範囲外です！",

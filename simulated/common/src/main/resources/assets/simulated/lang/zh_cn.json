@@ -333,7 +333,6 @@
   "simulated.linked_typewriter.title": "无线红石打字机",
   "simulated.merging_glue.block_exists": "此处已有方块！",
   "simulated.merging_glue.connection_terminated": "已取消选择",
-  "simulated.merging_glue.invalid_directions": "无效的方向！",
   "simulated.merging_glue.not_enough_support": "此面没有足够的支撑！",
   "simulated.merging_glue.only_between_sub_levels": "只能在物理结构之间进行黏合！",
   "simulated.merging_glue.out_of_range": "超出范围！",
