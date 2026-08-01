@@ -333,7 +333,6 @@
   "simulated.linked_typewriter.title": "Віддалена друкарська машинка",
   "simulated.merging_glue.block_exists": "Тут уже розміщено блок!",
   "simulated.merging_glue.connection_terminated": "Виділення скинуто",
-  "simulated.merging_glue.invalid_directions": "Неприпустимі напрями!",
   "simulated.merging_glue.not_enough_support": "Ця грань не має достатньої підтримки!",
   "simulated.merging_glue.only_between_sub_levels": "Можна склеювати лише симульовані приладини!",
   "simulated.merging_glue.out_of_range": "Поза зоною досяжности!",
