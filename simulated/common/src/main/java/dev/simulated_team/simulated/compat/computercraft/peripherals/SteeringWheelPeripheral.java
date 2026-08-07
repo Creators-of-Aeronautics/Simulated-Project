@@ -30,12 +30,12 @@ public class SteeringWheelPeripheral extends SimPeripheral<SteeringWheelBlockEnt
     }
 
     @LuaFunction
-    public final int getAngleLimit() {
+    public final int getLimit() {
         return blockEntity.angleInput.getValue();
     }
 
     @LuaFunction
-    public final void setAngleLimit(int limit) {
+    public final void setLimit(int limit) {
         blockEntity.angleInput.setValue(limit);
     }
 
