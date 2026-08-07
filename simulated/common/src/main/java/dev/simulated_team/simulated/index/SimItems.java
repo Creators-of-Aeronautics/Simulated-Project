@@ -40,6 +40,7 @@ public class SimItems {
 
     public static final ItemEntry<SpringItem> SPRING =
             REGISTRATE.item("spring", SpringItem::new)
+                    .properties(p -> p.component(SimDataComponents.BOUNCINESS, 1f))
                     .recipe((ctx, prov) ->
                             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ctx.get(), 2)
                                     .pattern("S")
