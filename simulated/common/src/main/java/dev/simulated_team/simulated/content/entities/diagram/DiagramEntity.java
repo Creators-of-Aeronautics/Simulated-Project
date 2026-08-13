@@ -68,7 +68,9 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     private static final Map<ResourceKey<Level>, Map<ServerSubLevel, DiagramRecordingTicket>> queuedDiagramRecordings = new WeakHashMap<>();
 
     protected int size;
-    protected Direction verticalOrientation;
+    // Entity-type construction happens before NBT is read. Keep a valid orientation
+    // so systems that inspect/save a newly-created entity cannot hit a null value.
+    protected Direction verticalOrientation = Direction.DOWN;
     protected DiagramConfig config;
 
     public static DiagramEntity create(final EntityType<? extends HangingEntity> entityType, final Level world) {
