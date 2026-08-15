@@ -211,7 +211,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         // check persistence to make sure we keep our sublevel after reload
-        if (this.getSubLevelID() != null) {
+        if (this.getSubLevelID() != null || this.isAssembled()) {
             this.checkPersistence(this.getSubLevelID());
         }
 
