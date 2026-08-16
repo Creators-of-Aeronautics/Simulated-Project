@@ -9,6 +9,7 @@ import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.simulated_team.simulated.content.entities.diagram.DiagramConfig;
 import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.index.SimSoundEvents;
+import dev.simulated_team.simulated.network.packets.contraption_diagram.LiftMarkerDataPacket;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import net.minecraft.client.Minecraft;
@@ -212,6 +213,7 @@ public class DiagramStickyNote extends DiagramButton {
             bufferSource.endBatch();
 
             this.renderCustomCOM(guiGraphics, ps);
+            this.renderCustomCOL(guiGraphics, ps);
             ps.popPose();
 
         }
@@ -286,5 +288,28 @@ public class DiagramStickyNote extends DiagramButton {
             }
             stack.popPose();
         }
+    }
+
+    private void renderCustomCOL(final GuiGraphics guiGraphics, final PoseStack stack) {
+        final LiftMarkerDataPacket data = this.parent.getVisibleLiftMarker();
+
+        if (data == null) {
+            return;
+        }
+
+        stack.pushPose();
+        final Vector2d screenCoords = DiagramScreen.getScreenCoords(new Vector3d(data.position()), NOTE_ORIENTATION, NOTE_LOCAL_CAM_POS, NOTE_PROJ_MAT, SUBLEVEL_RENDER_WIDTH_PIXELS, SUBLEVEL_RENDER_HEIGHT_PIXELS);
+
+        final double offsetX = screenCoords.x - 8;
+        final double offsetY = screenCoords.y - 8;
+
+        // there is no pointer variant of this icon, so out of scope it is left undrawn
+        if (offsetY > 0 && offsetX > 0 && offsetY < SUBLEVEL_RENDER_HEIGHT_PIXELS && offsetX < SUBLEVEL_RENDER_WIDTH_PIXELS) {
+            final SimGUITextures tex = SimGUITextures.DIAGRAM_ICON_COL_TINY;
+            stack.translate(offsetX, offsetY, 0);
+            guiGraphics.blit(tex.location, 0, 0, 5, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
+        }
+
+        stack.popPose();
     }
 }

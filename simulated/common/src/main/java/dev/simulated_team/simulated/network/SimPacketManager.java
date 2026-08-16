@@ -5,7 +5,9 @@ import dev.simulated_team.simulated.network.packets.*;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramDataPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramOpenPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramSaveConfigPacket;
+import dev.simulated_team.simulated.network.packets.contraption_diagram.LiftMarkerDataPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.RequestDiagramDataPacket;
+import dev.simulated_team.simulated.network.packets.contraption_diagram.RequestLiftMarkerPacket;
 import dev.simulated_team.simulated.network.packets.end_sea.ClientboundEndSeaPacket;
 import dev.simulated_team.simulated.network.packets.handle.ClientboundPlayersHoldingHandlePacket;
 import dev.simulated_team.simulated.network.packets.honey_glue.HoneyGlueChangeBoundsPacket;
@@ -73,6 +75,8 @@ public class SimPacketManager {
         INSTANCE.registerClientbound(DiagramDataPacket.TYPE, DiagramDataPacket.CODEC, DiagramDataPacket::handle);
         INSTANCE.registerServerbound(DiagramSaveConfigPacket.TYPE, DiagramSaveConfigPacket.CODEC, DiagramSaveConfigPacket::handle);
         INSTANCE.registerClientbound(DiagramOpenPacket.TYPE, DiagramOpenPacket.CODEC, DiagramOpenPacket::handle);
+        INSTANCE.registerServerbound(RequestLiftMarkerPacket.TYPE, RequestLiftMarkerPacket.CODEC, RequestLiftMarkerPacket::handle);
+        INSTANCE.registerClientbound(LiftMarkerDataPacket.TYPE, LiftMarkerDataPacket.CODEC, LiftMarkerDataPacket::handle);
 
 		INSTANCE.registerClientbound(UpdateClientLodestonePositionPacket.TYPE, UpdateClientLodestonePositionPacket.STREAM_CODEC, UpdateClientLodestonePositionPacket::handle);
     }
