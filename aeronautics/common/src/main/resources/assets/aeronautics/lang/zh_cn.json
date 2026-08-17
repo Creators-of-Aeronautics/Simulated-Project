@@ -58,7 +58,7 @@
   "aeronautics.ponder.gyro_pressure.text_4": "因此，可以调节推力大小来改变高度",
   "aeronautics.ponder.gyro_pressure.text_5": "可以用高度传感器读取气压的精确值",
   "aeronautics.ponder.gyroscopic_propeller_bearing_island.header": "使用向下放置的陀螺仪螺旋桨轴承稳定结构",
-  "aeronautics.ponder.gyroscopic_propeller_bearing_island.text_1": "当陀螺仪螺旋桨轴承向下放置时……",
+  "aeronautics.ponder.gyroscopic_propeller_bearing_island.text_1": "当陀螺仪螺旋桨轴承朝下放置时……",
   "aeronautics.ponder.gyroscopic_propeller_bearing_island.text_2": "……它可以稳定住一个上重下轻的结构",
   "aeronautics.ponder.gyroscopic_propeller_bearing_redstone.header": "使用红石信号控制陀螺仪螺旋桨轴承",
   "aeronautics.ponder.gyroscopic_propeller_bearing_redstone.text_1": "有时可能要避免陀螺仪螺旋桨轴承向上倾斜",
