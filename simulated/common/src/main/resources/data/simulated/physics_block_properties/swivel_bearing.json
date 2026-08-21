@@ -1,0 +1,13 @@
+{
+  "selector": "simulated:swivel_bearing",
+
+  "properties": {
+    "sable:mass": 1.0
+  },
+
+  "overrides": {
+    "assembled=true": {
+      "sable:mass": 0.75
+    }
+  }
+}

@@ -151,7 +151,7 @@ public class SimBlocks {
                     .properties(properties -> properties
                             .destroyTime(5f))
                     .loot((p, b) -> p.dropOther(b, SWIVEL_BEARING.get()))
-                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE, SimTags.Blocks.SUPER_LIGHT)
                     .register();
 
     public static final BlockEntry<MergingGlueBlock> MERGING_GLUE =
