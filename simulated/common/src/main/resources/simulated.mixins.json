@@ -6,6 +6,7 @@
   "minVersion": "0.8",
   "client": [
     "accessor.CreativeModeInventoryScreenAccessor",
+    "accessor.CreativeModeInventoryScreenSelectedTabAccessor",
     "accessor.KeyMappingsAccessor",
     "accessor.LevelRendererAccessor",
     "conditional_display_target.DisplayLinkScreenMixin",

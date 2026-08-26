@@ -11,6 +11,7 @@ import dev.simulated_team.simulated.mixin_interface.TickerExtension;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.Colorc;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -25,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,12 @@ import java.util.function.Supplier;
 public class SimulatedCreativeTab {
 	public static int CURRENT_ROW = 0;
 	public static final Object2IntOpenHashMap<ResourceLocation> SECTION_Y_VALUES = new Object2IntOpenHashMap<>();
+	// Layout of the tab as rendered on screen: alternating runs of spacer rows and real items,
+	// encoded per run (negative = spacers, positive = real items). Spacers are never part of the
+	// tab's actual item lists, they are only inserted into the creative menu's display buffer.
+	private static final IntArrayList LAYOUT_PLAN = new IntArrayList();
+	private static int rawLayoutSize = 0;
+	private static int paddedLayoutSize = 0;
 
 	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY) {
 		final PoseStack ps = graphics.pose();
@@ -136,9 +144,10 @@ public class SimulatedCreativeTab {
 			sectionMap.computeIfAbsent(section, (s) -> new LinkedList<>()).add(stack);
 		}
 
-		for (int i = 0; i < 9; i++) {
-			displayItems.accept(ItemStack.EMPTY);
-		}
+		LAYOUT_PLAN.clear();
+		rawLayoutSize = 0;
+		paddedLayoutSize = 0;
+		pushLayoutRun(true, 9);
 
 		int y = 0;
 		final List<SimulatedSection> sectionKeys = sectionMap.keySet().stream().sorted().toList();
@@ -152,6 +161,7 @@ public class SimulatedCreativeTab {
 				if(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.has(item.getItem())) {
 					searchItems.accept(item);
 				} else if(!CreativeTabItemTransforms.VisibilityType.INVISIBLE.has(item.getItem())) {
+					pushLayoutRun(false, 1);
 					displayItems.accept(item);
 					searchItems.accept(item);
 					itemCount++;
@@ -171,10 +181,59 @@ public class SimulatedCreativeTab {
 			if(padding < 9) {
 				padding += 9;
 			}
-			for (int i = 0; i < padding; i++) {
-				displayItems.accept(ItemStack.EMPTY);
+			pushLayoutRun(true, padding);
+		}
+	}
+
+	private static void pushLayoutRun(final boolean spacer, final int count) {
+		if(count <= 0)
+			return;
+		final int encoded = spacer ? -count : count;
+		if(!LAYOUT_PLAN.isEmpty() && Integer.signum(LAYOUT_PLAN.getInt(LAYOUT_PLAN.size() - 1)) == Integer.signum(encoded)) {
+			LAYOUT_PLAN.set(LAYOUT_PLAN.size() - 1, LAYOUT_PLAN.getInt(LAYOUT_PLAN.size() - 1) + encoded);
+		} else {
+			LAYOUT_PLAN.add(encoded);
+		}
+		paddedLayoutSize += count;
+		if(!spacer) {
+			rawLayoutSize += count;
+		}
+	}
+
+	/**
+	 * Inserts the layout's empty spacing slots into the creative screen's item buffer.
+	 * The tab's real item lists never contain empty stacks; the spacing only exists visually,
+	 * so other mods reading creative tab contents can never run into {@link ItemStack#EMPTY}.
+	 */
+	public static void padMenuItems(final List<ItemStack> items) {
+		if(rawLayoutSize == 0 || rawLayoutSize == paddedLayoutSize)
+			return;
+		if(items.size() != rawLayoutSize && items.size() != paddedLayoutSize)
+			return;
+		if(items.size() == paddedLayoutSize)
+			return;
+
+		final List<ItemStack> padded = new ArrayList<>(paddedLayoutSize);
+		int source = 0;
+		for (int i = 0; i < LAYOUT_PLAN.size(); i++) {
+			final int run = LAYOUT_PLAN.getInt(i);
+			if(run < 0) {
+				for (int r = 0; r < -run; r++) {
+					padded.add(ItemStack.EMPTY);
+				}
+			} else {
+				for (int r = 0; r < run; r++) {
+					if(source >= items.size())
+						return;
+					padded.add(items.get(source++));
+				}
 			}
 		}
+		if(source != items.size())
+			return;
+
+		items.clear();
+		items.addAll(padded);
 	}
 
 	public static void setPlaying(ResourceLocation resourceLocation, boolean playing) {
