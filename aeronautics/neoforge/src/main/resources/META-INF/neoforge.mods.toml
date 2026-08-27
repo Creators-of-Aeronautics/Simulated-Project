@@ -46,6 +46,12 @@ type="required" #mandatory (Can be one of "required", "optional", "incompatible"
 versionRange = "[${version},)"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "jei"
+type="optional"
+versionRange = "[${jei_min_version},)"
+ordering = "NONE"
+side = "CLIENT"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

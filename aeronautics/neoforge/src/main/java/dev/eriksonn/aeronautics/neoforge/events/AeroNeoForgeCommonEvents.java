@@ -1,9 +1,5 @@
 package dev.eriksonn.aeronautics.neoforge.events;
 
-import com.simibubi.create.compat.jei.ConversionRecipe;
-import com.simibubi.create.compat.jei.category.MysteriousItemConversionCategory;
-import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
-import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.data.AeroAdvancementTriggers;
 import dev.eriksonn.aeronautics.events.AeronauticsCommonEvents;
@@ -16,11 +12,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -59,28 +52,7 @@ public class AeroNeoForgeCommonEvents {
 			if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {
 				AeroAdvancements.init();
 				AeroAdvancementTriggers.register();
-
-				if (SimPlatformService.INSTANCE.isLoaded("jei")) {
-					jeiCompat();
-				}
 			}
-		}
-
-		// todo: move this somewhere more proper
-		private static void jeiCompat() {
-			MysteriousItemConversionCategory.RECIPES.add(
-					ConversionRecipe.create(AeroFluidsNeoForge.LEVITITE_BLEND.getBucket().get().getDefaultInstance(),
-							AeroBlocks.LEVITITE.asItem().getDefaultInstance()));
-			MysteriousItemConversionCategory.RECIPES.add(
-					ConversionRecipe.create(AeroFluidsNeoForge.LEVITITE_BLEND.getBucket().get().getDefaultInstance(),
-							AeroBlocks.PEARLESCENT_LEVITITE.asItem().getDefaultInstance()));
-
-			ResourceLocation recipeId = Aeronautics.path("conversion_music_disc_cloud_skipper");
-			ConversionRecipe recipe = new StandardProcessingRecipe.Builder<>(ConversionRecipe::new, recipeId)
-					.withItemIngredients(Ingredient.of(AeroTags.ItemTags.CONVERTS_TO_CLOUD_SKIPPER))
-					.withSingleItemOutput(AeroItems.MUSIC_DISC_CLOUD_SKIPPER.asStack())
-					.build();
-			MysteriousItemConversionCategory.RECIPES.add(new RecipeHolder<>(recipeId, recipe));
 		}
 
 		@SubscribeEvent(priority = EventPriority.HIGH)

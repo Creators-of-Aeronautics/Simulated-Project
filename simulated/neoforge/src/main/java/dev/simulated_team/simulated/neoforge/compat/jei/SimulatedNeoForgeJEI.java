@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class SimulatedNeoForgeJEI implements IModPlugin {
 
-    private static final ResourceLocation ID = Simulated.path("jei_plugin");
+    private static final ResourceLocation ID = Simulated.path("jei_plugin/neoforge");
 
     @Override
     public ResourceLocation getPluginUid() {

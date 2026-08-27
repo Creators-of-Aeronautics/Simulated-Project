@@ -56,8 +56,7 @@ if (project.path.endsWith(":common")) {
         compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
         annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
 
-        // neoforge version for JEI compat
-        compileOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+        compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 
         implementation ("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
             exclude group: "foundry.veil"
@@ -131,6 +130,8 @@ processResources {
             'sable_mod_version_range'            : sable_mod_version_range,
             'create_mod_version'           : create_mod_version,
             'flywheel_mod_version'         : flywheel_mod_version,
+            'jei_version'                  : jei_version,
+            'jei_min_version'              : jei_min_version,
             'credits'                      : credits,
             'java_version'                 : java_version
     ]
