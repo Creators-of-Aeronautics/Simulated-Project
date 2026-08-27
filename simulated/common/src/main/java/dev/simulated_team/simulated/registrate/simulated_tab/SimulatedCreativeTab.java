@@ -11,7 +11,6 @@ import dev.simulated_team.simulated.mixin_interface.TickerExtension;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.Colorc;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -35,11 +34,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SimulatedCreativeTab {
+	private static final int ITEMS_PER_ROW = 9;
+
 	public static int CURRENT_ROW = 0;
 	public static final Object2IntOpenHashMap<ResourceLocation> SECTION_Y_VALUES = new Object2IntOpenHashMap<>();
-	private static final IntArrayList LAYOUT_PLAN = new IntArrayList();
-	private static int rawLayoutSize = 0;
-	private static int paddedLayoutSize = 0;
+	private static final List<Integer> SECTION_ITEM_COUNTS = new ArrayList<>();
 
 	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY) {
 		final PoseStack ps = graphics.pose();
@@ -141,10 +140,8 @@ public class SimulatedCreativeTab {
 			sectionMap.computeIfAbsent(section, (s) -> new LinkedList<>()).add(stack);
 		}
 
-		LAYOUT_PLAN.clear();
-		rawLayoutSize = 0;
-		paddedLayoutSize = 0;
-		pushLayoutRun(true, 9);
+		SECTION_Y_VALUES.clear();
+		SECTION_ITEM_COUNTS.clear();
 
 		int y = 0;
 		final List<SimulatedSection> sectionKeys = sectionMap.keySet().stream().sorted().toList();
@@ -158,7 +155,6 @@ public class SimulatedCreativeTab {
 				if(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.has(item.getItem())) {
 					searchItems.accept(item);
 				} else if(!CreativeTabItemTransforms.VisibilityType.INVISIBLE.has(item.getItem())) {
-					pushLayoutRun(false, 1);
 					displayItems.accept(item);
 					searchItems.accept(item);
 					itemCount++;
@@ -167,35 +163,9 @@ public class SimulatedCreativeTab {
 
 			ResourceLocation id = SimResourceManagers.SIMULATED_SECTION.getId(key);
 			SECTION_Y_VALUES.put(id, y);
-			final int rowCount = (int) Math.ceil(itemCount / 9.0f);
+			SECTION_ITEM_COUNTS.add(itemCount);
+			final int rowCount = Math.ceilDiv(itemCount, ITEMS_PER_ROW);
 			y += rowCount + 1;
-
-			if(key != null && key.equals(sectionKeys.getLast())) {
-				break;
-			}
-
-			int padding = 9 - itemCount % 9;
-			if(padding < 9) {
-				padding += 9;
-			}
-			pushLayoutRun(true, padding);
-		}
-	}
-
-	private static void pushLayoutRun(final boolean spacer, final int count) {
-		if(count <= 0)
-			return;
-
-		final int encoded = spacer ? -count : count;
-		if(!LAYOUT_PLAN.isEmpty() && Integer.signum(LAYOUT_PLAN.getInt(LAYOUT_PLAN.size() - 1)) == Integer.signum(encoded)) {
-			LAYOUT_PLAN.set(LAYOUT_PLAN.size() - 1, LAYOUT_PLAN.getInt(LAYOUT_PLAN.size() - 1) + encoded);
-		} else {
-			LAYOUT_PLAN.add(encoded);
-		}
-
-		paddedLayoutSize += count;
-		if(!spacer) {
-			rawLayoutSize += count;
 		}
 	}
 
@@ -205,32 +175,40 @@ public class SimulatedCreativeTab {
 	 * creative-tab events never receive the visual padding.
 	 */
 	public static void padMenuItems(final List<ItemStack> items) {
-		if(rawLayoutSize == 0 || rawLayoutSize == paddedLayoutSize)
-			return;
-		if(items.size() != rawLayoutSize || items.size() == paddedLayoutSize)
+		if(SECTION_ITEM_COUNTS.isEmpty())
 			return;
 
-		final List<ItemStack> padded = new ArrayList<>(paddedLayoutSize);
-		int source = 0;
-		for (int i = 0; i < LAYOUT_PLAN.size(); i++) {
-			final int run = LAYOUT_PLAN.getInt(i);
-			if(run < 0) {
-				for (int r = 0; r < -run; r++) {
-					padded.add(ItemStack.EMPTY);
-				}
-			} else {
-				for (int r = 0; r < run; r++) {
-					if(source >= items.size())
-						return;
-					padded.add(items.get(source++));
-				}
+		int expectedItemCount = 0;
+		for (final int sectionItemCount : SECTION_ITEM_COUNTS) {
+			expectedItemCount += sectionItemCount;
+		}
+		if(items.size() != expectedItemCount)
+			return;
+
+		final List<ItemStack> padded = new ArrayList<>();
+		addEmptySlots(padded, ITEMS_PER_ROW);
+
+		int itemIndex = 0;
+		for (int sectionIndex = 0; sectionIndex < SECTION_ITEM_COUNTS.size(); sectionIndex++) {
+			final int sectionItemCount = SECTION_ITEM_COUNTS.get(sectionIndex);
+			final int nextItemIndex = itemIndex + sectionItemCount;
+			padded.addAll(items.subList(itemIndex, nextItemIndex));
+			itemIndex = nextItemIndex;
+
+			if(sectionIndex < SECTION_ITEM_COUNTS.size() - 1) {
+				final int slotsToFinishRow = (ITEMS_PER_ROW - sectionItemCount % ITEMS_PER_ROW) % ITEMS_PER_ROW;
+				addEmptySlots(padded, slotsToFinishRow + ITEMS_PER_ROW);
 			}
 		}
-		if(source != items.size())
-			return;
 
 		items.clear();
 		items.addAll(padded);
+	}
+
+	private static void addEmptySlots(final List<ItemStack> items, final int count) {
+		for (int i = 0; i < count; i++) {
+			items.add(ItemStack.EMPTY);
+		}
 	}
 
 	public static void setPlaying(ResourceLocation resourceLocation, boolean playing) {
