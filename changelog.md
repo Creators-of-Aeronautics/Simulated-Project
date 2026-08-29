@@ -1,4 +1,2 @@
-- Fix CC compat with linked typewriter
-- Portable engines are now polite enough to not remove creative blaze cakes from survival players
-- Allow Tires to specify a minimum friction
-- Fix some issues with Docking Connector fluid handling
+- Fix issues with JEI integration and creative tab compatibility with mods (PR #1403)
+- Fix swivel bearing not adjusting its mass when assembled properly
