@@ -21,7 +21,7 @@ public abstract class ItemPickerMenuMixin {
 
 	@Inject(method = "scrollTo", at = @At("HEAD"))
 	private void simulated$scrollTo(final float f, final CallbackInfo ci) {
-		if(SimTabService.INSTANCE.getCreativeTab() == CreativeModeInventoryScreenSelectedTabAccessor.simulated$getSelectedTab()) {
+		if (SimTabService.INSTANCE.getCreativeTab() == CreativeModeInventoryScreenSelectedTabAccessor.simulated$getSelectedTab()) {
 			SimulatedCreativeTab.padMenuItems(this.items);
 		}
 		SimulatedCreativeTab.CURRENT_ROW = this.getRowIndexForScroll(f);
