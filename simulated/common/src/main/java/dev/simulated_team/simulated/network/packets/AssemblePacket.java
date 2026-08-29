@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public record AssemblePacket(BlockPos pos) implements CustomPacketPayload {
@@ -24,7 +25,12 @@ public record AssemblePacket(BlockPos pos) implements CustomPacketPayload {
     }
 
     public void handle(final ServerPacketContext context) {
-        final ServerLevel level = (ServerLevel) context.player().level();
+        ServerPlayer player = context.player();
+        double range = player.blockInteractionRange() + 4.0f;
+        if (player.distanceToSqr(this.pos().getCenter()) >= range*range) {
+            return;
+        }
+        final ServerLevel level = (ServerLevel)player.level();
 
         final BlockEntity blockEntity = level.getBlockEntity(this.pos);
 

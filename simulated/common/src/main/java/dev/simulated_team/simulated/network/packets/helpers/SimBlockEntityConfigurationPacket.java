@@ -6,6 +6,7 @@ import foundry.veil.api.network.handler.ServerPacketContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -26,7 +27,7 @@ public abstract class SimBlockEntityConfigurationPacket<T extends SmartBlockEnti
 
         final Level world = player.level();
         if (world.isLoaded(this.pos)) {
-            if (player.distanceToSqr(Vec3.atBottomCenterOf(this.pos)) <= this.maxRangeSqr()) {
+            if (player.distanceToSqr(Vec3.atBottomCenterOf(this.pos)) <= this.maxRangeSqr(player)) {
                 final BlockEntity blockEntity = world.getBlockEntity(this.pos);
                 if (blockEntity instanceof SyncedBlockEntity) {
                     this.applySettings(player, (T) blockEntity);
@@ -41,8 +42,9 @@ public abstract class SimBlockEntityConfigurationPacket<T extends SmartBlockEnti
         }
     }
 
-    protected int maxRangeSqr() {
-        return 20;
+    protected double maxRangeSqr(Player player) {
+        double range = player.blockInteractionRange() + 4.0d;
+        return range*range;
     }
 
     protected boolean causeUpdate() {

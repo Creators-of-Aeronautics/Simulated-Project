@@ -24,6 +24,8 @@ public record SteeringWheelPacket(boolean shouldStop, float targetAngle, BlockPo
 
     public void handle(final ServerPacketContext context) {
         final ServerPlayer player = context.player();
+        double range = player.blockInteractionRange() + 4;
+        if (player.distanceToSqr(pos.getCenter()) > range*range) return;
 
         if (player.level().getBlockEntity(this.pos) instanceof final SteeringWheelBlockEntity be) {
             be.targetAngleToUpdate = this.targetAngle();

@@ -27,6 +27,7 @@ public record ThrottleLeverSignalPacket(BlockPos pos, int signal) implements Cus
     }
 
     public void handle(final ServerPacketContext context) {
+        if (this.signal < 0 || this.signal > 15) return;
         final ServerPlayer player = context.player();
         final ServerLevel level = (ServerLevel) player.level();
 

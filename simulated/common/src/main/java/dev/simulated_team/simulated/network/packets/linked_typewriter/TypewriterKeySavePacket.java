@@ -34,6 +34,8 @@ public record TypewriterKeySavePacket(Map<Integer, LinkedTypewriterEntries.Keybo
 
 
     public void handle(final ServerPacketContext context) {
+        double range = context.player().blockInteractionRange() + 4;
+        if (context.player().distanceToSqr(pos.getCenter()) > range*range) return;
         final Level level = context.level();
 
         final BlockEntity be = level.getBlockEntity(this.pos);

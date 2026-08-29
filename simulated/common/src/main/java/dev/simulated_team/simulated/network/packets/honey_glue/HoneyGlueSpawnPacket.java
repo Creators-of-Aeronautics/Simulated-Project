@@ -56,6 +56,8 @@ public record HoneyGlueSpawnPacket(BlockPos from, BlockPos to) implements Custom
         if (hand == null)
             return;
 
+        double range = player.blockInteractionRange() + 4;
+        if (player.distanceToSqr(this.to.getCenter()) > range*range) return;
         final AABB newBounds = AABB.encapsulatingFullBlocks(this.from, this.to);
         final Pair<Boolean, String> pair = HoneyGlueMaxSizing.checkBounds(newBounds);
 
