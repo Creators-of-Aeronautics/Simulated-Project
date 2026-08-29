@@ -14,8 +14,10 @@ import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.render.MatrixStack;
+import foundry.veil.api.compat.IrisCompat;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import net.createmod.catnip.outliner.Outliner;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -48,6 +50,9 @@ public class PhysicsStaffRenderHandler {
      */
     public static void renderSelectionBox(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer renderer, final MultiBufferSource.BufferSource bufferSource, final MatrixStack ps, final Matrix4fc frustrumMat, final Matrix4fc projectionMat, final int renderTick, final DeltaTracker tracker, final Camera camera, final Frustum frustrum) {
         if (stage != VeilRenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+        if (IrisCompat.isLoaded() && IrisApi.getInstance().isRenderingShadowPass()) {
+            return;
+        }
 
         if (Minecraft.getInstance().options.hideGui) {
             return;
