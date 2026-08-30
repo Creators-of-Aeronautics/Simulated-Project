@@ -581,7 +581,7 @@
   "simulated.portable_engine.tooltip_name": "Taşınabilir Motor",
   "simulated.prevent_disassembly": "Birincil olmayan Fizik Montajcısından sökme engellendi",
   "simulated.scroll_option.swivel_default_locked": "Kızıltaş Kilitleme Davranışı",
-  "simulated.simulated_section.simulated": "Simüle Edilmiş",
+  "simulated.simulated_section.simulated": "Simüle Edilmiş Araçlar",
   "simulated.spring.block_exists": "Burada zaten bir blok var!",
   "simulated.spring.connection_terminated": "Seçim iptal edildi",
   "simulated.spring.max_length": "Maksimum uzunluk (%sm)",
