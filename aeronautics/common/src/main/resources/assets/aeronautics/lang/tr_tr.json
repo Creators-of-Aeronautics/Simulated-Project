@@ -145,7 +145,7 @@
   "aeronautics.propeller.thrust": "İtiş Gücü: %s",
   "aeronautics.scroll_option.hot_air_amount": "Maksimum Sıcak Hava Çıkışı",
   "aeronautics.scroll_option.thrust_direction": "İtiş Yönü",
-  "aeronautics.simulated_section.aeronautics": "Aeronautics",
+  "aeronautics.simulated_section.aeronautics": "Havacılık Araçları",
   "aeronautics.subtitle.block.steam_vent.close": "Buhar Havalandırması kapanıyor",
   "aeronautics.subtitle.block.steam_vent.open": "Buhar Havalandırması uğuldayarak açılıyor",
   "aeronautics.subtitle.entity.gust": "Balon sızdırıyor",
