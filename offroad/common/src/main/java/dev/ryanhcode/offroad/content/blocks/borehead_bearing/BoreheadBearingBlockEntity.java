@@ -19,12 +19,11 @@ import dev.ryanhcode.offroad.data.OffroadLang;
 import dev.ryanhcode.offroad.data.OffroadTags;
 import dev.ryanhcode.offroad.handlers.server.MultiMiningServerManager;
 import dev.ryanhcode.offroad.handlers.server.MultiMiningSupplier;
-import dev.ryanhcode.sable.companion.math.BoundingBox3d;
-import dev.ryanhcode.sable.companion.math.BoundingBox3i;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import dev.simulated_team.simulated.api.BearingSlowdownController;
 import dev.simulated_team.simulated.multiloader.inventory.InventoryLoaderWrapper;
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.createmod.catnip.lang.FontHelper;
@@ -58,9 +57,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity implements MultiMiningSupplier {
 
     private static final Vector3dc IMMUT_ZERO = new Vector3d();
+    private static final double MINING_RANGE_EPSILON = 1.0E-7d;
 
-    private static final BoundingBox3d TEMP_BOUNDING_BOX_DOUBLE = new BoundingBox3d();
-    private static final BoundingBox3i TEMP_BOUNDING_BOX_INT = new BoundingBox3i();
     private static final BlockPos.MutableBlockPos TEMP_CURSOR = new BlockPos.MutableBlockPos();
     private static final Vector3d TEMP_POSITION = new Vector3d();
 
@@ -70,6 +68,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
      */
     private final ObjectArrayList<Vector3d> centerMiningPositions = new ObjectArrayList<>();
     private final Set<BlockPos> visitedPositions = new ObjectOpenHashSet<>();
+    private final LongOpenHashSet checkedMiningPositions = new LongOpenHashSet();
     /**
      * The next index available for rock cutter actors
      */
@@ -141,6 +140,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
 
         if (!this.level.isClientSide) {
             this.visitedPositions.clear();
+            this.checkedMiningPositions.clear();
         }
 
         if (this.movedContraption == null) {
@@ -176,27 +176,28 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
 
             //always global, never local
             final Vector3d localPoint = new Vector3d();
+            final double r = 1;
             for (final Vector3d pos : this.centerMiningPositions) {
-                TEMP_BOUNDING_BOX_DOUBLE.set(
-                        (pos.x - (searchRadius * 2)),
-                        (pos.y - (searchRadius * 2)),
-                        (pos.z - (searchRadius * 2)),
-                        (pos.x + (searchRadius * 2)),
-                        (pos.y + (searchRadius * 2)),
-                        (pos.z + (searchRadius * 2))
-                );
+                final int minX = minMiningCoordinate(pos.x, searchRadius);
+                final int minY = minMiningCoordinate(pos.y, searchRadius);
+                final int minZ = minMiningCoordinate(pos.z, searchRadius);
+                final int maxX = maxMiningCoordinate(pos.x, searchRadius);
+                final int maxY = maxMiningCoordinate(pos.y, searchRadius);
+                final int maxZ = maxMiningCoordinate(pos.z, searchRadius);
 
-                TEMP_BOUNDING_BOX_INT.set(TEMP_BOUNDING_BOX_DOUBLE);
-                for (int x = TEMP_BOUNDING_BOX_INT.minX(); x <= TEMP_BOUNDING_BOX_INT.maxX(); x++) {
-                    for (int z = TEMP_BOUNDING_BOX_INT.minZ(); z <= TEMP_BOUNDING_BOX_INT.maxZ(); z++) {
-                        for (int y = TEMP_BOUNDING_BOX_INT.minY(); y <= TEMP_BOUNDING_BOX_INT.maxY(); y++) {
+                for (int x = minX; x <= maxX; x++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        for (int y = minY; y <= maxY; y++) {
 
-                            final double r = 1;
                             TEMP_POSITION.set(x + 0.5, y + 0.5, z + 0.5).sub(pos, TEMP_POSITION);
                             TEMP_POSITION.absolute(localPoint).sub(searchRadius, searchRadius, searchRadius, localPoint).add(r, r, r);
                             final double boxSDF = localPoint.max(IMMUT_ZERO, TEMP_POSITION).length() +
                                     Math.min(Math.max(localPoint.x, Math.max(localPoint.y, localPoint.z)), 0);
                             if (boxSDF - r > 0) {
+                                continue;
+                            }
+
+                            if (!this.checkedMiningPositions.add(BlockPos.asLong(x, y, z))) {
                                 continue;
                             }
 
@@ -215,6 +216,14 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
         }
 
         this.accelerator.clearCache();
+    }
+
+    private static int minMiningCoordinate(final double center, final double searchRadius) {
+        return (int) Math.ceil(center - searchRadius - 0.5d - MINING_RANGE_EPSILON);
+    }
+
+    private static int maxMiningCoordinate(final double center, final double searchRadius) {
+        return (int) Math.floor(center + searchRadius - 0.5d + MINING_RANGE_EPSILON);
     }
 
     @Override
@@ -505,6 +514,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
         this.nextAvailableIndex = 0;
 
         this.visitedPositions.clear();
+        this.checkedMiningPositions.clear();
     }
 
     public void startDisassemblySlowdown() {
