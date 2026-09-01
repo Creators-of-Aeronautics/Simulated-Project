@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.compat.computercraft;
 
+import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dev.simulated_team.simulated.compat.computercraft.peripherals.*;
 import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElementImpl;
@@ -30,6 +31,8 @@ public class ComputerCraftPeripherals implements SimModCompatibilityService {
         service.addPeripheral(SimBlockEntityTypes.DOCKING_CONNECTOR, DockingConnectorPeripheral::new);
         service.addPeripheral(SimBlockEntityTypes.TORSION_SPRING, TorsionSpringPeripheral::new);
         service.addPeripheral(SimBlockEntityTypes.NAMEPLATE, NamePlatePeripheral::new);
+
+        ComputerCraftAPI.registerGenericSource(new PortableEnginePeripheral());
 
         service.addWired(SimBlockEntityTypes.DOCKING_CONNECTOR, (blockEntity, direction) -> {
             if (blockEntity.getBlockState().getValue(DockingConnectorBlock.FACING) == direction) {
