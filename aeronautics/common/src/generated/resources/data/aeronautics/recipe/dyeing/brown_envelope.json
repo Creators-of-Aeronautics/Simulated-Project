@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "aeronautics:envelope",
+  "ingredients": [
+    {
+      "tag": "aeronautics:shaftless_envelope"
+    },
+    {
+      "item": "minecraft:brown_dye"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics:brown_envelope"
+  }
+}
