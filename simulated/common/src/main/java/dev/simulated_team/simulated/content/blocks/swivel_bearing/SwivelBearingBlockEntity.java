@@ -20,6 +20,7 @@ import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.RotaryConstraintConfiguration;
 import dev.ryanhcode.sable.api.physics.constraint.RotaryConstraintHandle;
+import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.schematic.SubLevelSchematicSerializationContext;
 import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
@@ -211,7 +212,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         // check persistence to make sure we keep our sublevel after reload
-        if (this.getSubLevelID() != null) {
+        if (this.getSubLevelID() != null || this.isAssembled()) {
             this.checkPersistence(this.getSubLevelID());
         }
 
@@ -794,6 +795,14 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
     @Override
     public AssemblyException getLastAssemblyException() {
         return this.lastException;
+    }
+
+    //if the plate is in the main level, it won't update the servo coefficients for us
+    @Override
+    public void sable$physicsTick(ServerSubLevel subLevel, RigidBodyHandle handle, double timeStep) {
+        if (this.getSubLevelID() == null) {
+            this.updateServoCoefficients();
+        }
     }
 
     @Override
