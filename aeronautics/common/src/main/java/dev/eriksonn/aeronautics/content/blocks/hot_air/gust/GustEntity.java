@@ -5,11 +5,10 @@ import dev.eriksonn.aeronautics.content.particle.GustParticleData;
 import dev.eriksonn.aeronautics.index.AeroEntityTypes;
 import dev.eriksonn.aeronautics.index.AeroSoundEvents;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.util.SableBufferUtils;
 import dev.ryanhcode.sable.util.SableNBTUtils;
 import net.minecraft.core.BlockPos;
@@ -125,7 +124,7 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
                         positionalRandomness * (this.random.nextFloat() - 0.5)
                 );
 
-                level.addParticle(new AirPoofParticleData(), particlePos.x, particlePos.y, particlePos.z, vx, vy, vz);
+                level.addParticle(AirPoofParticleData.INSTANCE, particlePos.x, particlePos.y, particlePos.z, vx, vy, vz);
             }
 
             this.spawnedInitialBurst = true;

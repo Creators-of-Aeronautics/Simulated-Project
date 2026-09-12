@@ -9,7 +9,7 @@
       "item": "create:brass_casing"
     },
     "S": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     }
   },
   "pattern": [

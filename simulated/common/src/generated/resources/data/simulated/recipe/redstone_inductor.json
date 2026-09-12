@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "B": {
-      "item": "create:brass_sheet"
+      "tag": "c:plates/brass"
     },
     "C": {
-      "item": "create:copper_sheet"
+      "tag": "c:plates/copper"
     },
     "R": {
       "tag": "c:dusts/redstone"

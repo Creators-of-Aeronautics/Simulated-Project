@@ -65,13 +65,6 @@ public class RopeConnectorBlock extends AbstractDirectionalAxisBlock implements 
     }
 
     @Override
-    public void onPlace(final BlockState state, final Level worldIn, final BlockPos pos, final BlockState oldState, final boolean isMoving) {
-        super.onPlace(state, worldIn, pos, oldState, isMoving);
-        if (worldIn.isClientSide)
-            return;
-    }
-
-    @Override
     public void onRemove(final BlockState pState, final Level pLevel, final BlockPos pPos, final BlockState pNewState, final boolean pIsMoving) {
         IBE.onRemove(pState, pLevel, pPos, pNewState);
     }

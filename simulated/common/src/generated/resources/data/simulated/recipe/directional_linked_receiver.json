@@ -6,7 +6,7 @@
       "item": "create:transmitter"
     },
     "B": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     },
     "C": {
       "item": "create:brass_casing"

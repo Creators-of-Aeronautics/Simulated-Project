@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
-  "group": "handle_variants",
+  "group": "simulated:handle_variants",
   "ingredients": [
     {
       "item": "simulated:iron_handle"
     },
     {
-      "item": "create:copper_nugget"
+      "tag": "c:nuggets/copper"
     }
   ],
   "result": {

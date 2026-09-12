@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.SharedProperties;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.simibubi.create.foundation.utility.DyeHelper;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
@@ -30,8 +31,10 @@ import dev.eriksonn.aeronautics.content.blocks.propeller.small.wooden.WoodenProp
 import dev.eriksonn.aeronautics.content.components.Levitating;
 import dev.eriksonn.aeronautics.data.AeroBlockStateGen;
 import dev.ryanhcode.sable.index.SableTags;
+import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.data.SimBlockStateGen;
 import dev.simulated_team.simulated.index.SimItems;
+import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.index.sounds.SimLazySoundType;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import dev.simulated_team.simulated.registrate.simulated_tab.CreativeTabItemTransforms;
@@ -59,6 +62,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.common.Tags;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
@@ -85,13 +89,22 @@ public class AeroBlocks {
             .properties(p -> p.mapColor(DyeColor.WHITE))
             .blockstate((c, p) -> p.simpleBlock(c.get(), p.models()
                     .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + DyeColor.WHITE.getName()))))
-            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 4)
-                    .pattern("WS")
-                    .pattern("SW")
-                    .define('W', DyeHelper.getWoolOfDye(DyeColor.WHITE))
-                    .define('S', Items.STICK)
-                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(net.minecraft.tags.ItemTags.WOOL))
-                    .save(p))
+            .recipe((c, p) -> {
+                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 4)
+                        .pattern("WS")
+                        .pattern("SW")
+                        .define('W', DyeHelper.getWoolOfDye(DyeColor.WHITE))
+                        .define('S', Items.STICK)
+                        .group("aeronautics:envelope")
+                        .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(net.minecraft.tags.ItemTags.WOOL))
+                        .save(p);
+                ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
+                        .group("aeronautics:envelope")
+                        .requires(SimTags.Items.dyesTag(DyeColor.WHITE))
+                        .requires(AeroTags.ItemTags.SHAFTLESS_ENVELOPE)
+                        .unlockedBy("has_envelope", RegistrateRecipeProvider.has(AeroTags.ItemTags.ENVELOPE))
+                        .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_envelope"));
+            })
             .tag(AeroTags.BlockTags.ENVELOPE)
             .tag(net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE)
             .transform(flammable(30, 60))
@@ -120,13 +133,22 @@ public class AeroBlocks {
                     .properties(p -> p.mapColor(color))
                     .blockstate((c, p) -> p.simpleBlock(c.get(), p.models()
                             .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + colorName))))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 4)
+                    .recipe((c, p) ->{
+                    ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 4)
                             .pattern("WS")
                             .pattern("SW")
                             .define('W', DyeHelper.getWoolOfDye(color))
                             .define('S', Items.STICK)
+                            .group("aeronautics:envelope")
                             .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(net.minecraft.tags.ItemTags.WOOL))
-                            .save(p))
+                            .save(p);
+                    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
+                            .group("aeronautics:envelope")
+                            .requires(SimTags.Items.dyesTag(color))
+                            .requires(AeroTags.ItemTags.SHAFTLESS_ENVELOPE)
+                            .unlockedBy("has_envelope", RegistrateRecipeProvider.has(AeroTags.ItemTags.ENVELOPE))
+                            .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_envelope"));
+                    })
                     .tag(AeroTags.BlockTags.ENVELOPE)
                     .tag(net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE)
                     .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
@@ -194,11 +216,11 @@ public class AeroBlocks {
                             .pattern("S S")
                             .pattern("SCS")
                             .pattern("ARA")
-                            .define('S', AllItems.IRON_SHEET.get())
-                            .define('A', AllItems.ANDESITE_ALLOY.get())
+                            .define('S', CommonMetal.IRON.plates)
+                            .define('A', AllItems.ANDESITE_ALLOY)
                             .define('C', AeroTags.ItemTags.BURNER_FIRE)
-                            .define('R', Items.REDSTONE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(Items.REDSTONE))
+                            .define('R', Tags.Items.DUSTS_REDSTONE)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(Tags.Items.DUSTS_REDSTONE))
                             .save(p))
                     .register();
 
@@ -219,7 +241,7 @@ public class AeroBlocks {
                             .pattern("C")
                             .define('G', AeroTags.ItemTags.GOLD_SHEET)
                             .define('C', Blocks.COPPER_BLOCK)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(Items.COPPER_INGOT))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.COPPER.ingots))
                             .save(p))
                     .register();
 
@@ -238,9 +260,9 @@ public class AeroBlocks {
                             .pattern(" S ")
                             .pattern(" B ")
                             .define('A', net.minecraft.tags.ItemTags.WOODEN_SLABS)
-                            .define('B', AllBlocks.BRASS_CASING.get())
-                            .define('S', AllItems.IRON_SHEET.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .define('B', AllBlocks.BRASS_CASING)
+                            .define('S', CommonMetal.IRON.plates)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
     public static final BlockEntry<GyroscopicPropellerBearingBlock> GYROSCOPIC_PROPELLER_BEARING =
@@ -259,9 +281,9 @@ public class AeroBlocks {
                             .pattern(" G ")
                             .pattern(" B ")
                             .define('A', net.minecraft.tags.ItemTags.WOODEN_SLABS)
-                            .define('B', AllBlocks.BRASS_CASING.get())
-                            .define('G', SimItems.GYRO_MECHANISM.get())
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING.get()))
+                            .define('B', AllBlocks.BRASS_CASING)
+                            .define('G', SimItems.GYRO_MECHANISM)
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -286,7 +308,7 @@ public class AeroBlocks {
                             .define('P', AllItems.PROPELLER)
                             .define('G', SimItems.GYRO_MECHANISM)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.GYRO_MECHANISM.get()))
+                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.GYRO_MECHANISM))
                             .save(p)
                     )
                     .register();
@@ -303,6 +325,7 @@ public class AeroBlocks {
                     .recipe((c, p) -> {
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
                                 .requires(AeroBlocks.WOODEN_PROPELLER.get())
+                                .group("aeronautics:propeller_style")
                                 .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.PROPELLER.get()))
                                 .save(p, Aeronautics.path(c.getName() + "_from_andesite"));
 
@@ -327,8 +350,9 @@ public class AeroBlocks {
                     .blockstate(BlockStateGen.directionalBlockProvider(true))
                     .recipe((c, p) -> {
                         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
-                                .requires(AeroBlocks.ANDESITE_PROPELLER.get())
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.PROPELLER.get()))
+                                .requires(AeroBlocks.ANDESITE_PROPELLER)
+                                .group("aeronautics:propeller_style")
+                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.PROPELLER))
                                 .save(p, Aeronautics.path(c.getName() + "_from_andesite"));
                     })
                     .item()

@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "create:brass_casing"
+            "items": "#c:plates/iron"
           }
         ]
       },

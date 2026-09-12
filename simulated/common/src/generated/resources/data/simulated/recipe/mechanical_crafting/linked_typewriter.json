@@ -7,7 +7,7 @@
       "tag": "minecraft:buttons"
     },
     "G": {
-      "item": "create:golden_sheet"
+      "tag": "c:plates/gold"
     },
     "P": {
       "item": "create:precision_mechanism"

@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.multiloader.tanks;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.simulated_team.simulated.Simulated;
 import net.minecraft.core.component.DataComponentMap;
@@ -44,36 +43,35 @@ public class CFluidType {
         return this.equals(BLANK);
     }
 
-    public static final CFluidType BLANK = new CFluidType(Fluids.EMPTY, null);
+    public static final CFluidType BLANK = new CFluidType(Fluids.EMPTY, DataComponentPatch.EMPTY);
 
     public CompoundTag write() {
         final CompoundTag tag = new CompoundTag();
         tag.putString("Fluid", BuiltInRegistries.FLUID.getKey(this.fluid).toString());
-        if (this.data != null) {
-            final Codec<DataComponentMap> codec = DataComponentMap.CODEC;
-            final DataResult<Tag> result = codec.encodeStart(NbtOps.INSTANCE, this.data);
 
-            if (result.isError()) {
-                Simulated.LOGGER.warn(result.error().get().message());
-            } else {
-                tag.put("data", result.result().get());
-            }
+        final DataResult<Tag> result = DataComponentPatch.CODEC.encodeStart(NbtOps.INSTANCE, this.data);
+        if (result.isError()) {
+            Simulated.LOGGER.warn(result.error().get().message());
+        } else {
+            tag.put("data", result.result().get());
         }
+
         return tag;
     }
 
     public static CFluidType read(final CompoundTag tag) {
-        DataComponentMap map = null;
+        final Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(tag.getString("Fluid")));
+        DataComponentPatch data = DataComponentPatch.EMPTY;
         if (tag.contains("data")) {
-            final DataResult<Pair<DataComponentMap, Tag>> result = DataComponentMap.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));
+            final DataResult<Pair<DataComponentPatch, Tag>> result = DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));
             if (result.isError()) {
                 Simulated.LOGGER.warn(result.error().get().message());
             } else {
-                map = result.result().get().getFirst();
+                data = result.result().get().getFirst();
             }
         }
 
-        return new CFluidType(ResourceLocation.parse(tag.getString("Fluid")), map);
+        return new CFluidType(fluid, data);
     }
 
     @Override

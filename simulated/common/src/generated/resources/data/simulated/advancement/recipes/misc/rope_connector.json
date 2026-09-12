@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "create:iron_sheet"
+            "items": "simulated:rope_coupling"
           }
         ]
       },

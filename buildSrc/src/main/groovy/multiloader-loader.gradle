@@ -9,6 +9,11 @@ configurations {
     commonResources {
         canBeResolved = true
     }
+    localRuntime {
+        canBeResolved = false
+        canBeConsumed = false
+    }
+    runtimeClasspath.extendsFrom(localRuntime)
 }
 
 dependencies {
@@ -27,7 +32,9 @@ dependencies {
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.minecraft_version}:${project.sable_companion_version}")
 
     api("top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}")
-    api("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
     api("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
     api("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")

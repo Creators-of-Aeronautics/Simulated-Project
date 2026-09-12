@@ -106,7 +106,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
                 this.currentUser = userID;
                 final BlockPos previousTypewriter = playerEx.simulated$getCurrentTypewriter();
                 if (previousTypewriter != null) {
-                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe) {
+                    if (this.level.getBlockEntity(previousTypewriter) instanceof final LinkedTypewriterBlockEntity nbe && nbe != this) {
                         nbe.disconnectUser();
                     }
                 }

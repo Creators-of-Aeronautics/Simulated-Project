@@ -9,7 +9,7 @@
       "item": "minecraft:paper"
     },
     "S": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     }
   },
   "pattern": [

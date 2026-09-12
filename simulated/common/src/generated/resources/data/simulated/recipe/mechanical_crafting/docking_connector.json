@@ -7,7 +7,7 @@
       "item": "create:brass_casing"
     },
     "B": {
-      "item": "create:brass_sheet"
+      "tag": "c:plates/brass"
     },
     "C": {
       "item": "create:chute"
@@ -16,7 +16,7 @@
       "item": "create:electron_tube"
     },
     "I": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     },
     "P": {
       "item": "minecraft:piston"

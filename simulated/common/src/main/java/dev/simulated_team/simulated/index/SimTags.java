@@ -84,6 +84,10 @@ public class SimTags {
             return TagKey.create(Registries.ITEM, Simulated.path(path));
         }
 
+        public static TagKey<Item> dyesTag(DyeColor dyeColor) {
+            return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "dyes/" + dyeColor.getName()));
+        }
+
         public static void addGenerators() {
             Simulated.getRegistrate().addDataGenerator(ProviderType.ITEM_TAGS, Items::genItemTags);
         }

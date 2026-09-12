@@ -9,7 +9,7 @@
       "item": "create:industrial_iron_block"
     },
     "S": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     }
   },
   "pattern": [

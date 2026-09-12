@@ -8,16 +8,13 @@ import dev.simulated_team.simulated.index.SimResourceManagers;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.ingredients.ITypedIngredient;
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IIngredientAliasRegistration;
 import mezz.jei.api.registration.IModInfoRegistration;
-import mezz.jei.library.ingredients.itemStacks.TypedItemStack;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @JeiPlugin
 @SuppressWarnings("unused")
@@ -33,10 +30,7 @@ public class SimulatedJEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(final IGuiHandlerRegistration registration) {
-        IModPlugin.super.registerGuiHandlers(registration);
-
         registration.addGhostIngredientHandler(LinkedTypewriterScreen.class, new GhostIngredientHandler());
-
     }
 
     @Override
@@ -51,8 +45,7 @@ public class SimulatedJEI implements IModPlugin {
     @Override
     public void registerIngredientAliases(final IIngredientAliasRegistration registration) {
         for (final SearchAlias searchAlias : SimResourceManagers.SEARCH_ALIAS.entries()) {
-            final List<ITypedIngredient<ItemStack>> ingredients = searchAlias.getItems().stream().map(TypedItemStack::create).toList();
-            registration.addAliases(ingredients, searchAlias.terms());
+            registration.addAliases(VanillaTypes.ITEM_STACK, searchAlias.getItems(), searchAlias.terms());
         }
     }
 }

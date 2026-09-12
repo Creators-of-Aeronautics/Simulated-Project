@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.index;
 
+import com.mojang.serialization.Codec;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import foundry.veil.platform.registry.RegistrationProvider;
@@ -8,6 +9,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
@@ -32,6 +34,11 @@ public class SimDataComponents {
             .persistent(SimRegistries.NAVIGATION_TARGET.byNameCodec())
             .networkSynchronized(ResourceLocation.STREAM_CODEC
                     .map(SimRegistries.NAVIGATION_TARGET::get, SimRegistries.NAVIGATION_TARGET::getKey))
+    );
+
+    public static final DataComponentType<Float> BOUNCINESS = register("bounciness", builder -> builder
+            .persistent(Codec.FLOAT)
+            .networkSynchronized(ByteBufCodecs.FLOAT)
     );
 
     private static <T> DataComponentType<T> register(final String name, final UnaryOperator<DataComponentType.Builder<T>> builder) {

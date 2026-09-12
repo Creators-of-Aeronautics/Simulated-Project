@@ -3,10 +3,10 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     {
-      "item": "create:copper_sheet"
+      "tag": "c:plates/copper"
     },
     {
       "item": "create:industrial_iron_block"

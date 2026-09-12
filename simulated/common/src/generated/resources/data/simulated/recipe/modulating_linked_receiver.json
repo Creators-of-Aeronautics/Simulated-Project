@@ -6,7 +6,7 @@
       "item": "create:transmitter"
     },
     "B": {
-      "item": "create:golden_sheet"
+      "tag": "c:plates/gold"
     },
     "C": {
       "item": "create:brass_casing"

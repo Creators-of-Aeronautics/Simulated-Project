@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "create:shaft"
+            "items": "create:andesite_casing"
           }
         ]
       },

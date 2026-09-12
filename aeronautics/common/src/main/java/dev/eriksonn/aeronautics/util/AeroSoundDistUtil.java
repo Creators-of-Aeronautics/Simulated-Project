@@ -47,7 +47,6 @@ public class AeroSoundDistUtil {
         if (level != null && !minecraft.isPaused()) {
             if (BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND.canPlaySound() && !SoundExtension.isSoundPlaying(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND)) {
                 soundManager.queueTickingSound(BalloonBurnerSoundInstance.GLOBAL_HOT_AIR_BURNER_SOUND);
-                System.out.println("Start burner");
             }
 
             if (BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND.canPlaySound() && !SoundExtension.isSoundPlaying(BalloonBurnerSoundInstance.GLOBAL_STEAM_VENT_AIR_BURNER_SOUND)) {

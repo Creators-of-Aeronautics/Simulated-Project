@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "aeronautics:envelope",
+  "ingredients": [
+    {
+      "tag": "c:dyes/blue"
+    },
+    {
+      "tag": "aeronautics:shaftless_envelope"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics:blue_envelope"
+  }
+}

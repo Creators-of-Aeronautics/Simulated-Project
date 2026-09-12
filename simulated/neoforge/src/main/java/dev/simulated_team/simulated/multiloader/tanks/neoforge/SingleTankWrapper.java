@@ -15,11 +15,11 @@ public class SingleTankWrapper extends FluidTank {
     }
 
     public static FluidStack fromCType(final CFluidType type, final int amount) {
-        return new FluidStack(type.fluid.builtInRegistryHolder(), amount);
+        return new FluidStack(type.fluid().builtInRegistryHolder(), amount, type.data());
     }
 
     public static CFluidType toCType(final FluidStack stack) {
-        return new CFluidType(stack.getFluid(), stack.getComponents());
+        return new CFluidType(stack.getFluid(), stack.getComponents().asPatch());
     }
 
     @Override

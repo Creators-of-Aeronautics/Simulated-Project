@@ -13,10 +13,10 @@
       "item": "create:fluid_pipe"
     },
     "R": {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     "S": {
-      "item": "create:copper_sheet"
+      "tag": "c:plates/copper"
     }
   },
   "pattern": [

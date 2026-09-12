@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "group": "aeronautics:propeller_style",
   "ingredients": [
     {
       "item": "aeronautics:andesite_propeller"

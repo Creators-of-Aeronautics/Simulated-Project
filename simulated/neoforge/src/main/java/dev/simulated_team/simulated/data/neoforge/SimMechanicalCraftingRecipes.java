@@ -3,13 +3,13 @@ package dev.simulated_team.simulated.data.neoforge;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
@@ -25,7 +25,7 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine(" GPG ")
                     .key('B', Ingredient.of(ItemTags.BUTTONS))
                     .key('T', AllItems.TRANSMITTER)
-                    .key('G', AllItems.GOLDEN_SHEET)
+                    .key('G', CommonMetal.GOLD.plates)
                     .key('P', AllItems.PRECISION_MECHANISM)
             );
 
@@ -35,11 +35,11 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine("   P")
                     .patternLine("AMFR")
                     .patternLine("CC P")
-                    .key('C', Items.COPPER_INGOT)
+                    .key('C', CommonMetal.COPPER.ingots)
                     .key('R', SimItems.ROPE_COUPLING)
                     .key('A', AllItems.ANDESITE_ALLOY)
                     .key('M', AllItems.PRECISION_MECHANISM)
-                    .key('P', Items.SLIME_BALL)
+                    .key('P', Tags.Items.SLIME_BALLS)
                     .key('F', AllBlocks.FLUID_PIPE)
             );
 
@@ -50,12 +50,12 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine(" C ")
                     .patternLine("PAP")
                     .patternLine("BEB")
-                    .key('B', AllItems.BRASS_SHEET)
+                    .key('B', CommonMetal.BRASS.plates)
                     .key('E', AllItems.ELECTRON_TUBE)
                     .key('P', Blocks.PISTON)
                     .key('A', AllBlocks.BRASS_CASING)
                     .key('C', AllBlocks.CHUTE)
-                    .key('I', AllItems.IRON_SHEET)
+                    .key('I', CommonMetal.IRON.plates)
             );
 
 
