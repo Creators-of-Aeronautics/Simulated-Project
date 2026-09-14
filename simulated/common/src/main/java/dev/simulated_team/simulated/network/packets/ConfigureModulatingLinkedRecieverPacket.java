@@ -9,6 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public class ConfigureModulatingLinkedRecieverPacket extends SimBlockEntityConfigurationPacket<ModulatingLinkedReceiverBlockEntity> {
@@ -44,8 +45,8 @@ public class ConfigureModulatingLinkedRecieverPacket extends SimBlockEntityConfi
     @Override
     protected void applySettings(final ServerPlayer serverPlayer, final ModulatingLinkedReceiverBlockEntity be) {
         if (be instanceof final ModulatingLinkedReceiverBlockEntity abe) {
-            abe.minRange = this.minRange;
-            abe.maxRange = this.maxRange;
+            abe.minRange = Mth.clamp(this.minRange, 1, ModulatingLinkedReceiverBlockEntity.RANGE_LIMIT);
+            abe.maxRange = Mth.clamp(this.maxRange, abe.minRange, ModulatingLinkedReceiverBlockEntity.RANGE_LIMIT);
 
             abe.notifyUpdate();
         }

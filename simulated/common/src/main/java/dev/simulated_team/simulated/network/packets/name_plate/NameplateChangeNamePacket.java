@@ -28,6 +28,8 @@ public record NameplateChangeNamePacket(BlockPos controllerPos, @Nullable String
 
     public void handle(final ServerPacketContext context) {
         final Level level = context.level();
+        double range = context.player().blockInteractionRange() + 4;
+        if (context.player().distanceToSqr(controllerPos.getCenter()) > range*range) return;
         if (level.getBlockEntity(this.controllerPos()) instanceof final NameplateBlockEntity nbe && nbe.allowsEditing()) {
             nbe.setName(this.name, true, context.player());
         }
