@@ -24,4 +24,4 @@ jobs:
         env:
           local_maven_user: ${{ secrets.MAVEN_USERNAME }}
           local_maven_token: ${{ secrets.MAVEN_TOKEN }}
-        run: ./gradlew :simulated:build :simulated:neoforge:runGameTest
+        run: ./gradlew :simulated:build :simulated:neoforge:runGameTest :aeronautics:build :aeronautics:neoforge:runGameTest
