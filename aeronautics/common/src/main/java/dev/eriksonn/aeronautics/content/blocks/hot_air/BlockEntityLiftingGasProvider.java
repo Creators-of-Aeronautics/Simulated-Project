@@ -146,8 +146,8 @@ public interface BlockEntityLiftingGasProvider {
 
                 if (graph.hasBlockAt(unloaded.controllerPos())) {
                     serverBalloon.loadFrom(unloaded);
-                    balloonMap.markDirty();
                     iter.remove();
+                    balloonMap.markDirty();
                     break;
                 }
             }

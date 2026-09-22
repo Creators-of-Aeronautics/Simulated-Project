@@ -64,19 +64,23 @@ public abstract class Balloon {
         this.recomputeBalloonData();
     }
 
-    public void tick() {
+    public boolean tick() {
+        boolean changed = false;
+
         if (this.assembling) {
             this.rebuildBalloonFromController();
             this.assembling = false;
+            changed = true;
         }
 
-        this.checkHeaters();
+        return this.checkHeaters() || changed;
     }
 
-    protected void checkHeaters() {
+    protected boolean checkHeaters() {
         final Iterator<BlockEntityLiftingGasProvider> iterator = this.heaters.iterator();
 
         BlockPos highestPos = null;
+        boolean changed = false;
 
         final SubLevel balloonSubLevel = Sable.HELPER.getContaining(this.level, this.controllerPos);
         while (iterator.hasNext()) {
@@ -87,6 +91,7 @@ public abstract class Balloon {
             if (!heater.canOutputGas() || heaterPos == null || Sable.HELPER.getContaining(this.level, heaterPos) != balloonSubLevel) {
                 heater.setBalloon(null);
                 iterator.remove();
+                changed = true;
                 continue;
             }
 
@@ -98,18 +103,19 @@ public abstract class Balloon {
         }
 
         if (highestPos != null) {
-            this.moveController(highestPos);
+            changed |= this.moveController(highestPos);
         }
 
-        this.splitHeaters();
+        return this.splitHeaters() || changed;
     }
 
     /**
      * Splits heaters which are controlling blocks outside of this balloon off of this balloon
      * (in-case the region was split, or something of the nature)
      */
-    private void splitHeaters() {
+    private boolean splitHeaters() {
         final Iterator<BlockEntityLiftingGasProvider> iterator = this.heaters.iterator();
+        boolean changed = false;
 
         while (iterator.hasNext()) {
             final BlockEntityLiftingGasProvider heater = iterator.next();
@@ -121,8 +127,11 @@ public abstract class Balloon {
             if (!this.graph.hasBlockAt(heaterPos)) {
                 heater.setBalloon(null);
                 iterator.remove();
+                changed = true;
             }
         }
+
+        return changed;
     }
 
     public void onSolidBlockAdded(final BlockPos pos) {
@@ -293,15 +302,17 @@ public abstract class Balloon {
      * Moves the controller to a new position, rebuilding the region
      * @param newControllerPos the position to move the controller to
      */
-    public void moveController(final BlockPos newControllerPos) {
+    public boolean moveController(final BlockPos newControllerPos) {
         if (this.controllerPos.equals(newControllerPos))
-            return;
+            return false;
 
         final boolean needsRebuild = !Objects.equals(this.graph.getLayerAt(newControllerPos), this.graph.getLayerAt(this.controllerPos));
         this.controllerPos = newControllerPos;
 
         if (needsRebuild)
             this.rebuildBalloonFromController();
+
+        return true;
     }
 
     protected void rebuildBalloonFromController() {

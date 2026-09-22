@@ -17,6 +17,8 @@ import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import dev.ryanhcode.sable.util.SableMathUtils;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
@@ -67,27 +69,8 @@ public class ServerBalloon extends Balloon {
         SableMathUtils.fmaOuterProduct(this.averagePosition, this.averagePosition, -this.getCapacity(), this.translatedOuterProduct);
     }
 
-    protected void checkHeaters() {
-        super.checkHeaters();
-
-        for (final LiftingGasData data : this.gasAmounts.values()) {
-            data.target = 0;
-        }
-
-        if (this.leaking) {
-            return;
-        }
-
-        for (final BlockEntityLiftingGasProvider heater : this.heaters) {
-            this.gasAmounts.compute(heater.getLiftingGasType(), (k, v) -> {
-                if (v == null) {
-                    v = new LiftingGasData();
-                }
-
-                v.target += heater.getGasOutput();
-                return v;
-            });
-        }
+    protected boolean checkHeaters() {
+        return super.checkHeaters();
     }
     static final Vector3d force = new Vector3d();
     static final Vector3d torque = new Vector3d();
@@ -243,13 +226,32 @@ public class ServerBalloon extends Balloon {
         return this.totalTargetVolume > 0.05 || this.totalFilledVolume > 0.05;
     }
 
-    public void tick() {
-        super.tick();
-        this.updateGasAmounts();
+    public boolean tick() {
+        final boolean changed = super.tick();
+        return this.updateGasAmounts() || changed;
     }
 
-    public void updateGasAmounts() {
+    public boolean updateGasAmounts() {
         final int capacity = this.getCapacity();
+        boolean changed = false;
+        final Object2DoubleOpenHashMap<LiftingGasType> targetAmounts = new Object2DoubleOpenHashMap<>();
+
+        if (!this.leaking) {
+            for (final BlockEntityLiftingGasProvider heater : this.heaters) {
+                targetAmounts.addTo(heater.getLiftingGasType(), heater.getGasOutput());
+            }
+        }
+
+        for (final Object2DoubleMap.Entry<LiftingGasType> entry : targetAmounts.object2DoubleEntrySet()) {
+            this.gasAmounts.computeIfAbsent(entry.getKey(), x -> new LiftingGasData());
+        }
+
+        for (final Map.Entry<LiftingGasType, LiftingGasData> entry : this.gasAmounts.entrySet()) {
+            final LiftingGasData data = entry.getValue();
+            final double target = targetAmounts.getDouble(entry.getKey());
+            changed |= Double.compare(data.target, target) != 0;
+            data.target = target;
+        }
 
         // we'll allow the balloon to temporarily be over the capacity
         // so that situations such as nuking half of the balloon won't cause instant changes in lift
@@ -261,11 +263,12 @@ public class ServerBalloon extends Balloon {
         }
 
         // get nudges
-        final double scale = Math.min(capacity / this.totalTargetVolume, 1);
+        final double scale = this.totalTargetVolume > 0 ? Math.min(capacity / this.totalTargetVolume, 1) : 1;
         double totalDesiredVolume = 0;
         for (final Map.Entry<LiftingGasType, LiftingGasData> entry : this.gasAmounts.entrySet()) {
             final LiftingGasData data = entry.getValue();
             final LiftingGasType type = entry.getKey();
+            final double oldNudge = data.nudge;
             final double diff = data.target * scale - data.amount;
             data.nudge = diff > 0 ? diff / type.getFillingTime() : (diff < 0 ? diff / type.getEmptyingTime() : 0);
 
@@ -274,6 +277,7 @@ public class ServerBalloon extends Balloon {
                 data.nudge *= 1 + type.getResponsivenessAdjustmentFactor() / (1 + 3 * x * x);
             }
 
+            changed |= Double.compare(oldNudge, data.nudge) != 0;
             totalDesiredVolume += data.amount + data.nudge;
         }
 
@@ -284,13 +288,16 @@ public class ServerBalloon extends Balloon {
 
         for (final Map.Entry<LiftingGasType, LiftingGasData> entry : this.gasAmounts.entrySet()) {
             final LiftingGasData data = entry.getValue();
+            final double oldAmount = data.amount;
             data.amount += data.nudge;
+            changed |= Double.compare(oldAmount, data.amount) != 0;
             this.totalLift += data.amount * entry.getKey().getLiftStrength();
             this.totalFilledVolume += data.amount;
             this.totalVolumeChange += data.nudge;
         }
 
         this.totalTargetVolume = Math.min(this.totalTargetVolume, capacity);
+        return changed;
     }
 
     @Override
