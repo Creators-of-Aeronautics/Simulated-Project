@@ -158,20 +158,25 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
     @NotNull
     public ClientboundRopeDataPacket makeUpdatePacket() {
+        return this.makeUpdatePacket(Objects.requireNonNull(this.ownedServerStrand));
+    }
+
+    @NotNull
+    public ClientboundRopeDataPacket makeUpdatePacket(final ServerRopeStrand strand) {
         final ServerSubLevelContainer container = (ServerSubLevelContainer) SubLevelContainer.getContainer(this.getLevel());
         assert container != null;
 
         final SubLevelTrackingSystem trackingSystem = container.trackingSystem();
 
         //todo can be null from schematics
-        final RopeAttachment startAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.START);
-        final RopeAttachment endAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.END);
+        final RopeAttachment startAttachment = strand.getAttachment(RopeAttachmentPoint.START);
+        final RopeAttachment endAttachment = strand.getAttachment(RopeAttachmentPoint.END);
 
         return new ClientboundRopeDataPacket(
                 trackingSystem.getInterpolationTick(),
                 this.blockEntity.getBlockPos(),
-                this.ownedServerStrand.getUUID(),
-                new ObjectArrayList<>(this.ownedServerStrand.getPoints()),
+                strand.getUUID(),
+                new ObjectArrayList<>(strand.getPoints()),
                 startAttachment != null ? startAttachment.blockAttachment() : null,
                 endAttachment != null ? endAttachment.blockAttachment() : null
         );
@@ -624,7 +629,14 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     }
 
     public void takeOwnedStrand(final ServerRopeStrand ownedStrand) {
-        this.ownedServerStrand = ownedStrand;
+        this.takeMovedStrand(ownedStrand, true);
+    }
+
+    public void takeMovedStrand(final ServerRopeStrand strand, final boolean ownsStrand) {
+        this.strandOwner = ownsStrand;
+        this.attachedRopeID = strand.getUUID();
+        this.ownedServerStrand = ownsStrand ? strand : null;
+        this.blockEntity.setChanged();
     }
 
     public void receiveClientStrandStopped() {

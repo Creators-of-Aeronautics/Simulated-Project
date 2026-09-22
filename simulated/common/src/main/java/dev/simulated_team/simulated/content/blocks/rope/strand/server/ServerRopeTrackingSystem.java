@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,9 +41,7 @@ public class ServerRopeTrackingSystem implements SubLevelTrackingPlugin {
                 continue;
             }
 
-            final RopeAttachment attachment = strand.getAttachment(RopeAttachmentPoint.START);
-            final BlockPos block = attachment.blockAttachment();
-            final RopeStrandHolderBehavior holder = RopeStrandHolderBehavior.get(this.level.getBlockEntity(block), RopeStrandHolderBehavior.TYPE);
+            final RopeStrandHolderBehavior holder = this.getStartHolder(strand);
 
             if (holder == null) {
                 continue;
@@ -67,22 +66,18 @@ public class ServerRopeTrackingSystem implements SubLevelTrackingPlugin {
             if (strand.needsSync()) {
                 strand.networkingStopped = false;
 
-                final RopeAttachment attachment = strand.getAttachment(RopeAttachmentPoint.START);
-                final BlockPos block = attachment.blockAttachment();
-                final RopeStrandHolderBehavior holder = RopeStrandHolderBehavior.get(this.level.getBlockEntity(block), RopeStrandHolderBehavior.TYPE);
+                final RopeStrandHolderBehavior holder = this.getStartHolder(strand);
 
                 if (holder == null) {
                     continue;
                 }
 
-                holder.getStrandPacketSink().sendPacket(holder.makeUpdatePacket());
+                holder.getStrandPacketSink().sendPacket(holder.makeUpdatePacket(strand));
                 strand.justSynced();
             } else if (!strand.networkingStopped) {
                 strand.networkingStopped = true;
 
-                final RopeAttachment attachment = strand.getAttachment(RopeAttachmentPoint.START);
-                final BlockPos block = attachment.blockAttachment();
-                final RopeStrandHolderBehavior holder = RopeStrandHolderBehavior.get(this.level.getBlockEntity(block), RopeStrandHolderBehavior.TYPE);
+                final RopeStrandHolderBehavior holder = this.getStartHolder(strand);
 
                 if (holder == null) {
                     continue;
@@ -91,5 +86,35 @@ public class ServerRopeTrackingSystem implements SubLevelTrackingPlugin {
                 holder.getStrandPacketSink().sendPacket(holder.makeStopPacket());
             }
         }
+    }
+
+    @Nullable
+    private RopeStrandHolderBehavior getStartHolder(final ServerRopeStrand strand) {
+        final RopeAttachment attachment = strand.getAttachment(RopeAttachmentPoint.START);
+
+        if (attachment == null) {
+            return null;
+        }
+
+        final BlockPos block = attachment.blockAttachment();
+        final RopeStrandHolderBehavior holder = RopeStrandHolderBehavior.get(this.level.getBlockEntity(block), RopeStrandHolderBehavior.TYPE);
+
+        if (holder == null) {
+            return null;
+        }
+
+        final ServerRopeStrand ownedStrand = holder.getOwnedStrand();
+        if (ownedStrand != null) {
+            return ownedStrand.getUUID().equals(strand.getUUID()) ? holder : null;
+        }
+
+        final ServerRopeStrand attachedStrand = holder.getAttachedStrand();
+        if (attachedStrand != null && !attachedStrand.getUUID().equals(strand.getUUID())) {
+            return null;
+        }
+
+        holder.takeOwnedStrand(strand);
+
+        return holder;
     }
 }
