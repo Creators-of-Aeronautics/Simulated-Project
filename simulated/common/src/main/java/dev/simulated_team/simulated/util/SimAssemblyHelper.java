@@ -138,7 +138,7 @@ public class SimAssemblyHelper {
             return null;
         }
 
-        final SimAssemblyContraption contraption = new SimAssemblyContraption(includeStart ? null : selfPos, !includeEncasingGlue);
+        final SimAssemblyContraption contraption = new SimAssemblyContraption(selfPos, includeStart, !includeEncasingGlue);
 
         contraption.searchMovedStructure(level, toAssemble);
 
