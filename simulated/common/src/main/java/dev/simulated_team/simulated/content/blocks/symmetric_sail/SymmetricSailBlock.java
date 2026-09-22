@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import dev.simulated_team.simulated.service.SimConfigService;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -187,7 +188,7 @@ public class SymmetricSailBlock extends RotatedPillarBlock implements IWrenchabl
 
     @Override
     public float sable$getParallelDragScalar() {
-        return 1.75f;
+        return SimConfigService.INSTANCE.server().physics.symmetricSailParallelDragScalar.getF();
     }
 
     @Override
