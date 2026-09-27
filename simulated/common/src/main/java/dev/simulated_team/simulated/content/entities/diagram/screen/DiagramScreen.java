@@ -13,6 +13,7 @@ import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.simulated_team.simulated.Simulated;
+import dev.simulated_team.simulated.content.entities.diagram.CenterOfLiftCalculator;
 import dev.simulated_team.simulated.content.entities.diagram.DiagramConfig;
 import dev.simulated_team.simulated.content.entities.diagram.DiagramEntity;
 import dev.simulated_team.simulated.data.SimLang;
@@ -20,7 +21,9 @@ import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.index.SimResourceManagers;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramDataPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.DiagramSaveConfigPacket;
+import dev.simulated_team.simulated.network.packets.contraption_diagram.LiftMarkerDataPacket;
 import dev.simulated_team.simulated.network.packets.contraption_diagram.RequestDiagramDataPacket;
+import dev.simulated_team.simulated.network.packets.contraption_diagram.RequestLiftMarkerPacket;
 import dev.simulated_team.simulated.util.SimpleSubLevelGroupRenderer;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
@@ -121,6 +124,9 @@ public class DiagramScreen extends AbstractSimiScreen {
 
     private DiagramButton mergeButton;
 
+    @Nullable
+    private LiftMarkerDataPacket liftMarkerData = null;
+
     private boolean magnifying = false;
 
     private DiagramStickyNote note;
@@ -189,6 +195,10 @@ public class DiagramScreen extends AbstractSimiScreen {
             return;
         }
 
+        if (this.config.displayCenterOfLift()) {
+            this.requestLiftMarker();
+        }
+
         this.renderContents(this.subLevel, 0);
 
         for (int i = 0; i < 1; i++) {
@@ -212,14 +222,26 @@ public class DiagramScreen extends AbstractSimiScreen {
             return SimLang.translate("contraption_diagram.merge_forces").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.mergeForces() ? "contraption_diagram.merged" : "contraption_diagram.unmerged").color(0xffffffff)).component();
         });
 
-        final DiagramButton centerOfMassButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_COM_TOGGLE, diagramX + 9, diagramY + 9 + 20 * 2, Component.empty(), () -> {
+        final DiagramButton centerOfMassButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_COM_TOGGLE, diagramX + 9, diagramY + 9 + 20 * 3, Component.empty(), () -> {
             this.config.setDisplayCenterOfMass(!this.config.displayCenterOfMass());
             this.setConfigDirty();
         }).setDiagramTooltip(() -> {
             return SimLang.translate("contraption_diagram.center_of_mass").color(TOOLTIP_LABEL_COLOR).add(SimLang.translate(this.config.displayCenterOfMass() ? "contraption_diagram.shown" : "contraption_diagram.hidden").color(0xffffffff)).component();
         });
 
-        final DiagramButton massButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_MASS, diagramX + 9, diagramY + 9 + 20 * 3, Component.empty(), () -> {
+        final DiagramButton centerOfLiftButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_COL_TOGGLE, diagramX + 9, diagramY + 9 + 20 * 2, Component.empty(), () -> {
+            this.config.setDisplayCenterOfLift(!this.config.displayCenterOfLift());
+
+            if (this.config.displayCenterOfLift()) {
+                this.requestLiftMarker();
+            }
+
+            this.setConfigDirty();
+        }).setDiagramTooltip(() -> {
+            return SimLang.translate("contraption_diagram.center_of_lift").color(TOOLTIP_LABEL_COLOR).add(this.getLiftMarkerStatusText().color(0xffffffff)).component();
+        });
+
+        final DiagramButton massButton = new DiagramButton(SimGUITextures.DIAGRAM_ICON_MASS, diagramX + 9, diagramY + 9 + 20 * 4, Component.empty(), () -> {
 
         }).setDiagramTooltip(() -> {
             final String massString = this.serverData != null ? String.format("%,.2f", this.serverData.mass()) : "---";
@@ -229,6 +251,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         massButton.active = false;
 
         this.addRenderableWidget(forceButton);
+        this.addRenderableWidget(centerOfLiftButton);
         this.addRenderableWidget(centerOfMassButton);
         this.addRenderableWidget(massButton);
         this.addRenderableWidget(this.mergeButton);
@@ -270,6 +293,45 @@ public class DiagramScreen extends AbstractSimiScreen {
 
         this.updateViewportOrientation();
         this.setConfigDirty();
+    }
+
+    private LangBuilder getLiftMarkerStatusText() {
+        if (!this.config.displayCenterOfLift()) {
+            return SimLang.translate("contraption_diagram.hidden");
+        }
+
+        final LiftMarkerDataPacket data = this.liftMarkerData;
+        if (data == null || data.status() == CenterOfLiftCalculator.Status.OK) {
+            return SimLang.translate("contraption_diagram.shown");
+        }
+
+        return SimLang.translate(data.status() == CenterOfLiftCalculator.Status.NO_SURFACES
+                ? "contraption_diagram.col_no_surfaces"
+                : "contraption_diagram.col_cancelled");
+    }
+
+    private void requestLiftMarker() {
+        VeilPacketManager.server().sendPacket(new RequestLiftMarkerPacket(this.subLevel.getUniqueId()));
+    }
+
+    public void updateLiftMarker(final LiftMarkerDataPacket data) {
+        if (this.subLevel.getUniqueId().equals(data.subLevel())) {
+            this.liftMarkerData = data;
+        }
+    }
+
+    /**
+     * The center of lift to draw, or null while it is hidden or has not arrived yet
+     */
+    @Nullable
+    public LiftMarkerDataPacket getVisibleLiftMarker() {
+        final LiftMarkerDataPacket data = this.liftMarkerData;
+
+        if (!this.config.displayCenterOfLift() || data == null || data.status() != CenterOfLiftCalculator.Status.OK) {
+            return null;
+        }
+
+        return data;
     }
 
     private void addForceToggleWidgets(final int diagramX, final int diagramY) {
@@ -326,7 +388,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         final List<AABB> placed = new ObjectArrayList<>();
 
         // Avoid top-left region (diagram buttons are placed there)
-        placed.add(new AABB(0, 0, 0, 26, 66, 1));
+        placed.add(new AABB(0, 0, 0, 26, 86, 1));
 
         // Avoid rotation gizmo
         placed.add(new AABB(227, 8, 0, 250, 28, 1));
@@ -485,6 +547,10 @@ public class DiagramScreen extends AbstractSimiScreen {
         if (this.ticksWithoutUpdate++ > UPDATE_REQUEST_INTERVAL) {
             this.ticksWithoutUpdate = 0;
             VeilPacketManager.server().sendPacket(new RequestDiagramDataPacket(this.subLevel.getUniqueId()));
+
+            if (this.config.displayCenterOfLift()) {
+                this.requestLiftMarker();
+            }
         }
 
         this.lastPaperOffset = this.paperOffset;
@@ -651,6 +717,8 @@ public class DiagramScreen extends AbstractSimiScreen {
         if (this.config.displayCenterOfMass()) {
             this.renderCenterOfMass(graphics);
         }
+
+        this.renderCenterOfLift(graphics);
 
         ps.popPose();
 
@@ -1000,6 +1068,24 @@ public class DiagramScreen extends AbstractSimiScreen {
         final Vector2d screenCoords = getScreenCoords(centerOfMass, LOCAL_ORIENTATION, LOCAL_CAMERA_POSITION, PROJECTION_MAT, DIAGRAM_TEXTURE.width, DIAGRAM_TEXTURE.height);
 
         final SimGUITextures tex = SimGUITextures.DIAGRAM_ICON_COM;
+
+        final PoseStack pose = graphics.pose();
+        pose.pushPose();
+        pose.translate(screenCoords.x - 8, screenCoords.y - 8, 0);
+        graphics.blit(tex.location, 0, 0, 5, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
+        pose.popPose();
+    }
+
+    private void renderCenterOfLift(final GuiGraphics graphics) {
+        final LiftMarkerDataPacket data = this.getVisibleLiftMarker();
+
+        if (data == null) {
+            return;
+        }
+
+        final Vector2d screenCoords = getScreenCoords(new Vector3d(data.position()), LOCAL_ORIENTATION, LOCAL_CAMERA_POSITION, PROJECTION_MAT, DIAGRAM_TEXTURE.width, DIAGRAM_TEXTURE.height);
+
+        final SimGUITextures tex = SimGUITextures.DIAGRAM_ICON_COL;
 
         final PoseStack pose = graphics.pose();
         pose.pushPose();

@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 import java.util.List;
 
@@ -22,16 +23,18 @@ public class DiagramConfig {
             Codec.BOOL.fieldOf("merge_forces").forGetter(DiagramConfig::mergeForces),
             Codec.DOUBLE.fieldOf("yaw").forGetter(DiagramConfig::yaw),
             Codec.DOUBLE.fieldOf("pitch").forGetter(DiagramConfig::pitch),
-            NoteConfigs.NOTE_CONFIG_CODEC.fieldOf("note").forGetter(DiagramConfig::getNoteConfigs)
+            NoteConfigs.NOTE_CONFIG_CODEC.fieldOf("note").forGetter(DiagramConfig::getNoteConfigs),
+            Codec.BOOL.optionalFieldOf("display_center_of_lift", false).forGetter(DiagramConfig::displayCenterOfLift)
     ).apply(instance, DiagramConfig::new));
 
-    public static final StreamCodec<ByteBuf, DiagramConfig> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, DiagramConfig> STREAM_CODEC = NeoForgeStreamCodecs.composite(
             ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()), DiagramConfig::enabledForceGroups,
             ByteBufCodecs.BOOL, DiagramConfig::displayCenterOfMass,
             ByteBufCodecs.BOOL, DiagramConfig::mergeForces,
             ByteBufCodecs.DOUBLE, DiagramConfig::yaw,
             ByteBufCodecs.DOUBLE, DiagramConfig::pitch,
             NoteConfigs.NOTE_CONFIG_STREAM_CODEC, DiagramConfig::getNoteConfigs,
+            ByteBufCodecs.BOOL, DiagramConfig::displayCenterOfLift,
             DiagramConfig::new);
 
     private final List<ResourceLocation> enabledForceGroups;
@@ -39,6 +42,7 @@ public class DiagramConfig {
     private boolean mergeForces;
     private double yaw;
     private double pitch;
+    private boolean displayCenterOfLift;
 
     private final NoteConfigs noteConfig;
 
@@ -51,7 +55,7 @@ public class DiagramConfig {
         }
 
         final NoteConfigs noteConfig = new NoteConfigs(new BoundingBox3d(), -entity.getYRot(), entity.getXRot(), false);
-        return new DiagramConfig(enabledForceGroups, false, false, -entity.getYRot(), entity.getXRot(), noteConfig);
+        return new DiagramConfig(enabledForceGroups, false, false, -entity.getYRot(), entity.getXRot(), noteConfig, false);
     }
 
     public DiagramConfig(final List<ResourceLocation> enabledForceGroups,
@@ -59,12 +63,14 @@ public class DiagramConfig {
                          final boolean mergeForces,
                          final double yaw,
                          final double pitch,
-                         final NoteConfigs noteConfig) {
+                         final NoteConfigs noteConfig,
+                         final boolean displayCenterOfLift) {
         this.enabledForceGroups = enabledForceGroups;
         this.displayCenterOfMass = displayCenterOfMass;
         this.mergeForces = mergeForces;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.displayCenterOfLift = displayCenterOfLift;
 
         this.noteConfig = noteConfig;
     }
@@ -89,8 +95,16 @@ public class DiagramConfig {
         return this.pitch;
     }
 
+    public boolean displayCenterOfLift() {
+        return this.displayCenterOfLift;
+    }
+
     public void setDisplayCenterOfMass(final boolean displayCenterOfMass) {
         this.displayCenterOfMass = displayCenterOfMass;
+    }
+
+    public void setDisplayCenterOfLift(final boolean displayCenterOfLift) {
+        this.displayCenterOfLift = displayCenterOfLift;
     }
 
     public void setMergeForces(final boolean mergeForces) {
