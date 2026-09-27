@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public record AssemblePacket(BlockPos pos) implements CustomPacketPayload {
     public static final Type<AssemblePacket> TYPE = new Type<>(Simulated.path("assemble"));
@@ -24,11 +24,11 @@ public record AssemblePacket(BlockPos pos) implements CustomPacketPayload {
     }
 
     public void handle(final ServerPacketContext context) {
-        final ServerLevel level = (ServerLevel) context.player().level();
+        final ServerPlayer player = context.player();
+        final ServerLevel level = player.serverLevel();
 
-        final BlockEntity blockEntity = level.getBlockEntity(this.pos);
-
-        if (blockEntity instanceof final PhysicsAssemblerBlockEntity assembler) {
+        if (player.canInteractWithBlock(this.pos, 4) &&
+                level.getBlockEntity(this.pos) instanceof final PhysicsAssemblerBlockEntity assembler) {
             assembler.assembleOrDisassemble();
             SimStats.INTERACT_WITH_ASSEMBLER.awardTo(context.player());
         }

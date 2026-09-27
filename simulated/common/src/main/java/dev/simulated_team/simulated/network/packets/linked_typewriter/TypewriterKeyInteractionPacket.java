@@ -25,6 +25,11 @@ public record TypewriterKeyInteractionPacket(BlockPos interactionPos, int key, i
 
     public void handle(final ServerPacketContext context) {
         final Level level = context.level();
+
+        if (!level.isLoaded(this.interactionPos)) {
+            return;
+        }
+
         final BlockEntity be = level.getBlockEntity(this.interactionPos);
 
         if (be instanceof final LinkedTypewriterBlockEntity typeWriter) {

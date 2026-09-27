@@ -39,7 +39,7 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
     @Override
     public boolean activeTick(final Level level, final LocalPlayer player) {
         if (level.getBlockEntity(this.getInteractionPos()) instanceof ThrottleLeverBlockEntity &&
-                BlockHoldInteraction.inInteractionRange(player, this.getInteractionPos().getCenter(), 0)) {
+                BlockHoldInteraction.inInteractionRange(player, this.getInteractionPos().getCenter(), 4)) {
             final float speed = 0.85f;
             this.lastAnimatedValue = this.animatedValue;
             this.animatedValue = this.animatedValue * (1 - speed) + this.signal / 15f * speed;

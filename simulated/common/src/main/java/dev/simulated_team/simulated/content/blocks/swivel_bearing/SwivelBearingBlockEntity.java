@@ -211,9 +211,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         // check persistence to make sure we keep our sublevel after reload
-        if (this.getSubLevelID() != null) {
-            this.checkPersistence(this.getSubLevelID());
-        }
+        this.checkPersistence(this.getSubLevelID());
 
         // update our target angles
         this.lastTargetAngleDegrees = this.targetAngleDegrees;
@@ -530,11 +528,16 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             }
         }
 
-        final SubLevel subLevel = SubLevelContainer.getContainer(this.getLevel()).getSubLevel(id);
         this.validateConstraintHandle();
 
         if (this.handle == null) {
-            this.reattachConstraint((ServerSubLevel) subLevel, true);
+            final ServerSubLevel subLevel;
+            if (id == null) {
+                subLevel = null;
+            } else {
+                subLevel = (ServerSubLevel) SubLevelContainer.getContainer(this.getLevel()).getSubLevel(id);
+            }
+            this.reattachConstraint(subLevel, true);
         }
     }
 

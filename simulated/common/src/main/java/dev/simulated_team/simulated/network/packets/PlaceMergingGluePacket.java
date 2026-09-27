@@ -46,6 +46,10 @@ public record PlaceMergingGluePacket(BlockPos parentPos, BlockPos childPos, Dire
         final ServerPlayer player = ctx.player();
         final Level level = ctx.level();
 
+        if (!player.canInteractWithBlock(this.childPos, 4)) {
+            return;
+        }
+
         final ItemStack glue = player.getItemInHand(this.hand);
         final double distanceSquared = Sable.HELPER.distanceSquaredWithSubLevels(level, this.parentPos.getCenter(), this.childPos.getCenter());
         final float mergingGlueRange = SimConfigService.INSTANCE.server().assembly.mergingGlueRange.getF();

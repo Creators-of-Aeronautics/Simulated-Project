@@ -17,6 +17,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -49,9 +50,17 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
         final BlockPos parentRelative = this.parentPos().relative(this.parentFacing);
         final BlockPos childRelative = this.childPos().relative(this.childFacing);
 
+        if (!player.canInteractWithBlock(childRelative, 4)) {
+            return;
+        }
+
         final ItemStack spring = player.getItemInHand(this.hand);
         final double distanceSquared = Sable.HELPER.distanceSquaredWithSubLevels(level, parentRelative.getCenter(), childRelative.getCenter());
         if (!(spring.getItem() instanceof SpringItem) || distanceSquared > (SpringItemHandler.MAX_LENGTH + 1) * (SpringItemHandler.MAX_LENGTH + 1)) {
+            return;
+        }
+
+        if (!level.getBlockState(parentRelative).is(BlockTags.REPLACEABLE) || !level.getBlockState(childRelative).is(BlockTags.REPLACEABLE)) {
             return;
         }
 

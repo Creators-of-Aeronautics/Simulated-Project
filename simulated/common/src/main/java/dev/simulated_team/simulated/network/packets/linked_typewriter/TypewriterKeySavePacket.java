@@ -5,14 +5,12 @@ import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.Li
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterEntries;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import foundry.veil.api.network.handler.ServerPacketContext;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +34,8 @@ public record TypewriterKeySavePacket(Map<Integer, LinkedTypewriterEntries.Keybo
     public void handle(final ServerPacketContext context) {
         final Level level = context.level();
 
-        final BlockEntity be = level.getBlockEntity(this.pos);
-        if (be instanceof final LinkedTypewriterBlockEntity lbe) {
+        if (context.player().canInteractWithBlock(this.pos, 4) &&
+                level.getBlockEntity(this.pos) instanceof final LinkedTypewriterBlockEntity lbe) {
             // make sure all entries have a valid pos
             for (final LinkedTypewriterEntries.KeyboardEntry entry : this.changedKeys.values()) {
                 entry.setLocation(this.pos);

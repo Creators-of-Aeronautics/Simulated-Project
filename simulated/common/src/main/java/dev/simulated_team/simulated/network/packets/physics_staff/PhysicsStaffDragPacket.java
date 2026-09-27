@@ -37,6 +37,10 @@ public record PhysicsStaffDragPacket(UUID subLevel, Vector3dc playerRelativeGoal
         final ServerPlayer player = context.player();
         final Level level = player.level();
 
+        if (!PhysicsStaffActionPacket.validateWorthyness(context, player)) {
+            return;
+        }
+
         PhysicsStaffServerHandler.get((ServerLevel) level)
                 .drag(player.getGameProfile().getId(), this.subLevel, this.playerRelativeGoal, this.localAnchor, this.orientation);
     }

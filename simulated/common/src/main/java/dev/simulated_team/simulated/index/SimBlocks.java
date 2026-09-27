@@ -7,6 +7,7 @@ import com.simibubi.create.Create;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.api.behaviour.display.DisplayTarget;
 import com.simibubi.create.api.stress.BlockStressValues;
+import com.simibubi.create.content.contraptions.wrench.RadialWrenchMenu;
 import com.simibubi.create.foundation.block.DyedBlockList;
 import com.simibubi.create.foundation.block.ItemUseOverrides;
 import com.simibubi.create.foundation.data.AssetLookup;
@@ -151,7 +152,7 @@ public class SimBlocks {
                     .properties(properties -> properties
                             .destroyTime(5f))
                     .loot((p, b) -> p.dropOther(b, SWIVEL_BEARING.get()))
-                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE, SimTags.Blocks.SUPER_LIGHT)
                     .register();
 
     public static final BlockEntry<MergingGlueBlock> MERGING_GLUE =
@@ -611,7 +612,6 @@ public class SimBlocks {
                     .transform(SimStress.setCapacity(16.0))
                     .onRegister(BlockStressValues.setGeneratorSpeed(SteeringWheelBlockEntity.RPM))
                     .tag(SimTags.Blocks.LIGHT)
-                    .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("C")
                             .pattern("A")
@@ -936,6 +936,9 @@ public class SimBlocks {
     }
 
     public static void register() {
+        RadialWrenchMenu.registerBlacklistedBlock(SWIVEL_BEARING.getId());
+        RadialWrenchMenu.registerBlacklistedBlock(SWIVEL_BEARING_LINK_BLOCK.getId());
+        RadialWrenchMenu.registerBlacklistedBlock(PAIRED_DOCKING_CONNECTOR.getId());
     }
 
 }

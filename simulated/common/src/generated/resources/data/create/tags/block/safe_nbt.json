@@ -8,7 +8,6 @@
     "simulated:navigation_table",
     "simulated:optical_sensor",
     "simulated:analog_transmission",
-    "simulated:steering_wheel",
     "simulated:throttle_lever",
     "simulated:linked_typewriter",
     "simulated:directional_linked_receiver",

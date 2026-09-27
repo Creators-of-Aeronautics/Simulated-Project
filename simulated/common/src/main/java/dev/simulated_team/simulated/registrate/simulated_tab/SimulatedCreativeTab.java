@@ -11,7 +11,10 @@ import dev.simulated_team.simulated.mixin_interface.TickerExtension;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.Colorc;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,6 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,8 +37,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SimulatedCreativeTab {
+	private static final int ITEMS_PER_ROW = 9;
+
 	public static int CURRENT_ROW = 0;
 	public static final Object2IntOpenHashMap<ResourceLocation> SECTION_Y_VALUES = new Object2IntOpenHashMap<>();
+	private static final IntList SECTION_ITEM_COUNTS = new IntArrayList();
 
 	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY) {
 		final PoseStack ps = graphics.pose();
@@ -52,7 +59,7 @@ public class SimulatedCreativeTab {
 			ResourceLocation id = SimResourceManagers.SIMULATED_SECTION.getId(section);
 			int yValue = SECTION_Y_VALUES.getInt(id);
 			final int sectionRow = (yValue - CURRENT_ROW);
-			if(sectionRow < 0 || sectionRow > 4) continue;
+			if (sectionRow < 0 || sectionRow > 4) continue;
 
 			Font font = Minecraft.getInstance().font;
 			int x = 0;
@@ -62,12 +69,12 @@ public class SimulatedCreativeTab {
 
 			ResourceLocation bannerTexture = section.sprite();
 
-			if(section.animateOnHover()) {
+			if (section.animateOnHover()) {
 				boolean isHovering =
 						mouseX >= left + x &&
-						mouseX <= left + x + w &&
-						mouseY >= top + y &&
-						mouseY <= top + y + h;
+								mouseX <= left + x + w &&
+								mouseY >= top + y &&
+								mouseY <= top + y + h;
 				setPlaying(bannerTexture, isHovering);
 			}
 
@@ -107,7 +114,7 @@ public class SimulatedCreativeTab {
 		int height = (int) (corner.y - position.y);
 		int width = (int) (corner.x - position.x);
 		RenderSystem.enableScissor(
-                (int) position.x,
+				(int) position.x,
 				window.getHeight() - (int) position.y - height,
 				width,
 				height
@@ -118,7 +125,6 @@ public class SimulatedCreativeTab {
 		RenderSystem.disableScissor();
 
 		ps.popPose();
-
 	}
 
 	public static void processItems(final Consumer<ItemStack> displayItems, final Consumer<ItemStack> searchItems) {
@@ -136,9 +142,8 @@ public class SimulatedCreativeTab {
 			sectionMap.computeIfAbsent(section, (s) -> new LinkedList<>()).add(stack);
 		}
 
-		for (int i = 0; i < 9; i++) {
-			displayItems.accept(ItemStack.EMPTY);
-		}
+		SECTION_Y_VALUES.clear();
+		SECTION_ITEM_COUNTS.clear();
 
 		int y = 0;
 		final List<SimulatedSection> sectionKeys = sectionMap.keySet().stream().sorted().toList();
@@ -146,12 +151,13 @@ public class SimulatedCreativeTab {
 
 			int itemCount = 0;
 			final List<ItemStack> sectionItems = sectionMap.get(key);
+
 			for (ItemStack item : sectionItems) {
 				item = CreativeTabItemTransforms.applyTransform(item);
 
-				if(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.has(item.getItem())) {
+				if (CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.has(item.getItem())) {
 					searchItems.accept(item);
-				} else if(!CreativeTabItemTransforms.VisibilityType.INVISIBLE.has(item.getItem())) {
+				} else if (!CreativeTabItemTransforms.VisibilityType.INVISIBLE.has(item.getItem())) {
 					displayItems.accept(item);
 					searchItems.accept(item);
 					itemCount++;
@@ -160,29 +166,55 @@ public class SimulatedCreativeTab {
 
 			ResourceLocation id = SimResourceManagers.SIMULATED_SECTION.getId(key);
 			SECTION_Y_VALUES.put(id, y);
-			final int rowCount = (int) Math.ceil(itemCount / 9.0f);
+			SECTION_ITEM_COUNTS.add(itemCount);
+			final int rowCount = Math.ceilDiv(itemCount, ITEMS_PER_ROW);
 			y += rowCount + 1;
+		}
+	}
 
-			if(key != null && key.equals(sectionKeys.getLast())) {
-				break;
-			}
+	public static void padMenuItems(final List<ItemStack> items) {
+		if (SECTION_ITEM_COUNTS.isEmpty())
+			return;
 
-			int padding = 9 - itemCount % 9;
-			if(padding < 9) {
-				padding += 9;
+		int expectedItemCount = 0;
+		for (final int sectionItemCount : SECTION_ITEM_COUNTS) {
+			expectedItemCount += sectionItemCount;
+		}
+
+		if (items.size() != expectedItemCount)
+			return;
+
+		final List<ItemStack> padded = new ObjectArrayList<>();
+		addEmptySlots(padded, ITEMS_PER_ROW);
+
+		int itemIndex = 0;
+		for (int sectionIndex = 0; sectionIndex < SECTION_ITEM_COUNTS.size(); sectionIndex++) {
+			final int sectionItemCount = SECTION_ITEM_COUNTS.get(sectionIndex);
+			final int nextItemIndex = itemIndex + sectionItemCount;
+			padded.addAll(items.subList(itemIndex, nextItemIndex));
+			itemIndex = nextItemIndex;
+
+			if (sectionIndex < SECTION_ITEM_COUNTS.size() - 1) {
+				final int slotsToFinishRow = (ITEMS_PER_ROW - sectionItemCount % ITEMS_PER_ROW) % ITEMS_PER_ROW;
+				addEmptySlots(padded, slotsToFinishRow + ITEMS_PER_ROW);
 			}
-			for (int i = 0; i < padding; i++) {
-				displayItems.accept(ItemStack.EMPTY);
-			}
+		}
+
+		items.clear();
+		items.addAll(padded);
+	}
+
+	private static void addEmptySlots(final List<ItemStack> items, final int count) {
+		for (int i = 0; i < count; i++) {
+			items.add(ItemStack.EMPTY);
 		}
 	}
 
 	public static void setPlaying(ResourceLocation resourceLocation, boolean playing) {
 		TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().getSprite(resourceLocation);
 		SpriteContents.Ticker ticker = ((SpriteContentsExtension) sprite.contents()).simulated$getTicker();
-		if(ticker instanceof TickerExtension extension) {
+		if (ticker instanceof TickerExtension extension) {
 			extension.simulated$setPlaying(playing);
 		}
 	}
-
 }

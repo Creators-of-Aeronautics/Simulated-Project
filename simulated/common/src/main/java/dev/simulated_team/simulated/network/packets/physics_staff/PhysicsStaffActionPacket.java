@@ -53,9 +53,7 @@ public class PhysicsStaffActionPacket implements CustomPacketPayload {
         final ServerLevel level = (ServerLevel) context.level();
         final Player player = context.player();
 
-        if (!player.getMainHandItem().is(SimItems.PHYSICS_STAFF) &&
-                !player.getOffhandItem().is(SimItems.PHYSICS_STAFF)) {
-            context.disconnect(Component.literal("Invalid packet"));
+        if (!validateWorthyness(context, player)) {
             return;
         }
 
@@ -81,5 +79,14 @@ public class PhysicsStaffActionPacket implements CustomPacketPayload {
                 otherPlayer.connection.send(beamPacket);
             }
         }
+    }
+
+    public static boolean validateWorthyness(final PacketContext context, final Player player) {
+        if (!player.getMainHandItem().is(SimItems.PHYSICS_STAFF) &&
+                !player.getOffhandItem().is(SimItems.PHYSICS_STAFF)) {
+            context.disconnect(Component.literal("Invalid packet"));
+            return false;
+        }
+        return true;
     }
 }
