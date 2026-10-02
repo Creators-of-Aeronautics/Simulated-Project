@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface RopeHolderBlock <T extends SmartBlockEntity> extends BlockSubLevelAssemblyListener, IBE<T> {
@@ -53,31 +54,37 @@ public interface RopeHolderBlock <T extends SmartBlockEntity> extends BlockSubLe
 
     @Override
     default void afterMove(final ServerLevel originLevel, final ServerLevel serverLevel, final BlockState blockState, final BlockPos oldPos, final BlockPos newPos) {
-        final AtomicReference<ServerRopeStrand> ownedStrand = new AtomicReference<>();
+        final AtomicBoolean wasStrandOwner = new AtomicBoolean(false);
+        final AtomicReference<ServerRopeStrand> movedStrand = new AtomicReference<>();
         this.withBlockEntityDo(originLevel, oldPos, be -> {
             final RopeStrandHolderBehavior holder = this.getHolder(be);
-            ownedStrand.set(holder.getOwnedStrand());
+            wasStrandOwner.set(holder.ownsRope());
+            ServerRopeStrand strand = holder.getAttachedStrand();
+            if (strand == null) {
+                strand = holder.getOwnedStrand();
+            }
+            movedStrand.set(strand);
             holder.detachRope();
         });
         this.withBlockEntityDo(serverLevel, newPos, be -> {
             final RopeStrandHolderBehavior holder = this.getHolder(be);
+            final ServerRopeStrand strand = movedStrand.get();
 
-            if (ownedStrand.get() != null && holder.ownsRope()) {
-                holder.takeOwnedStrand(ownedStrand.get());
+            if (strand == null) {
+                return;
             }
 
-            final ServerRopeStrand strand = holder.getAttachedStrand();
+            final boolean ownsStrand = wasStrandOwner.get();
+            holder.takeMovedStrand(strand, ownsStrand);
 
-            if (strand != null) {
-                strand.getTrackingPlayers().clear();
-                final SubLevel newSubLevel = Sable.HELPER.getContaining(serverLevel, newPos);
-                final UUID newSubLevelId = newSubLevel != null ? newSubLevel.getUniqueId() : null;
+            strand.getTrackingPlayers().clear();
+            final SubLevel newSubLevel = Sable.HELPER.getContaining(serverLevel, newPos);
+            final UUID newSubLevelId = newSubLevel != null ? newSubLevel.getUniqueId() : null;
 
-                final RopeAttachmentPoint point = holder.ownsRope() ? RopeAttachmentPoint.START : RopeAttachmentPoint.END;
-                final RopeAttachment attachment = new RopeAttachment(point, newSubLevelId, newPos);
+            final RopeAttachmentPoint point = ownsStrand ? RopeAttachmentPoint.START : RopeAttachmentPoint.END;
+            final RopeAttachment attachment = new RopeAttachment(point, newSubLevelId, newPos);
 
-                strand.addAttachment(serverLevel, point, attachment);
-            }
+            strand.addAttachment(serverLevel, point, attachment);
         });
     }
 
