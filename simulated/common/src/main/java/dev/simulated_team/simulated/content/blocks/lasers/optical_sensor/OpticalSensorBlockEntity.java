@@ -17,6 +17,7 @@ import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import dev.simulated_team.simulated.content.blocks.lasers.LaserBehaviour;
 import dev.simulated_team.simulated.data.SimLang;
+import dev.simulated_team.simulated.mixin_interface.filter_stack_fluid.FilteringBehaviourFluidExtension;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.service.SimFluidService;
 import net.createmod.catnip.math.AngleHelper;
@@ -43,6 +44,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3dc;
 
@@ -110,7 +112,8 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
 
                 this.lastRayDistance = this.rayDistance;
             }
-            if(SimFluidService.INSTANCE.getFluidInItem(this.filter.getFilter()) != null) {
+            FilteringBehaviourFluidExtension duck = (FilteringBehaviourFluidExtension) this.filter;
+            if(duck.simulated$hasFluid()) {
                 this.laser.setFluidCollide(ClipContext.Fluid.ANY);
             } else {
                 this.laser.setFluidCollide(ClipContext.Fluid.NONE);
@@ -126,9 +129,9 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         final ItemStack filterItem = this.filter.getFilter();
         if (context.getType() != HitResult.Type.MISS) {
             if (!filterItem.isEmpty()) {
-                final Fluid fluidInItem = SimFluidService.INSTANCE.getFluidInItem(filterItem);
-                if (fluidInItem != null && !hitFluid.isEmpty()) {
-                    passed = fluidInItem.isSame(hitFluid.getType());
+                FilteringBehaviourFluidExtension duck = (FilteringBehaviourFluidExtension) this.filter;
+                if (duck.simulated$hasFluid() && !hitFluid.isEmpty()) {
+                    passed = this.filter.test(new FluidStack(hitFluid.getType(), 1000));
                 } else {
                     passed = !hitBlock.isAir() && this.filter.test(new ItemStack(hitBlock.getBlock()));
                 }
