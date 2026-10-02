@@ -37,6 +37,11 @@ public class ConfigureModulatingLinkedRecieverPacket extends SimBlockEntityConfi
     }
 
     @Override
+    protected Class<ModulatingLinkedReceiverBlockEntity> blockEntityClass() {
+        return ModulatingLinkedReceiverBlockEntity.class;
+    }
+
+    @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }

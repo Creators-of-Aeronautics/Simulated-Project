@@ -33,10 +33,10 @@ public record RopeRidingPacket(UUID uuid, boolean stop) implements CustomPacketP
         player.connection.aboveGroundVehicleTickCount = 0;
         player.fallDistance = 0.0f;
 
-        if (this.stop)
+        if (this.stop) {
             ServerChainConveyorHandler.handleStopRidingPacket(player);
-        else
+        } else {
             ServerChainConveyorHandler.handleTTLPacket(player);
-
+        }
     }
 }

@@ -31,7 +31,7 @@ public record ThrottleLeverSignalPacket(BlockPos pos, int signal) implements Cus
 
         if (BlockHoldInteraction.inInteractionRange(player, this.pos.getCenter(), 4) &&
                 level.getBlockEntity(this.pos) instanceof final ThrottleLeverBlockEntity throttleLever) {
-            throttleLever.setSignal(this.signal);
+            throttleLever.setSignal(Math.clamp(this.signal, 0, 15));
         }
     }
 }

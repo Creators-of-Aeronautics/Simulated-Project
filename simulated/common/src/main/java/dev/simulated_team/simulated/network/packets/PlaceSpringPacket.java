@@ -21,7 +21,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction parentFacing, Direction childFacing,
@@ -68,8 +67,8 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
         final SpringBlockEntity partnerSpring = this.addSpring(level, childRelative, parentRelative, this.childFacing(), false, (float) distanceSquared);
 
         if (controllerSpring == null || partnerSpring == null) {
-            level.setBlockAndUpdate(parentRelative, Blocks.AIR.defaultBlockState());
-            level.setBlockAndUpdate(childRelative, Blocks.AIR.defaultBlockState());
+            level.destroyBlock(parentRelative, true, player);
+            level.destroyBlock(childRelative, true, player);
             return;
         }
 

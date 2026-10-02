@@ -27,7 +27,7 @@ public record SteeringWheelPacket(boolean shouldStop, float targetAngle, BlockPo
 
         if (player.canInteractWithBlock(this.pos, 4) &&
                 player.level().getBlockEntity(this.pos) instanceof final SteeringWheelBlockEntity be) {
-            be.targetAngleToUpdate = this.targetAngle();
+            be.targetAngleToUpdate = Math.clamp(this.targetAngle(), -be.angleInput.getValue(), be.angleInput.getValue());
 
             if (this.shouldStop()) {
                 be.stopHolding();

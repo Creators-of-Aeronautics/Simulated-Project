@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.network.packets.helpers;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.SyncedBlockEntity;
 import foundry.veil.api.network.handler.ServerPacketContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -27,19 +26,22 @@ public abstract class SimBlockEntityConfigurationPacket<T extends SmartBlockEnti
         final Level world = player.level();
         if (world.isLoaded(this.pos)) {
             if (player.distanceToSqr(Vec3.atBottomCenterOf(this.pos)) <= this.maxRangeSqr()) {
-                final BlockEntity blockEntity = world.getBlockEntity(this.pos);
-                if (blockEntity instanceof SyncedBlockEntity) {
-                    this.applySettings(player, (T) blockEntity);
+                final BlockEntity checkedBlockEntity = world.getBlockEntity(this.pos);
+                if (this.blockEntityClass().isInstance(checkedBlockEntity)) {
+                    final T blockEntity = this.blockEntityClass().cast(checkedBlockEntity);
+                    this.applySettings(player, blockEntity);
                     if (!this.causeUpdate()) {
                         return;
                     }
 
-                    ((SyncedBlockEntity)blockEntity).sendData();
+                    blockEntity.sendData();
                     blockEntity.setChanged();
                 }
             }
         }
     }
+
+    protected abstract Class<T> blockEntityClass();
 
     protected int maxRangeSqr() {
         return 20;

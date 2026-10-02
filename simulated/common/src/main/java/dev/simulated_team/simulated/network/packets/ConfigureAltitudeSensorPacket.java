@@ -38,6 +38,10 @@ public class ConfigureAltitudeSensorPacket extends SimBlockEntityConfigurationPa
         return this.highSignal;
     }
 
+    @Override
+    protected Class<AltitudeSensorBlockEntity> blockEntityClass() {
+        return AltitudeSensorBlockEntity.class;
+    }
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {

@@ -33,6 +33,10 @@ public record UpdatePlayerUsingHandlePacket(float desiredRange, boolean remove, 
         final ServerPlayer player = ctx.player();
         final Level level = ctx.level();
 
+        if (!level.isLoaded(this.interactionPos)) {
+            return;
+        }
+
         final BlockEntity be = level.getBlockEntity(this.interactionPos);
 
         if (this.remove) {

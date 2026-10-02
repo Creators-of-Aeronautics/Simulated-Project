@@ -17,7 +17,8 @@ public record TypewriterDisconnectUser(BlockPos pos) implements CustomPacketPayl
     );
 
     public void handle(final ServerPacketContext context) {
-        if (context.level().getBlockEntity(this.pos) instanceof final LinkedTypewriterBlockEntity lbe) {
+        if (context.level().isLoaded(this.pos) &&
+                context.level().getBlockEntity(this.pos) instanceof final LinkedTypewriterBlockEntity lbe) {
             if (lbe.checkUser(context.player().getUUID())) {
                 lbe.disconnectUser();
             }

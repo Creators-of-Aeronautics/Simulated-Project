@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -32,10 +33,11 @@ public record LevititeCatalystCrystallizationPacket(BlockPos pos, InteractionHan
 
 	public void handle(final ServerPacketContext context) {
 		final ServerPlayer player = context.player();
+		final ServerLevel level = player.serverLevel();
 
 		final ItemStack item = player.getItemInHand(this.hand);
 
-		if (!CatalyzerHelper.isCatalyzer(item)) {
+		if (!CatalyzerHelper.isCatalyzer(item) || !level.isLoaded(this.pos)) {
 			return;
 		}
 
@@ -50,8 +52,8 @@ public record LevititeCatalystCrystallizationPacket(BlockPos pos, InteractionHan
 		final CrystalPropagationContext itemContext = item.is(AeroTags.ItemTags.LEVITITE_SOUL_CATALYZER) ?
 				AeroLevititeBlendPropagationContexts.SOUL_CONTEXT.get() :
 				AeroLevititeBlendPropagationContexts.STANDARD_CONTEXT.get();
-		LevititeBlendHelper.addLevititeBlendTicker(context.level(), this.pos, false, false,
-				itemContext.getContextForSpread(context.level(), this.pos)
+		LevititeBlendHelper.addLevititeBlendTicker(level, this.pos, false, false,
+				itemContext.getContextForSpread(level, this.pos)
 		);
 	}
 }

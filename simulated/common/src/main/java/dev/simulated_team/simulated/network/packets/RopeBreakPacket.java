@@ -48,6 +48,10 @@ public record RopeBreakPacket(UUID uuid) implements CustomPacketPayload {
 
             final BlockPos blockAttachment = startAttachment.blockAttachment();
 
+            if (!level.isLoaded(blockAttachment)) {
+                return;
+            }
+
             final BlockEntity blockEntity = level.getBlockEntity(blockAttachment);
 
             if (!(blockEntity instanceof final SmartBlockEntity smartBlockEntity)) {
