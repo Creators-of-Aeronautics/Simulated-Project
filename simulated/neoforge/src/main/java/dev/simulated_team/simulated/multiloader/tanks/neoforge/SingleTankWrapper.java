@@ -28,6 +28,14 @@ public class SingleTankWrapper extends FluidTank {
     }
 
     @Override
+    public @NotNull FluidStack drain(final FluidStack resource, final FluidAction action) {
+        if (resource.isEmpty() || !FluidStack.isSameFluidSameComponents(resource, this.getFluid())) {
+            return FluidStack.EMPTY;
+        }
+        return this.drain(resource.getAmount(), action);
+    }
+
+    @Override
     public @NotNull FluidStack drain(final int maxDrain, final FluidAction action) {
         return fromCType(this.tank.type, (int) this.tank.extract(this.tank.type, maxDrain, action.simulate()));
     }
