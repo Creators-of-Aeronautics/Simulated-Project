@@ -38,6 +38,11 @@ neoForge {
                     '--existing-mod', 'create',
                     '--existing-mod', 'simulated'
         }
+
+        gameTest {
+            type = "gameTestServer"
+            gameDirectory = project.file('build/gametest')
+        }
     }
 
     mods {
