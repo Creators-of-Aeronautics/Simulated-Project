@@ -3,6 +3,7 @@ package dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.map;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.ServerBalloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.graph.BalloonBuilder;
+import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.graph.BalloonLayerData;
 import dev.eriksonn.aeronautics.index.AeroTags;
 import dev.ryanhcode.sable.companion.math.BoundingBox3i;
 import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
@@ -10,6 +11,7 @@ import dev.ryanhcode.sable.api.sublevel.SubLevelObserver;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.ryanhcode.sable.sublevel.storage.SubLevelRemovalReason;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.createmod.catnip.data.WorldAttached;
 import net.minecraft.core.BlockPos;
@@ -59,6 +61,7 @@ public class BalloonMap {
      */
     public void addBalloon(final Balloon balloon) {
         this.balloons.add(balloon);
+        this.markDirty();
     }
 
     public void markDirty() {
@@ -74,13 +77,18 @@ public class BalloonMap {
         final boolean newAirtight = newState.is(AeroTags.BlockTags.AIRTIGHT);
 
         if (oldAirtight != newAirtight) {
+            boolean changed = false;
             for (final Balloon balloon : this.getBalloonsNear(blockPos)) {
                 if (newAirtight)
                     balloon.onAirtightBlockAdded(blockPos);
                 else
                     balloon.onAirtightBlockRemoved(blockPos);
+                changed = true;
             }
 
+            if (changed) {
+                this.markDirty();
+            }
             return;
         }
 
@@ -88,11 +96,17 @@ public class BalloonMap {
         final boolean newSolid = BalloonBuilder.isSolid(newState);
 
         if (oldSolid != newSolid) {
+            boolean changed = false;
             for (final Balloon balloon : this.getBalloonsNear(blockPos)) {
                 if (newSolid)
                     balloon.onSolidBlockAdded(blockPos);
                 else
                     balloon.onSolidBlockRemoved(blockPos);
+                changed = true;
+            }
+
+            if (changed) {
+                this.markDirty();
             }
         }
     }
@@ -105,41 +119,114 @@ public class BalloonMap {
             this.initialized = true;
         }
 
-        this.balloons.forEach(Balloon::tick);
-        this.removeBalloons();
-        this.mergeBalloons();
-        this.markDirty();
+        boolean changed = false;
+        for (final Balloon balloon : this.balloons) {
+            changed |= balloon.tick();
+        }
+
+        changed |= this.removeBalloons();
+        changed |= this.mergeBalloons();
+
+        if (changed) {
+            this.markDirty();
+        }
     }
 
     /**
      * Merges balloons that hold heaters that hold eachothers controller positions
      */
-    private void mergeBalloons() {
+    private boolean mergeBalloons() {
+        if (this.balloons.size() < 2) {
+            return false;
+        }
+
+        final Long2ObjectOpenHashMap<ObjectList<Balloon>> controllersByLayerChunk = new Long2ObjectOpenHashMap<>();
+        for (final Balloon balloon : this.balloons) {
+            controllersByLayerChunk.computeIfAbsent(getLayerChunkKey(balloon.getControllerPos()), key -> new ObjectArrayList<>())
+                    .add(balloon);
+        }
+
         final ObjectIterator<Balloon> iter = this.balloons.iterator();
+        boolean changed = false;
 
         while (iter.hasNext()) {
             final Balloon balloon = iter.next();
+            final Balloon otherBalloon = this.findMergeTarget(balloon, controllersByLayerChunk);
 
-            for (final Balloon otherBalloon : this.balloons) {
-                if (balloon == otherBalloon) continue;
+            if (otherBalloon != null) {
+                // the balloons intersect. delightful. we shall nuke the first
+                balloon.onRemoved();
+                otherBalloon.merge(balloon);
+                iter.remove();
+                removeControllerFromIndex(balloon, controllersByLayerChunk);
+                changed = true;
+            }
+        }
 
-                if (balloon.getBounds().intersects(otherBalloon.getBounds()) &&
-                        balloon.getGraph().getLayerAt(otherBalloon.getControllerPos()) != null) {
-                    // the balloons intersect. delightful. we shall nuke the first
-                    balloon.onRemoved();
-                    otherBalloon.merge(balloon);
-                    iter.remove();
-                    break;
+        return changed;
+    }
+
+    @Nullable
+    private Balloon findMergeTarget(final Balloon balloon,
+                                    final Long2ObjectOpenHashMap<ObjectList<Balloon>> controllersByLayerChunk) {
+        for (final List<BalloonLayerData> layersAtY : balloon.getGraph().getAllLayers()) {
+            for (final BalloonLayerData layer : layersAtY) {
+                for (final long chunkLong : layer.getChunks().keySet()) {
+                    final int chunkX = BalloonLayerData.getChunkX(chunkLong);
+                    final int chunkZ = BalloonLayerData.getChunkZ(chunkLong);
+                    final ObjectList<Balloon> candidates = controllersByLayerChunk.get(getLayerChunkKey(chunkX, layer.getYLevel(), chunkZ));
+
+                    if (candidates == null) {
+                        continue;
+                    }
+
+                    for (final Balloon otherBalloon : candidates) {
+                        if (balloon == otherBalloon) {
+                            continue;
+                        }
+
+                        if (balloon.getBounds().intersects(otherBalloon.getBounds()) &&
+                                balloon.getGraph().getLayerAt(otherBalloon.getControllerPos()) != null) {
+                            return otherBalloon;
+                        }
+                    }
                 }
             }
         }
+
+        return null;
+    }
+
+    private static void removeControllerFromIndex(final Balloon balloon,
+                                                  final Long2ObjectOpenHashMap<ObjectList<Balloon>> controllersByLayerChunk) {
+        final long key = getLayerChunkKey(balloon.getControllerPos());
+        final ObjectList<Balloon> balloons = controllersByLayerChunk.get(key);
+
+        if (balloons == null) {
+            return;
+        }
+
+        balloons.remove(balloon);
+
+        if (balloons.isEmpty()) {
+            controllersByLayerChunk.remove(key);
+        }
+    }
+
+    private static long getLayerChunkKey(final BlockPos pos) {
+        return getLayerChunkKey(pos.getX() >> BalloonLayerData.LAYER_CHUNK_SHIFT, pos.getY(), pos.getZ() >> BalloonLayerData.LAYER_CHUNK_SHIFT);
+    }
+
+    private static long getLayerChunkKey(final int chunkX, final int y, final int chunkZ) {
+        return BlockPos.asLong(chunkX, y, chunkZ);
     }
 
     /**
      * Remove non-valid balloons
      */
-    private void removeBalloons() {
+    private boolean removeBalloons() {
         final ObjectIterator<Balloon> iter = this.balloons.iterator();
+        boolean changed = false;
 
         while (iter.hasNext()) {
             final Balloon balloon = iter.next();
@@ -147,8 +234,11 @@ public class BalloonMap {
             if (!balloon.isValid()) {
                 iter.remove();
                 balloon.onRemoved();
+                changed = true;
             }
         }
+
+        return changed;
     }
 
     /**
@@ -156,7 +246,10 @@ public class BalloonMap {
      * @param balloon the balloon to remove
      */
     public void removeBalloon(final Balloon balloon) {
-        balloon.onRemoved();
+        if (this.balloons.remove(balloon)) {
+            balloon.onRemoved();
+            this.markDirty();
+        }
     }
 
     @Nullable
@@ -235,6 +328,7 @@ public class BalloonMap {
 
                 final BalloonMap map = BalloonMap.MAP.get(this.level);
                 final Iterator<Balloon> iter = map.getBalloons().iterator();
+                boolean changed = false;
 
                 while (iter.hasNext()) {
                     final Balloon balloon = iter.next();
@@ -246,7 +340,12 @@ public class BalloonMap {
                     if (plot.contains(controllerPos.getX(), controllerPos.getZ())) {
                         balloon.onRemoved();
                         iter.remove();
+                        changed = true;
                     }
+                }
+
+                if (changed) {
+                    map.markDirty();
                 }
             }
         }
