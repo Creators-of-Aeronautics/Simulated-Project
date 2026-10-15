@@ -78,6 +78,8 @@ public class PropellerBearingContraptionEntity extends ControlledContraptionEnti
             if (tile.disassemblySlowdown) {
                 return tile.getInterpolatedAngle(partialTicks - 1);
             }
+            // The bearing keeps advancing even when the contraption entity's tick is culled.
+            return partialTicks == 1.0F ? this.angle : angleLerp(partialTicks, tile.prevAngle, this.angle);
         }
 
         return partialTicks == 1.0F ? this.angle : angleLerp(partialTicks, this.prevAngle, this.angle);
