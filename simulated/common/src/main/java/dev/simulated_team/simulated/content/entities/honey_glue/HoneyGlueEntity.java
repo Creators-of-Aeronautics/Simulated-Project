@@ -24,6 +24,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -257,6 +258,11 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     }
 
     @Override
+    public boolean ignoreExplosion(Explosion explosion) {
+        return true; // Fix lag related to large explosions, since honey glue cannot be hurt (consequence of above method)
+    }
+
+    @Override
     public ItemRequirement getRequiredItems() {
         return new ItemRequirement(ItemRequirement.ItemUseType.DAMAGE, SimItems.HONEY_GLUE.get());
     }
@@ -279,4 +285,5 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     public @NotNull EntityDimensions getDimensions(@NotNull final Pose pose) {
         return super.getDimensions(pose).withEyeHeight(0.0F);
     }
+
 }
