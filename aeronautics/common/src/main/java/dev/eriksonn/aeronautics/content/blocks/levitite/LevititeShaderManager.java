@@ -123,6 +123,7 @@ public class LevititeShaderManager {
         subLevel.logicalPose().orientation().transform(temp);
         linearVelocity.sub(temp);
         SableMathUtils.getAngularVelocity(subLevel.lastPose().orientation(), subLevel.logicalPose().orientation(), angularVelocity);
+        subLevel.logicalPose().orientation().transform(angularVelocity);
 
         smoothedLinearVelocity.lerp(linearVelocity, SMOOTHING_SPEED);
         smoothedAngularVelocity.lerp(angularVelocity, SMOOTHING_SPEED);
