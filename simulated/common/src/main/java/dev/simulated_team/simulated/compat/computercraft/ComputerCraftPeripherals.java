@@ -20,6 +20,7 @@ public class ComputerCraftPeripherals implements SimModCompatibilityService {
         service.addPeripheral(SimBlockEntityTypes.NAVIGATION_TABLE, NavTablePeripheral::new);
         service.addPeripheral(SimBlockEntityTypes.LINKED_TYPEWRITER, LinkedTypewriterPeripheral::new);
         service.addPeripheral(SimBlockEntityTypes.OPTICAL_SENSOR, OpticalSensorPeripheral::new);
+        service.addPeripheral(SimBlockEntityTypes.STEERING_WHEEL, SteeringWheelPeripheral::new);
         service.addPeripheral(SimBlockEntityTypes.SWIVEL_BEARING, SwivelBearingPeripheral::new);
 
         service.addPeripheral(SimBlockEntityTypes.VELOCITY_SENSOR, VelocitySensorPeripheral::new);
