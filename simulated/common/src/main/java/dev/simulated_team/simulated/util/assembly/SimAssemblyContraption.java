@@ -55,9 +55,12 @@ public class SimAssemblyContraption {
     private final ObjectOpenHashSet<SuperGlueEntity> glueCache = new ObjectOpenHashSet<>();
     private final ObjectOpenHashSet<HoneyGlueEntity> honeyGlueCache = new ObjectOpenHashSet<>();
 
-    public SimAssemblyContraption(final BlockPos anchor, final boolean ignoreEnclosingGlue) {
-        this.anchor = anchor;
+    public SimAssemblyContraption(final BlockPos selfPos, final boolean includeStart, boolean ignoreEnclosingGlue) {
+        this.anchor = includeStart ? null : selfPos;
         this.ignoreEnclosingGlue = ignoreEnclosingGlue;
+        if (includeStart) {
+            this.blocks.add(selfPos);
+        }
     }
 
     public boolean checkAndCacheGlue(final LevelAccessor level, final BlockPos blockPos, final BlockPos offsetDir) {
