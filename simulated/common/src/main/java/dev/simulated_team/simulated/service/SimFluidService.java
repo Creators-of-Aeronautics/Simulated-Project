@@ -1,8 +1,5 @@
 package dev.simulated_team.simulated.service;
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.Fluid;
-
 public interface SimFluidService {
 
     SimFluidService INSTANCE = ServiceUtil.load(SimFluidService.class);
@@ -13,5 +10,4 @@ public interface SimFluidService {
      */
     long mbToLoaderUnits(final long mb);
 
-    Fluid getFluidInItem(ItemStack stack);
 }
