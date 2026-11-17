@@ -47,7 +47,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -133,7 +132,10 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
             if (alreadyTrackingPlayers.add(uuid)) {
                 this.ownedServerStrand.updatePose();
-                VeilPacketManager.player(player).sendPacket(this.makeUpdatePacket());
+                final ClientboundRopeDataPacket packet = this.makeUpdatePacket();
+                if (packet != null) {
+                    VeilPacketManager.player(player).sendPacket(packet);
+                }
             }
         }
     }
@@ -156,22 +158,26 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         return level.getChunkSource().chunkMap.getPlayers(chunk, false);
     }
 
-    @NotNull
+    @Nullable
     public ClientboundRopeDataPacket makeUpdatePacket() {
         final ServerSubLevelContainer container = (ServerSubLevelContainer) SubLevelContainer.getContainer(this.getLevel());
         assert container != null;
 
         final SubLevelTrackingSystem trackingSystem = container.trackingSystem();
 
-        //todo can be null from schematics
-        final RopeAttachment startAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.START);
-        final RopeAttachment endAttachment = this.ownedServerStrand.getAttachment(RopeAttachmentPoint.END);
+        final ServerRopeStrand strand = this.ownedServerStrand != null ? this.ownedServerStrand : this.getAttachedStrand();
+        if (strand == null) {
+            return null;
+        }
+
+        final RopeAttachment startAttachment = strand.getAttachment(RopeAttachmentPoint.START);
+        final RopeAttachment endAttachment = strand.getAttachment(RopeAttachmentPoint.END);
 
         return new ClientboundRopeDataPacket(
                 trackingSystem.getInterpolationTick(),
                 this.blockEntity.getBlockPos(),
-                this.ownedServerStrand.getUUID(),
-                new ObjectArrayList<>(this.ownedServerStrand.getPoints()),
+                strand.getUUID(),
+                new ObjectArrayList<>(strand.getPoints()),
                 startAttachment != null ? startAttachment.blockAttachment() : null,
                 endAttachment != null ? endAttachment.blockAttachment() : null
         );
