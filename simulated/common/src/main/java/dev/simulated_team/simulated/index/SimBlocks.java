@@ -936,9 +936,7 @@ public class SimBlocks {
     }
 
     public static void register() {
-        RadialWrenchMenu.registerBlacklistedBlock(SWIVEL_BEARING.getId());
-        RadialWrenchMenu.registerBlacklistedBlock(SWIVEL_BEARING_LINK_BLOCK.getId());
-        RadialWrenchMenu.registerBlacklistedBlock(PAIRED_DOCKING_CONNECTOR.getId());
+
     }
 
 }
