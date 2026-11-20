@@ -147,14 +147,6 @@
     ],
     "subtitle": "aeronautics.subtitle.item.cloud_skipper_transform"
   },
-  "music.windstream": {
-    "sounds": [
-      {
-        "name": "aeronautics:music/windstream",
-        "stream": true
-      }
-    ]
-  },
   "music.cirrus": {
     "sounds": [
       {
@@ -224,6 +216,14 @@
       "minecraft:music/game/swamp/aerie",
       "minecraft:music/game/swamp/labyrinthine",
       "minecraft:music/game/water/axolotl"
+    ]
+  },
+  "music.windstream": {
+    "sounds": [
+      {
+        "name": "aeronautics:music/windstream",
+        "stream": true
+      }
     ]
   },
   "music_disc.cloud_skipper": {
