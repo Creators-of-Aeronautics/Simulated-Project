@@ -5,12 +5,12 @@
 		"cover": "cloud_skipper",
 		"title": "Cloud Skipper"
 	},
-	"aeronautics:music/adrift": {
+	"aeronautics:music/windstream": {
 		"author": "Starlotte",
 		"album": "Create Aeronautics Soundtrack",
 		"cover": "create_aeronautics",
-		"customId": "aeronautics:music.adrift",
-		"title": "Adrift"
+		"customId": "aeronautics:music.windstream",
+		"title": "Windstream"
 	},
 	"aeronautics:music/cirrus": {
 		"author": "Starlotte",

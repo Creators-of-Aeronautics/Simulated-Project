@@ -99,7 +99,7 @@ public class AeroSoundEvents {
         // Music
 
         MUSIC_DISC_CLOUD_SKIPPER = song("music_disc.cloud_skipper", "music/cloud_skipper"),
-        MUSIC_WINDSTREAM = song("music.adrift", "music/windstream"),
+        MUSIC_WINDSTREAM = song("music.windstream", "music/windstream"),
         MUSIC_CIRRUS = song("music.cirrus", "music/cirrus"),
         MUSIC_GLIDE = song("music.glide", "music/glide"),
         MUSIC_MAMMATUS = song("music.mammatus", "music/mammatus"),

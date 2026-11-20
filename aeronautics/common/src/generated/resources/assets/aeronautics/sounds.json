@@ -147,7 +147,7 @@
     ],
     "subtitle": "aeronautics.subtitle.item.cloud_skipper_transform"
   },
-  "music.adrift": {
+  "music.windstream": {
     "sounds": [
       {
         "name": "aeronautics:music/windstream",
@@ -167,7 +167,7 @@
     "sounds": [
       {
         "type": "event",
-        "name": "aeronautics:music.adrift",
+        "name": "aeronautics:music.windstream",
         "stream": true,
         "weight": 5
       },
@@ -218,7 +218,7 @@
       },
       {
         "type": "event",
-        "name": "aeronautics:music.adrift",
+        "name": "aeronautics:music.windstream",
         "stream": true
       },
       "minecraft:music/game/swamp/aerie",
