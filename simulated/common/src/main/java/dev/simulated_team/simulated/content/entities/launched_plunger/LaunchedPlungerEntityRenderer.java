@@ -15,10 +15,12 @@ import dev.simulated_team.simulated.content.items.plunger_launcher.PlungerLaunch
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.CatmulRomSpline;
+import foundry.veil.Veil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SuperByteBuffer;
+import net.irisshaders.iris.Iris;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -76,13 +78,22 @@ public class LaunchedPlungerEntityRenderer extends EntityRenderer<LaunchedPlunge
 
         final Vector3d focusPoint = new Vector3d(PlungerLauncherItemRenderer.focusPos);
         final Quaternionf orientation = camera.rotation();
-        orientation.transformInverse(focusPoint);
-        final Vector4f v4 = new Vector4f((float) focusPoint.x, (float) focusPoint.y, (float) focusPoint.z, 1.0f);
+        final boolean shadersActive = Veil.IRIS && Iris.isPackInUseQuick();
+        if (!shadersActive) {
+            orientation.transformInverse(focusPoint);
+        }
 
+        final Vector4f v4 = new Vector4f((float) focusPoint.x, (float) focusPoint.y, (float) focusPoint.z, 1.0f);
 
         final Matrix4f actualProjMat = gameRenderer.getProjectionMatrix(gameRenderer.getFov(camera, AnimationTickHolder.getPartialTicks(), true));
         actualProjMat.invert(new Matrix4f()).transform(v4);
-        PlungerLauncherItemRenderer.itemProjMat.transform(v4);
+
+        Matrix4f mat = PlungerLauncherItemRenderer.itemProjMat;
+        if (shadersActive) {
+            mat = mat.scaleLocal(1f, 1f, 1.0f / 0.125f, new Matrix4f());
+        }
+
+        mat.transform(v4);
         final Vec3 cameraPosition = camera.getPosition();
         focusPoint.set(v4.x, v4.y, v4.z);
         orientation.transform(focusPoint);

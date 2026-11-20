@@ -8,6 +8,7 @@ import dev.eriksonn.aeronautics.content.blocks.hot_air.BlockEntityLiftingGasProv
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.ClientBalloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.map.BalloonMap;
+import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.post.PostPipeline;
@@ -15,6 +16,7 @@ import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniformAccess;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
+import net.irisshaders.iris.Iris;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +48,8 @@ public class ClientBalloonEffectRenderer {
             return;
         }
 
-        if (!AeroConfig.client().enableHotAirRendering.get()) {
+        final boolean shadersActive = Veil.IRIS && Iris.isPackInUseQuick();
+        if (!AeroConfig.client().enableHotAirRendering.get() || shadersActive) {
             freeFbo();
             return;
         }
