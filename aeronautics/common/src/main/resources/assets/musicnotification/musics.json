@@ -1,36 +1,37 @@
 {
-	"aeronautics:music_disc.cloud_skipper": {
-		"author": "Starlotte",
-		"album": "Create Aeronautics Soundtrack",
-		"cover": "cloud_skipper",
-		"title": "Cloud Skipper"
-	},
-	"aeronautics:music/adrift": {
-		"author": "Starlotte",
-		"album": "Create Aeronautics Soundtrack",
-		"cover": "create_aeronautics",
-		"customId": "aeronautics:music.adrift",
-		"title": "Adrift"
-	},
-	"aeronautics:music/cirrus": {
-		"author": "Starlotte",
-		"album": "Create Aeronautics Soundtrack",
-		"cover": "create_aeronautics",
-		"customId": "aeronautics:music.cirrus",
-		"title": "Cirrus"
-	},
-	"aeronautics:music/glide": {
-		"author": "Starlotte",
-		"album": "Create Aeronautics Soundtrack",
-		"cover": "create_aeronautics",
-		"customId": "aeronautics:music.glide",
-		"title": "Glide"
-	},
-	"aeronautics:music/mammatus": {
-		"author": "Starlotte",
-		"album": "Create Aeronautics Soundtrack",
-		"cover": "create_aeronautics",
-		"customId": "aeronautics:music.mammatus",
-		"title": "Mammatus"
-	}
+    "aeronautics:music/cloud_skipper": {
+      "author": "Starlotte",
+      "album": "Create Aeronautics Soundtrack",
+      "cover": "cloud_skipper",
+      "customId": "aeronautics:music_disc.cloud_skipper",
+      "title": "Cloud Skipper"
+    },
+    "aeronautics:music/windstream": {
+      "author": "Starlotte",
+      "album": "Create Aeronautics Soundtrack",
+      "cover": "create_aeronautics",
+      "customId": "aeronautics:music.adrift",
+      "title": "Adrift"
+    },
+    "aeronautics:music/cirrus": {
+      "author": "Starlotte",
+      "album": "Create Aeronautics Soundtrack",
+      "cover": "create_aeronautics",
+      "customId": "aeronautics:music.cirrus",
+      "title": "Cirrus"
+    },
+    "aeronautics:music/glide": {
+      "author": "Starlotte",
+      "album": "Create Aeronautics Soundtrack",
+      "cover": "create_aeronautics",
+      "customId": "aeronautics:music.glide",
+      "title": "Glide"
+    },
+    "aeronautics:music/mammatus": {
+      "author": "Starlotte",
+      "album": "Create Aeronautics Soundtrack",
+      "cover": "create_aeronautics",
+      "customId": "aeronautics:music.mammatus",
+      "title": "Mammatus"
+    }
 }
