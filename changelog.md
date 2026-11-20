@@ -1,2 +1,11 @@
-- Fix issues with JEI integration and creative tab compatibility with mods (PR #1403)
-- Fix swivel bearing not adjusting its mass when assembled properly
+- Add Envelope dyeing recipes
+- Add config to disable Hot Air rendering
+- Disable Hot Air rendering when Iris shaders are active
+- Fix the Creative Physics Staff and Plunger Launcher rendering their beams and ropes incorrectly when Iris shaders are active
+- Fix the Levitite visual effects rendering incorrectly at some rotations
+- Fixed music notification labels
+
+- Blacklist a few "internal" blocks from the wrench rotation menu
+- Fix a case where swivel bearings could lose their constraint on reload
+- Fix Honey Glue not ignoring explosions and causing lag
+- Add server-side distance and item validation to several packets
